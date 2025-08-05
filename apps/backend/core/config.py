@@ -30,12 +30,47 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str = Field(alias="DATABASE_URL")
+    postgres_user: Optional[str] = Field(None, alias="POSTGRES_USER")
+    postgres_password: Optional[str] = Field(None, alias="POSTGRES_PASSWORD")
+    db_host: Optional[str] = Field(None, alias="DB_HOST")
+    db_port: Optional[str] = Field(None, alias="DB_PORT")
+    db_name: Optional[str] = Field(None, alias="DB_NAME")
+    db_user: Optional[str] = Field(None, alias="DB_USER")
+    db_password: Optional[str] = Field(None, alias="DB_PASSWORD")
 
     # Redis
     redis_url: str = Field(alias="REDIS_URL")
 
+    # AWS Configuration
+    aws_access_key_id: Optional[str] = Field(None, alias="AWS_ACCESS_KEY_ID")
+    aws_secret_access_key: Optional[str] = Field(None, alias="AWS_SECRET_ACCESS_KEY")
+    aws_region: Optional[str] = Field(None, alias="AWS_REGION")
+
     # CORS
     cors_origins: str = Field(default="http://localhost:3000", alias="CORS_ORIGINS")
+
+    # Frontend Configuration
+    frontend_url: str = Field(default="http://localhost:3000", alias="FRONTEND_URL")
+
+    # Session Configuration
+    session_secret_key: str = Field(
+        default="dev-secret-key", alias="SESSION_SECRET_KEY"
+    )
+    session_max_age: int = Field(default=3600, alias="SESSION_MAX_AGE")
+
+    # Audit Configuration
+    enable_audit_logging: bool = Field(default=True, alias="ENABLE_AUDIT_LOGGING")
+    audit_log_retention_days: int = Field(
+        default=2555, alias="AUDIT_LOG_RETENTION_DAYS"
+    )
+
+    # Auth0 Configuration
+    auth0_domain: Optional[str] = Field(None, alias="AUTH0_DOMAIN")
+    auth0_client_id: Optional[str] = Field(None, alias="AUTH0_CLIENT_ID")
+    auth0_client_secret: Optional[str] = Field(None, alias="AUTH0_CLIENT_SECRET")
+    auth0_audience: Optional[str] = Field(None, alias="AUTH0_AUDIENCE")
+    redirect_uri: Optional[str] = Field(None, alias="REDIRECT_URI")
+    logout_redirect_uri: Optional[str] = Field(None, alias="LOGOUT_REDIRECT_URI")
 
     # OIDC Configuration
     oidc_google_client_id: Optional[str] = Field(None, alias="OIDC_GOOGLE_CLIENT_ID")
@@ -49,11 +84,19 @@ class Settings(BaseSettings):
         None, alias="OIDC_MICROSOFT_CLIENT_SECRET"
     )
     oidc_redirect_uri: str = Field(
-        default="http://localhost:8000/auth/callback", alias="OIDC_REDIRECT_URI"
+        default="http://localhost:8000/auth/callback",
+        alias="OIDC_REDIRECT_URI",
     )
 
     # Logging
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
+    log_format: Optional[str] = Field(None, alias="LOG_FORMAT")
+
+    # Additional Configuration
+    allowed_origins: Optional[str] = Field(None, alias="ALLOWED_ORIGINS")
+    trusted_hosts: Optional[str] = Field(None, alias="TRUSTED_HOSTS")
+    prometheus_enabled: Optional[str] = Field(None, alias="PROMETHEUS_ENABLED")
+    metrics_port: Optional[str] = Field(None, alias="METRICS_PORT")
 
     @field_validator("cors_origins", mode="before")
     @classmethod

@@ -10,8 +10,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from api.admin import router as admin_router
+from api.appointments import router as appointments_router
+from api.auth import router as auth_api_router
 from api.clients import router as clients_router
 from api.events import router as events_router
+from api.patients import router as patients_router
 from middleware.correlation import CorrelationIDMiddleware, get_correlation_id
 from middleware.metrics import PrometheusMetricsMiddleware, metrics_endpoint
 from middleware.session_middleware import add_session_middleware
@@ -200,6 +203,31 @@ async def healthz():
     }
 
 
+@app.get("/readyz")
+async def readiness_check():
+    """Readiness check endpoint with database connectivity."""
+    from sqlalchemy import text
+
+    from database import get_async_db
+
+    try:
+        # Test database connectivity
+        async for db in get_async_db():
+            # Simple query to test connection
+            await db.execute(text("SELECT 1"))
+            break
+
+        return {"status": "ready", "service": "pms-backend", "database": "connected"}
+    except Exception as e:
+        logger.error("Database connectivity check failed", error=str(e))
+        return {
+            "status": "not ready",
+            "service": "pms-backend",
+            "database": "disconnected",
+            "error": str(e),
+        }
+
+
 @app.get("/version")
 async def get_version():
     """Dedicated version endpoint for deployment verification."""
@@ -230,7 +258,10 @@ async def get_metrics(request: Request):
 # Include API routers
 app.include_router(events_router, prefix="/api")
 app.include_router(clients_router, prefix="/api")
+app.include_router(patients_router, prefix="/api")
+app.include_router(appointments_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
+app.include_router(auth_api_router, prefix="/api")
 app.include_router(oidc_router, prefix="/oidc")
 app.include_router(auth_router, prefix="/api")
 

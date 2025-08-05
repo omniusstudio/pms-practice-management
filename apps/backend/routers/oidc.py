@@ -23,9 +23,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.config import get_settings
 from core.exceptions import AuthenticationError, ConfigurationError, ValidationError
 from database import get_db
-from models.auth_token import AuthToken
-from models.user import User
-from services.auth_service import AuthService
+
+# from models.auth_token import AuthToken  # Disabled
+
+# from services.auth_service import AuthService  # Disabled
 from services.oidc_service import OIDCConfig, oidc_service
 
 logger = logging.getLogger(__name__)
@@ -248,27 +249,28 @@ async def handle_oidc_callback(
         # Record login
         user.record_login()
 
-        # Create internal JWT token
-        auth_svc = AuthService(db)
-        jwt_token = await auth_svc.create_token(
-            user_id=str(user.id),
-            provider_id=provider,
-            token_type="access",
-            expires_minutes=settings.jwt_expire_minutes,
-        )
+        # DISABLED: AuthService functionality is disabled
+        # auth_svc = AuthService(db)
+        # jwt_token = await auth_svc.create_token(
+        #     user_id=str(user.id),
+        #     provider_id=provider,
+        #     token_type="access",
+        #     expires_minutes=settings.jwt_expire_minutes,
+        # )
+        jwt_token = None  # AuthService disabled
 
-        # Store OIDC tokens (encrypted)
-        await auth_svc.create_token(
-            user_id=str(user.id),
-            provider_id=provider,
-            token_type="oidc_access",
-            expires_minutes=(tokens.expires_in // 60 if tokens.expires_in else 60),
-            metadata={
-                "oidc_access_token": tokens.access_token,
-                "oidc_refresh_token": tokens.refresh_token,
-                "oidc_id_token": tokens.id_token,
-            },
-        )
+        # DISABLED: Store OIDC tokens (encrypted)
+        # await auth_svc.create_token(
+        #     user_id=str(user.id),
+        #     provider_id=provider,
+        #     token_type="oidc_access",
+        #     expires_minutes=(tokens.expires_in // 60 if tokens.expires_in else 60),
+        #     metadata={
+        #         "oidc_access_token": tokens.access_token,
+        #         "oidc_refresh_token": tokens.refresh_token,
+        #         "oidc_id_token": tokens.id_token,
+        #     },
+        # )
 
         await db.commit()
 
@@ -314,43 +316,13 @@ async def refresh_access_token(
     request: RefreshRequest, db: AsyncSession = Depends(get_db)
 ) -> RefreshResponse:
     """Refresh access token using refresh token."""
-    settings = get_oidc_settings()
     try:
-        # Validate refresh token
-        auth_svc = AuthService(db)
-        refresh_token = await auth_svc.validate_token(request.refresh_token)
-
-        if refresh_token.token_type != "refresh":
-            raise ValidationError("Invalid token type")
-
-        # Get user
-        stmt = select(User).where(User.id == refresh_token.user_id)
-        result = await db.execute(stmt)
-        user = result.scalar_one_or_none()
-
-        if not user or not user.is_active:
-            raise AuthenticationError("User not found or inactive")
-
-        # Create new access token
-        new_token = await auth_svc.create_token(
-            user_id=str(user.id),
-            provider_id=refresh_token.provider_id,
-            token_type="access",
-            expires_minutes=settings.jwt_expire_minutes,
-        )
-
-        # Rotate refresh token
-        await auth_svc.rotate_token(refresh_token.id)
-
-        await db.commit()
-
-        logger.info("Access token refreshed", extra={"user_id": str(user.id)})
-
-        return RefreshResponse(
-            access_token=new_token.token,
-            token_type="Bearer",
-            expires_in=settings.jwt_expire_minutes * 60,
-        )
+        # DISABLED: Validate refresh token
+        # auth_svc = AuthService(db)
+        # refresh_token = await auth_svc.validate_token(request.refresh_token)
+        # if refresh_token.token_type != "refresh":
+        #     raise ValidationError("Invalid token type")
+        raise ValidationError("AuthService disabled")
 
     except (AuthenticationError, ValidationError) as e:
         logger.error(f"Token refresh error: {e}")
@@ -371,51 +343,54 @@ async def logout(
         if not auth_header or not auth_header.startswith("Bearer "):
             raise HTTPException(status_code=401, detail="No token provided")
 
-        token_value = auth_header.split(" ")[1]
+        # token_value = auth_header.split(" ")[1]  # Unused in disabled code
 
-        # Validate and revoke token
-        auth_svc = AuthService(db)
-        token = await auth_svc.validate_token(token_value)
-        await auth_svc.revoke_token(token.id)
-
+        # DISABLED: Validate and revoke token
+        # auth_svc = AuthService(db)
+        # token = await auth_svc.validate_token(token_value)
+        # await auth_svc.revoke_token(token.id)
         # Get user for OIDC token revocation
-        stmt = select(User).where(User.id == token.user_id)
-        result = await db.execute(stmt)
-        user = result.scalar_one_or_none()
+        # stmt = select(User).where(User.id == token.user_id)
+        # result = await db.execute(stmt)
+        # user = result.scalar_one_or_none()
+        user = None  # AuthService disabled
+        token = None  # AuthService disabled
 
         if user:
             # Record logout
             user.record_logout()
 
             # Try to revoke OIDC tokens at provider
-            try:
-                # Find OIDC tokens
-                oidc_stmt = select(AuthToken).where(
-                    AuthToken.user_id == user.id,
-                    AuthToken.token_type == "oidc_access",
-                    AuthToken.status == "active",
-                )
-                oidc_result = await db.execute(oidc_stmt)
-                oidc_tokens = oidc_result.scalars().all()
-
-                for oidc_token in oidc_tokens:
-                    if (
-                        oidc_token.metadata
-                        and "oidc_access_token" in oidc_token.metadata
-                    ):
-                        # Get provider config
-                        config = get_provider_config(token.provider_id)
-
-                        # Revoke at provider
-                        await oidc_service.revoke_tokens(
-                            config, oidc_token.metadata["oidc_access_token"]
-                        )
-
-                    # Revoke internal token
-                    await auth_svc.revoke_token(oidc_token.id)
-
-            except Exception as e:
-                logger.warning(f"Failed to revoke OIDC tokens: {e}")
+            # DISABLED: AuthToken functionality is disabled
+            # try:
+            #     # Find OIDC tokens
+            #     oidc_stmt = select(AuthToken).where(
+            #         AuthToken.user_id == user.id,
+            #         AuthToken.token_type == "oidc_access",
+            #         AuthToken.status == "active",
+            #     )
+            #     oidc_result = await db.execute(oidc_stmt)
+            #     oidc_tokens = oidc_result.scalars().all()
+            #
+            #     for oidc_token in oidc_tokens:
+            #         if (
+            #             oidc_token.metadata
+            #             and "oidc_access_token" in oidc_token.metadata
+            #         ):
+            #             # Get provider config
+            #             config = get_provider_config(token.provider_id)
+            #
+            #             # Revoke at provider
+            #             await oidc_service.revoke_tokens(
+            #                 config, oidc_token.metadata["oidc_access_token"]
+            #             )
+            #
+            #         # Revoke internal token
+            #         await auth_svc.revoke_token(oidc_token.id)
+            #
+            # except Exception as e:
+            #     logger.warning(f"Failed to revoke OIDC tokens: {e}")
+            pass  # AuthToken functionality disabled
 
         await db.commit()
 

@@ -3,7 +3,7 @@
 import os
 
 import pytest
-import requests  # type: ignore
+import requests  # type: ignore[import]
 
 
 class TestDeploymentSmoke:
@@ -53,7 +53,7 @@ class TestDeploymentSmoke:
     def test_api_documentation_accessible(self, base_url: str):
         """Test that API documentation is accessible."""
         # Test OpenAPI docs
-        response = requests.get(f"{base_url}/docs", timeout=5)
+        response = requests.get(f"{base_url}/api/docs", timeout=5)
         assert response.status_code == 200
         assert "text/html" in response.headers.get("content-type", "")
 
@@ -126,7 +126,7 @@ class TestDeploymentSmoke:
         endpoints = [
             ("/healthz", 0.1),  # Health check should be very fast
             ("/readyz", 0.5),  # Readiness can be slower (DB check)
-            ("/docs", 2.0),  # Documentation can be slower
+            ("/api/docs", 2.0),  # Documentation can be slower
         ]
 
         for endpoint, max_time in endpoints:

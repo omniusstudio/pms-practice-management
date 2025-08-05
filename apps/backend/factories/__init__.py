@@ -1,7 +1,8 @@
 """Seed factories for HIPAA-compliant test data generation."""
 
 from .appointment import AppointmentFactory
-from .auth_token import AuthTokenFactory
+
+# from .auth_token import AuthTokenFactory  # Disabled
 from .base import BaseFactory
 from .client import ClientFactory
 from .encryption_key import (
@@ -34,7 +35,7 @@ __all__ = [
     "AppointmentFactory",
     "NoteFactory",
     "LedgerEntryFactory",
-    "AuthTokenFactory",
+    # "AuthTokenFactory",  # Disabled
     "EncryptionKeyFactory",
     "ActiveEncryptionKeyFactory",
     "PHIKeyFactory",

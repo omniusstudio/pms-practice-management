@@ -5,20 +5,22 @@ and role-based access control (RBAC) for HIPAA-compliant applications.
 """
 
 import logging
-from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import BaseModel, ConfigDict, PrivateAttr
 
 from core.config import get_settings
 from database import get_db
-from models.auth_token import AuthToken
+
+# from models.auth_token import AuthToken  # Disabled
 from models.user import User
-from services.auth_service import get_async_auth_service
+
+# SQLAlchemy imports removed - not currently used
+
+
+# from services.auth_service import get_async_auth_service  # Disabled
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -29,32 +31,67 @@ security = HTTPBearer(auto_error=False)
 class AuthenticatedUser(BaseModel):
     """Authenticated user context."""
 
-    user: User
-    token: AuthToken
+    _user: User = PrivateAttr()
+    # token: AuthToken  # Disabled
+    token: Optional[dict] = None  # Placeholder for disabled auth tokens
     permissions: List[str] = []
 
-    class Config:
-        from_attributes = True
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(from_attributes=True, arbitrary_types_allowed=True)
+
+    def __init__(self, user: User, **data):
+        super().__init__(**data)
+        self._user = user
+
+    @property
+    def user(self) -> User:
+        """Get the user object."""
+        return self._user
 
     @property
     def user_id(self) -> str:
         """Get user ID."""
-        return str(self.user.id)
+        return str(self._user.id) if self._user else ""
 
     @property
     def email(self) -> str:
         """Get user email."""
-        return self.user.email
+        return str(self._user.email) if self._user else ""
+
+    @property
+    def display_name(self) -> str:
+        """Get user display name."""
+        if not self._user:
+            return ""
+        display = getattr(self._user, "display_name", None)
+        first = getattr(self._user, "first_name", None) or ""
+        last = getattr(self._user, "last_name", None) or ""
+        email = str(self._user.email) if self._user.email else ""
+        return display or f"{first} {last}".strip() or email
 
     @property
     def roles(self) -> List[str]:
         """Get user roles."""
-        return self.user.roles or []
+        if not self._user:
+            return []
+        user_roles = getattr(self._user, "roles", None)
+        return list(user_roles) if user_roles else []
+
+    @property
+    def is_admin(self) -> bool:
+        """Check if user is admin."""
+        return "admin" in self.roles
+
+    @property
+    def is_active(self) -> bool:
+        """Check if user is active."""
+        if not self._user:
+            return False
+        active = getattr(self._user, "is_active", None)
+        return bool(active) if active is not None else False
 
     def has_role(self, role: str) -> bool:
         """Check if user has specific role."""
-        return self.user.has_role(role)
+        return self._user.has_role(role)
 
     def has_permission(self, permission: str) -> bool:
         """Check if user has specific permission."""
@@ -80,63 +117,56 @@ async def get_current_user(
         return None
 
     try:
-        # Get database session
-        db: AsyncSession = request.state.db
-
         # Get correlation ID for audit logging
         correlation_id = getattr(request.state, "correlation_id", "unknown")
 
-        # Create auth service instance
-        auth_svc = get_async_auth_service(db, correlation_id)
-
-        # Validate token
-        token = await auth_svc.validate_token(credentials.credentials)
-
-        if not token:
-            logger.warning("Token validation failed")
-            return None
-
-        if token.token_type != "access":
-            logger.warning(
-                "Invalid token type for authentication",
-                extra={"token_type": token.token_type},
-            )
-            return None
-
-        # Get user
-        stmt = select(User).where(User.id == token.user_id)
-        result = await db.execute(stmt)
-        user = result.scalar_one_or_none()
-
-        if not user or not user.is_active:
-            logger.warning(
-                "User not found or inactive", extra={"user_id": str(token.user_id)}
-            )
-            return None
-
-        # Update last login time
-        user.last_login_at = datetime.now(timezone.utc)
-
-        # Get user permissions (combine role-based and direct permissions)
-        permissions = list(user.permissions or [])
-
-        # Add role-based permissions
-        role_permissions = get_role_permissions(user.roles or [])
-        permissions.extend(role_permissions)
-
-        # Remove duplicates
-        permissions = list(set(permissions))
-
+        # DISABLED: Auth service functionality is disabled
+        # auth_svc = get_async_auth_service(db, correlation_id)
+        # token = await auth_svc.validate_token(credentials.credentials)
+        # Authentication is disabled - return None
         logger.debug(
-            "User authenticated successfully",
-            extra={
-                "user_id": str(user.id),
-                "roles": user.roles,
-                "permissions_count": len(permissions),
-            },
+            "Authentication disabled", extra={"correlation_id": correlation_id}
         )
+        return None
 
-        return AuthenticatedUser(user=user, token=token, permissions=permissions)
+        # # Get user
+        # stmt = select(User).where(User.id == token.user_id)
+        # result = await db.execute(stmt)
+        # user = result.scalar_one_or_none()
+
+        # DISABLED: All authentication logic is disabled
+        # if not user or not user.is_active:
+        #     logger.warning(
+        #         "User not found or inactive",
+        #         extra={"user_id": str(token.user_id)}
+        #     )
+        #     return None
+        #
+        # # Update last login time
+        # user.last_login_at = datetime.now(timezone.utc)
+        #
+        # # Get user permissions (combine role-based and direct permissions)
+        # permissions = list(user.permissions or [])
+        #
+        # # Add role-based permissions
+        # role_permissions = get_role_permissions(user.roles or [])
+        # permissions.extend(role_permissions)
+        #
+        # # Remove duplicates
+        # permissions = list(set(permissions))
+        #
+        # logger.debug(
+        #     "User authenticated successfully",
+        #     extra={
+        #         "user_id": str(user.id),
+        #         "roles": user.roles,
+        #         "permissions_count": len(permissions),
+        #     },
+        # )
+        #
+        # return AuthenticatedUser(
+        #     user=user, token=token, permissions=permissions
+        # )
 
     except Exception as e:
         logger.error("Authentication failed", extra={"error": str(e)})
@@ -182,8 +212,8 @@ def get_role_permissions(roles: List[str]) -> List[str]:
             "read:ledger",
             "write:ledger",
             "read:financial_reports",
-            "read:patients",  # Need to see patient info for billing
-            "read:appointments",  # Need to see appointments for billing
+            "read:patients",  # Need patient info for billing
+            "read:appointments",  # Need appointments for billing
             "read:profile",
             "write:profile",
         ],

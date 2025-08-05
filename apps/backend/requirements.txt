@@ -26,7 +26,7 @@ PyJWT==2.8.0
 python-dotenv==1.0.0
 structlog==23.2.0
 rich==13.7.0
-prometheus-client==0.19.0
+prometheus-client==0.22.1
 
 # Event Bus & ETL
 redis==5.0.1

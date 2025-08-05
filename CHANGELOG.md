@@ -1,3 +1,10 @@
+## [1.0.12](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.11...v1.0.12) (2025-08-05)
+
+
+### Bug Fixes
+
+* add debugging and error handling for Trivy SARIF generation ([6d6b5f2](https://github.com/omniusstudio/pms-practice-management/commit/6d6b5f290f9636bd20303655857e0ebe6c190f04))
+
 ## [1.0.11](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.10...v1.0.11) (2025-08-05)
 
 

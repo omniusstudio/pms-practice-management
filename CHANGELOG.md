@@ -1,3 +1,10 @@
+## [1.0.9](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.8...v1.0.9) (2025-08-05)
+
+
+### Bug Fixes
+
+* create public directory before writing version.json in frontend Dockerfile ([062dddd](https://github.com/omniusstudio/pms-practice-management/commit/062dddde9d72927e5c360291dc47fc7ffd0ddf11))
+
 ## [1.0.8](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.7...v1.0.8) (2025-08-05)
 
 

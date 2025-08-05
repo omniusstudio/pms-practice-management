@@ -9,7 +9,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from models import Base  # noqa: E402
+from models.base import Base  # noqa: E402
 
 # Load test environment variables from .env.test file
 test_env_file = Path(__file__).parent.parent.parent.parent / ".env.test"

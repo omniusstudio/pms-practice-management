@@ -1,3 +1,10 @@
+## [1.0.7](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.6...v1.0.7) (2025-08-05)
+
+
+### Bug Fixes
+
+* remove unused React imports from ErrorBoundary, Layout, and AuthContext ([4ddd383](https://github.com/omniusstudio/pms-practice-management/commit/4ddd383a4ac27fa9dbba902f289f1e184bbd574f))
+
 ## [1.0.6](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.5...v1.0.6) (2025-08-05)
 
 

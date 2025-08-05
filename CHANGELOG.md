@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.4...v1.0.5) (2025-08-05)
+
+
+### Bug Fixes
+
+* remove terraform-docs from Python requirements as it's a binary tool ([666e286](https://github.com/omniusstudio/pms-practice-management/commit/666e2868c72cbd59acca88f54a1a4f216deb7737))
+
 ## [1.0.4](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.3...v1.0.4) (2025-08-05)
 
 

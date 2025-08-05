@@ -17,8 +17,8 @@ RUN npm ci --only=production
 # Copy source code
 COPY . .
 
-# Create version file with build information
-RUN echo "{\"version\":\"${VERSION}\",\"gitSha\":\"${GIT_SHA}\",\"buildTime\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > public/version.json
+# Create public directory and version file with build information
+RUN mkdir -p public && echo "{\"version\":\"${VERSION}\",\"gitSha\":\"${GIT_SHA}\",\"buildTime\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > public/version.json
 
 # Build the application
 RUN npm run build

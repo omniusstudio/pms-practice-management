@@ -14,6 +14,9 @@ from models import Base  # noqa: E402
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["ASYNC_DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 os.environ["ENVIRONMENT"] = "test"
+os.environ["SECRET_KEY"] = "test-secret-key-for-testing-only"
+os.environ["JWT_SECRET_KEY"] = "test-jwt-secret-key-for-testing-only"
+os.environ["REDIS_URL"] = "redis://localhost:6379/0"
 
 
 @pytest.fixture(scope="session")

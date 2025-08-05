@@ -1,3 +1,10 @@
+## [1.0.13](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.12...v1.0.13) (2025-08-05)
+
+
+### Bug Fixes
+
+* replace problematic SARIF upload with artifact upload for Trivy results ([2b89bf4](https://github.com/omniusstudio/pms-practice-management/commit/2b89bf447d3cf95247cf729c68b0e6ca6f3dbcd8))
+
 ## [1.0.12](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.11...v1.0.12) (2025-08-05)
 
 

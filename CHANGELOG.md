@@ -1,3 +1,17 @@
+## [1.0.2](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.1...v1.0.2) (2025-08-05)
+
+
+### Bug Fixes
+
+* Add missing aiosqlite dependency to resolve test import errors ([76a75de](https://github.com/omniusstudio/pms-practice-management/commit/76a75de418a0309296a2060ceadace2c6113fb95))
+* Add root package.json for semantic-release dependencies ([8fbcbd5](https://github.com/omniusstudio/pms-practice-management/commit/8fbcbd532cd452e449f02289c6ad92bf2fb004b7))
+* Add write permissions to release workflow ([2424c42](https://github.com/omniusstudio/pms-practice-management/commit/2424c42946ef8198714018201f3dba56d6fe3422))
+* Resolve artillery node.js compatibility issues ([8a40357](https://github.com/omniusstudio/pms-practice-management/commit/8a403578d1ce047f7c91dd684b4e9ae79a4dc1e3))
+* Resolve linter errors in test_schema_cleanup_audit.py ([7e4e790](https://github.com/omniusstudio/pms-practice-management/commit/7e4e790bab96afd9838afaaeafc9f517c0b62dbc))
+* Update deprecated artifact actions from v3 to v4 ([cd7b3aa](https://github.com/omniusstudio/pms-practice-management/commit/cd7b3aac0ca5be19c77292a721db4b25cd460464))
+* Update test_practice_active_lookup_performance threshold ([6524238](https://github.com/omniusstudio/pms-practice-management/commit/652423804e64e39e2188276a7e1d2ba938f7d36b))
+* Upgrade codeql to v3 and fix yaml formatting ([aa3c855](https://github.com/omniusstudio/pms-practice-management/commit/aa3c855e8aa9af817b66f75d855e08e37bd17327))
+
 ## [1.0.1](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.0...v1.0.1) (2025-08-05)
 
 ### Bug Fixes

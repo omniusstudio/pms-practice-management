@@ -100,14 +100,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install semantic-release dependencies
-        run: |
-          npm install -g semantic-release \
-            @semantic-release/changelog \
-            @semantic-release/exec \
-            @semantic-release/git \
-            @semantic-release/github \
-            conventional-changelog-conventionalcommits
+      - name: Install dependencies
+        run: npm ci
 
       - name: Create release artifacts directory
         run: mkdir -p release-artifacts

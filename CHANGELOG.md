@@ -1,3 +1,12 @@
+## [1.0.4](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.3...v1.0.4) (2025-08-05)
+
+
+### Bug Fixes
+
+* disable subject-case rule to allow technical acronyms ([fb0bfca](https://github.com/omniusstudio/pms-practice-management/commit/fb0bfca1b359b46592e4529e031a79a7ef10b058))
+* relax commitlint rules for header length and subject case ([4747a3a](https://github.com/omniusstudio/pms-practice-management/commit/4747a3ae4e50c4559cad3b0fc170cb24a807458a))
+* resolve OIDC router undefined settings variables and line length issues ([4306ac9](https://github.com/omniusstudio/pms-practice-management/commit/4306ac9bf4d95d18c8c23ff8fe68c49adafb6f22))
+
 ## [1.0.3](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.2...v1.0.3) (2025-08-05)
 
 

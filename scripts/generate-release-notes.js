@@ -210,12 +210,17 @@ function createReleaseArtifacts(version, formattedNotes) {
 
 function main() {
   const version = process.argv[2];
-  const rawNotes = process.argv[3] || '';
+  const notesFile = process.argv[3];
   
   if (!version) {
     console.error('❌ Error: Version parameter is required');
-    console.error('Usage: node generate-release-notes.js <version> [notes]');
+    console.error('Usage: node generate-release-notes.js <version> [notes-file]');
     process.exit(1);
+  }
+  
+  let rawNotes = '';
+  if (notesFile && fs.existsSync(notesFile)) {
+    rawNotes = fs.readFileSync(notesFile, 'utf8').trim();
   }
   
   console.log(`🔄 Generating release notes for version: ${version}`);

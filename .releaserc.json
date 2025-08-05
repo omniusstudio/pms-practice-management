@@ -16,7 +16,7 @@
       "@semantic-release/exec",
       {
         "prepareCmd": "./scripts/update-version.sh ${nextRelease.version}",
-        "publishCmd": "./scripts/generate-release-notes.js ${nextRelease.version} ${nextRelease.notes}"
+        "publishCmd": "echo '${nextRelease.notes}' > /tmp/release-notes.txt && ./scripts/generate-release-notes.js ${nextRelease.version} /tmp/release-notes.txt"
       }
     ],
     [

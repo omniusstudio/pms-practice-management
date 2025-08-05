@@ -147,6 +147,10 @@ jobs:
     name: Container Security Scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -181,9 +185,11 @@ jobs:
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && (hashFiles('trivy-backend-results.sarif') != '' || hashFiles('trivy-frontend-results.sarif') != '')
         with:
-          sarif_file: '*.sarif'
+          sarif_file: |
+            trivy-backend-results.sarif
+            trivy-frontend-results.sarif
 
   secrets-scan:
     name: Secrets Detection
@@ -203,9 +209,19 @@ jobs:
 
       - name: Run TruffleHog
         uses: trufflesecurity/trufflehog@main
+        if: github.event_name == 'pull_request'
         with:
           path: ./
-          base: main
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: Run TruffleHog (Push Events)
+        uses: trufflesecurity/trufflehog@main
+        if: github.event_name == 'push'
+        with:
+          path: ./
+          base: ${{ github.event.before }}
           head: HEAD
           extra_args: --debug --only-verified
 

@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.5...v1.0.6) (2025-08-05)
+
+
+### Bug Fixes
+
+* resolve TypeScript compilation errors in AuthContext and tests ([53d35ae](https://github.com/omniusstudio/pms-practice-management/commit/53d35ae0aab1628e0be01b9b92d484a7a7e732f0))
+
 ## [1.0.5](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.4...v1.0.5) (2025-08-05)
 
 

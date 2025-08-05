@@ -137,7 +137,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
             // Store token and get user info
             authService.setToken(token);
             const user = await authService.getCurrentUser();
-            dispatch({ type: "AUTH_SUCCESS", payload: user });
+            if (user) {
+              dispatch({ type: "AUTH_SUCCESS", payload: user });
+            } else {
+              dispatch({ type: "AUTH_LOGOUT" });
+            }
 
             // Clean up URL
             window.history.replaceState({}, document.title, window.location.pathname);

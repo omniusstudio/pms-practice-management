@@ -79,7 +79,7 @@ vi.mock('../src/services/authService', () => ({
 
 // Mock React Router
 vi.mock('react-router-dom', () => ({
-  RouterProvider: ({ router }: any) => {
+  RouterProvider: ({ router: _router }: any) => {
     return React.createElement('div', { 'data-testid': 'mock-router' }, [
       React.createElement('div', { key: 'greeting' }, 'Good morning, John Doe!'),
       React.createElement('div', { key: 'welcome' }, 'Welcome to the Patient Management System'),

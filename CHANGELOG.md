@@ -1,3 +1,11 @@
+## [1.0.15](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.14...v1.0.15) (2025-08-05)
+
+
+### Bug Fixes
+
+* add missing environment variables to test configuration ([a72d0c7](https://github.com/omniusstudio/pms-practice-management/commit/a72d0c758f2930b0fbca14933647e6bee721cfd0))
+* correct import path for Base class in conftest.py ([d2bf925](https://github.com/omniusstudio/pms-practice-management/commit/d2bf925208767e89a44a578181b08a386626410d))
+
 ## [1.0.14](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.13...v1.0.14) (2025-08-05)
 
 

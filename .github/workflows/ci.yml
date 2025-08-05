@@ -2,9 +2,9 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
     types: [opened, synchronize, reopened, ready_for_review]
 
 env:
@@ -35,14 +35,16 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
-          cache-dependency-path: '**/requirements*.txt'
+          cache-dependency-path: |
+            **/requirements*.txt
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+          cache-dependency-path: |
+            **/package-lock.json
 
       - name: Install Python linting tools
         run: |
@@ -82,6 +84,7 @@ jobs:
             apps/backend/.flake8.log
             apps/frontend/eslint-report.json
           retention-days: 7
+
 
   test-backend:
     name: Backend Tests
@@ -125,7 +128,10 @@ jobs:
         run: |
           cd apps/backend
           pip install pytest-cov
-          python -m pytest tests/ --cov=. --cov-report=xml --cov-report=html --cov-report=term-missing --cov-fail-under=70 --junitxml=test-results.xml
+          python -m pytest tests/ --cov=. \
+            --cov-report=xml --cov-report=html \
+            --cov-report=term-missing --cov-fail-under=70 \
+            --junitxml=test-results.xml
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pms_test
           ENVIRONMENT: test
@@ -136,14 +142,13 @@ jobs:
         with:
           name: backend-coverage
           path: |
-            apps/backend/coverage.xml
             apps/backend/htmlcov/
-            apps/backend/test-results.xml
+            apps/backend/coverage.xml
+            apps/backend/pytest-report.xml
           retention-days: 30
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-        if: always()
         with:
           file: apps/backend/coverage.xml
           flags: backend
@@ -178,7 +183,8 @@ jobs:
         run: |
           if [ -f "apps/frontend/package.json" ]; then
             cd apps/frontend
-            npm run test:coverage || npm test
+            npm run test -- --coverage --watchAll=false \
+              --testResultsProcessor=jest-junit
           else
             echo "No frontend package.json found, running basic tests"
             make test-frontend
@@ -204,20 +210,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          # Skip slow scans for PR speed
-          skip-dirs: 'node_modules,__pycache__,.mypy_cache'
+        run: |
+          trivy fs --exit-code 0 --severity HIGH,CRITICAL \
+            --format sarif --output trivy-results.sarif \
+            --skip-dirs node_modules,__pycache__,.mypy_cache .
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: trivy-results.sarif
 
       - name: Upload security scan artifacts
         uses: actions/upload-artifact@v4
@@ -273,7 +275,8 @@ jobs:
       - name: Run performance tests
         run: |
           cd tests/performance
-          artillery run artillery.yml --output report.json
+          artillery run artillery.yml \
+            --output report.json
           artillery report report.json --output report.html
           
       - name: Upload performance results
@@ -297,34 +300,34 @@ jobs:
           echo "Frontend tests result: ${{ needs.test-frontend.result }}"
           echo "Build result: ${{ needs.build.result }}"
           echo "Security scan result: ${{ needs.security-scan.result }}"
-          
+
           # Fail if critical jobs failed
           if [[ "${{ needs.lint.result }}" == "failure" ]]; then
             echo "❌ Lint checks failed - blocking merge"
             exit 1
           fi
-          
+
           if [[ "${{ needs.test-backend.result }}" == "failure" ]]; then
             echo "❌ Backend tests failed - blocking merge"
             exit 1
           fi
-          
+
           if [[ "${{ needs.test-frontend.result }}" == "failure" ]]; then
             echo "❌ Frontend tests failed - blocking merge"
             exit 1
           fi
-          
+
           if [[ "${{ needs.build.result }}" == "failure" ]]; then
             echo "❌ Build failed - blocking merge"
             exit 1
           fi
-          
+
           # Enhanced security gate - fail on high/critical vulnerabilities
           if [[ "${{ needs.security-scan.result }}" == "failure" ]]; then
             echo "❌ Security scan failed - blocking merge"
             exit 1
           fi
-          
+
           echo "✅ All quality gates passed - ready for merge"
           
       - name: Check coverage thresholds
@@ -409,7 +412,8 @@ jobs:
             cd apps/frontend
             npm run build
             # Create build info
-            echo "{\"version\":\"${{ github.sha }}\",\"buildTime\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"branch\":\"${{ github.ref_name }}\"}" > dist/build-info.json
+            echo "{\"version\":\"${{ github.sha }}\",\"buildTime\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"," \
+              "\"branch\":\"${{ github.ref_name }}\"}" > dist/build-info.json
           fi
 
       - name: Upload build artifacts

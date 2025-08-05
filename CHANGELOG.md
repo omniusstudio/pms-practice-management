@@ -1,3 +1,10 @@
+## [1.0.11](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.10...v1.0.11) (2025-08-05)
+
+
+### Bug Fixes
+
+* resolve security workflow issues with TruffleHog and SARIF uploads ([848c5b4](https://github.com/omniusstudio/pms-practice-management/commit/848c5b4ebcb9c1cfade78b453855df7d5f25a878))
+
 ## [1.0.10](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.9...v1.0.10) (2025-08-05)
 
 

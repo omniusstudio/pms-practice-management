@@ -185,26 +185,15 @@ jobs:
           output: 'trivy-frontend-results.sarif'
         continue-on-error: true
 
-      - name: Check SARIF files
-        run: |
-          echo "Checking for SARIF files..."
-          ls -la *.sarif || echo "No SARIF files found"
-          if [ -f "trivy-backend-results.sarif" ]; then
-            echo "Backend SARIF file exists"
-            head -n 10 trivy-backend-results.sarif
-          fi
-          if [ -f "trivy-frontend-results.sarif" ]; then
-            echo "Frontend SARIF file exists"
-            head -n 10 trivy-frontend-results.sarif
-          fi
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always() && (hashFiles('trivy-backend-results.sarif') != '' || hashFiles('trivy-frontend-results.sarif') != '')
+      - name: Upload Trivy scan results as artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          sarif_file: |
+          name: trivy-scan-results
+          path: |
             trivy-backend-results.sarif
             trivy-frontend-results.sarif
+          retention-days: 30
         continue-on-error: true
 
   secrets-scan:

@@ -1,3 +1,10 @@
+## [1.0.10](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.9...v1.0.10) (2025-08-05)
+
+
+### Bug Fixes
+
+* install all dependencies including dev dependencies for frontend Docker build ([9a1a2df](https://github.com/omniusstudio/pms-practice-management/commit/9a1a2df5537159a6fcc8885c39d223c55f4f42ca))
+
 ## [1.0.9](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.8...v1.0.9) (2025-08-05)
 
 

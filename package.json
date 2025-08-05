@@ -1,6 +1,6 @@
 {
   "name": "pms-practice-management",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Mental Health Practice Management System",
   "private": true,
   "workspaces": [

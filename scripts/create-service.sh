@@ -20,7 +20,7 @@ case "$SERVICE_TYPE" in
         echo "Creating backend service: $SERVICE_NAME"
         mkdir -p "apps/$SERVICE_NAME"
         mkdir -p "apps/$SERVICE_NAME/tests"
-        
+
         # Create basic FastAPI structure
         cat > "apps/$SERVICE_NAME/main.py" << EOF
 """$SERVICE_NAME FastAPI application."""
@@ -50,7 +50,7 @@ EOF
 
         # Create requirements.txt
         cp "apps/backend/requirements.txt" "apps/$SERVICE_NAME/requirements.txt"
-        
+
         # Create basic test
         cat > "apps/$SERVICE_NAME/tests/test_main.py" << EOF
 """Tests for $SERVICE_NAME application."""
@@ -68,17 +68,17 @@ def test_service_configuration():
     }
     assert config["service_name"] == "$SERVICE_NAME"
 EOF
-        
+
         echo "✅ Backend service '$SERVICE_NAME' created successfully!"
         echo "📁 Location: apps/$SERVICE_NAME/"
         ;;
-        
+
     "frontend")
         echo "Creating frontend service: $SERVICE_NAME"
         mkdir -p "apps/$SERVICE_NAME/src/components"
         mkdir -p "apps/$SERVICE_NAME/src/pages"
         mkdir -p "apps/$SERVICE_NAME/tests"
-        
+
         # Create package.json
         cat > "apps/$SERVICE_NAME/package.json" << EOF
 {
@@ -141,15 +141,15 @@ try {
   process.exit(1);
 }
 EOF
-        
+
         echo "✅ Frontend service '$SERVICE_NAME' created successfully!"
         echo "📁 Location: apps/$SERVICE_NAME/"
         ;;
-        
+
     "package")
         echo "Creating shared package: $SERVICE_NAME"
         mkdir -p "packages/$SERVICE_NAME/src"
-        
+
         # Create package.json
         cat > "packages/$SERVICE_NAME/package.json" << EOF
 {
@@ -170,7 +170,7 @@ EOF
 
         # Create TypeScript config
         cp "packages/shared-types/tsconfig.json" "packages/$SERVICE_NAME/tsconfig.json"
-        
+
         # Create basic index file
         cat > "packages/$SERVICE_NAME/src/index.ts" << EOF
 // $SERVICE_NAME shared package
@@ -182,11 +182,11 @@ export interface ${SERVICE_NAME^}Config {
 
 export const ${SERVICE_NAME^}_VERSION = '1.0.0';
 EOF
-        
+
         echo "✅ Shared package '$SERVICE_NAME' created successfully!"
         echo "📁 Location: packages/$SERVICE_NAME/"
         ;;
-        
+
     *)
         echo "❌ Unknown service type: $SERVICE_TYPE"
         echo "Available types: backend, frontend, package"

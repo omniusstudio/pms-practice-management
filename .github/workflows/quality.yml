@@ -316,13 +316,13 @@ jobs:
           echo "- Frontend Analysis: ${{ needs.advanced-frontend-analysis.result }}"
           echo "- Documentation Quality: ${{ needs.documentation-quality.result }}"
           echo "- Performance Analysis: ${{ needs.performance-analysis.result }}"
-          
+
           # Fail if critical checks failed
           if [ "${{ needs.pre-commit-validation.result }}" = "failure" ]; then
             echo "❌ Quality gate failed: Pre-commit validation failed"
             exit 1
           fi
-          
+
           echo "✅ Quality gate passed"
 
       - name: Generate quality report
@@ -338,7 +338,7 @@ jobs:
           echo "- **Performance Analysis**: ${{ needs.performance-analysis.result }}" >> quality-report.md
           echo "" >> quality-report.md
           echo "Generated on: $(date)" >> quality-report.md
-          
+
           cat quality-report.md
 
       - name: Upload quality report

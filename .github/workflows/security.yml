@@ -282,7 +282,7 @@ jobs:
           echo "- **License Compliance**: ${{ needs.license-compliance.result }}" >> security-summary.md
           echo "" >> security-summary.md
           echo "Generated on: $(date)" >> security-summary.md
-          
+
           cat security-summary.md
 
       - name: Upload security summary

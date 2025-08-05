@@ -104,7 +104,7 @@ for endpoint in "${endpoints[@]}"; do
     echo "Testing endpoint: $endpoint"
     response=$(curl -s -H "X-Correlation-ID: test-endpoint-$endpoint" "http://localhost:8000$endpoint")
     header=$(curl -s -I -H "X-Correlation-ID: test-endpoint-$endpoint" "http://localhost:8000$endpoint" | grep -i "x-correlation-id")
-    
+
     if echo "$header" | grep -q "test-endpoint-$endpoint"; then
         echo -e "${GREEN}✓ $endpoint has correlation ID in headers${NC}"
     else
@@ -120,7 +120,7 @@ echo "Testing that API responses don't contain PHI patterns..."
 # Make several requests and check responses
 for i in {1..3}; do
     response=$(curl -s -H "X-Correlation-ID: phi-test-$i" http://localhost:8000/)
-    
+
     # Check for common PHI patterns
     if echo "$response" | grep -qE '\b\d{3}-\d{2}-\d{4}\b'; then
         echo -e "${RED}✗ SSN pattern found in response${NC}"

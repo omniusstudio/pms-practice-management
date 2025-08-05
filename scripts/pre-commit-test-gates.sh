@@ -100,9 +100,9 @@ fi
 # Run backend tests if Python files changed
 if [ -n "$PYTHON_FILES" ] && [ -d "apps/backend" ]; then
     echo "\n🧪 Running backend tests..."
-    
+
     cd apps/backend
-    
+
     # Run unit tests
     if python3 -m pytest tests/unit/ -v --tb=short > /tmp/backend_unit_output 2>&1; then
         print_status "success" "Backend unit tests passed"
@@ -112,7 +112,7 @@ if [ -n "$PYTHON_FILES" ] && [ -d "apps/backend" ]; then
         tail -20 /tmp/backend_unit_output
         OVERALL_SUCCESS=false
     fi
-    
+
     # Run integration tests if they exist
     if [ -d "tests/integration" ]; then
         if python3 -m pytest tests/integration/ -v --tb=short > /tmp/backend_integration_output 2>&1; then
@@ -124,11 +124,11 @@ if [ -n "$PYTHON_FILES" ] && [ -d "apps/backend" ]; then
             OVERALL_SUCCESS=false
         fi
     fi
-    
+
     # Check coverage for critical changes
     if [ "$REQUIRES_TESTS" = true ]; then
         echo "\n📊 Checking test coverage for critical changes..."
-        
+
         if python3 -m pytest --cov=. --cov-report=term --cov-fail-under=80 > /tmp/coverage_output 2>&1; then
             print_status "success" "Coverage threshold met (80%+)"
         else
@@ -137,21 +137,21 @@ if [ -n "$PYTHON_FILES" ] && [ -d "apps/backend" ]; then
             grep -E "TOTAL|FAILED" /tmp/coverage_output || true
             OVERALL_SUCCESS=false
         fi
-        
+
         # Check HIPAA compliance tests if HIPAA-related files changed
         HIPAA_PATHS="models/patient models/appointment services/auth services/encryption"
         HIPAA_CHANGED=false
-        
+
         for path in $HIPAA_PATHS; do
             if echo "$PYTHON_FILES" | grep -q "apps/backend/$path"; then
                 HIPAA_CHANGED=true
                 break
             fi
         done
-        
+
         if [ "$HIPAA_CHANGED" = true ]; then
             echo "\n🏥 Running HIPAA compliance tests..."
-            
+
             if python3 -m pytest -m hipaa --cov=. --cov-report=term --cov-fail-under=100 > /tmp/hipaa_output 2>&1; then
                 print_status "success" "HIPAA compliance tests passed (100% coverage)"
             else
@@ -162,16 +162,16 @@ if [ -n "$PYTHON_FILES" ] && [ -d "apps/backend" ]; then
             fi
         fi
     fi
-    
+
     cd - > /dev/null
 fi
 
 # Run frontend tests if TS/JS files changed
 if [ -n "$TS_FILES" ] && [ -d "apps/frontend" ] && command_exists npm; then
     echo "\n🎨 Running frontend tests..."
-    
+
     cd apps/frontend
-    
+
     # Check if dependencies are installed
     if [ ! -d "node_modules" ]; then
         print_status "warning" "Frontend dependencies not installed, skipping tests"
@@ -184,7 +184,7 @@ if [ -n "$TS_FILES" ] && [ -d "apps/frontend" ] && command_exists npm; then
             tail -20 /tmp/frontend_test_output
             OVERALL_SUCCESS=false
         fi
-        
+
         # Check frontend coverage if critical files changed
         if [ "$REQUIRES_TESTS" = true ]; then
             if npm run test:coverage > /tmp/frontend_coverage_output 2>&1; then
@@ -195,7 +195,7 @@ if [ -n "$TS_FILES" ] && [ -d "apps/frontend" ] && command_exists npm; then
             fi
         fi
     fi
-    
+
     cd - > /dev/null
 fi
 

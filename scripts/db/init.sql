@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS audit_log (
     ip_address INET,
     user_agent TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    
+
     -- Indexes for performance
     INDEX idx_audit_log_correlation_id (correlation_id),
     INDEX idx_audit_log_user_id (user_id),

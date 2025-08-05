@@ -124,7 +124,7 @@ jobs:
             --build-arg VERSION=${{ steps.version.outputs.version }} \
             --build-arg GIT_SHA=${{ steps.version.outputs.git-sha }} \
             apps/backend/
-          
+
           # Frontend image
           docker build -t pms-frontend:${{ steps.version.outputs.version }} \
             --build-arg VERSION=${{ steps.version.outputs.version }} \
@@ -181,13 +181,13 @@ jobs:
         run: |
           # Tag images for ECR
           aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-          
+
           docker tag pms-backend:${{ needs.build.outputs.version }} ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ needs.build.outputs.version }}
           docker tag pms-frontend:${{ needs.build.outputs.version }} ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ needs.build.outputs.version }}
-          
+
           docker push ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ needs.build.outputs.version }}
           docker push ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ needs.build.outputs.version }}
-          
+
           # Deploy using blue/green strategy
           cd apps/infra/scripts
           ./deploy-blue-green.sh staging ${{ needs.build.outputs.version }}
@@ -196,15 +196,15 @@ jobs:
         run: |
           # Wait for deployment to be ready
           sleep 30
-          
+
           # Test health endpoints
           curl -f https://staging.pms.example.com/health || exit 1
           curl -f https://staging.pms.example.com/healthz || exit 1
-          
+
           # Verify version endpoint
           VERSION_RESPONSE=$(curl -s https://staging.pms.example.com/healthz)
           echo "Deployed version: $VERSION_RESPONSE"
-          
+
           # Basic functionality test
           curl -f https://staging.pms.example.com/api/docs || exit 1
 
@@ -260,7 +260,7 @@ jobs:
         run: |
           # Get current production version
           CURRENT_VERSION=$(aws ssm get-parameter --name "/pms/production/current-version" --query "Parameter.Value" --output text 2>/dev/null || echo "none")
-          
+
           # Store as previous version
           if [ "$CURRENT_VERSION" != "none" ]; then
             aws ssm put-parameter --name "/pms/production/previous-version" --value "$CURRENT_VERSION" --overwrite
@@ -272,16 +272,16 @@ jobs:
             # Load and push new images
             docker load < backend-image.tar.gz
             docker load < frontend-image.tar.gz
-            
+
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-            
+
             docker tag pms-backend:${{ steps.deploy-version.outputs.version }} ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ steps.deploy-version.outputs.version }}
             docker tag pms-frontend:${{ steps.deploy-version.outputs.version }} ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ steps.deploy-version.outputs.version }}
-            
+
             docker push ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ steps.deploy-version.outputs.version }}
             docker push ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ steps.deploy-version.outputs.version }}
           fi
-          
+
           # Deploy using blue/green strategy
           cd apps/infra/scripts
           ./deploy-blue-green.sh production ${{ steps.deploy-version.outputs.version }}
@@ -290,15 +290,15 @@ jobs:
         run: |
           # Wait for deployment to be ready
           sleep 60
-          
+
           # Test health endpoints
           curl -f https://pms.example.com/health || exit 1
           curl -f https://pms.example.com/healthz || exit 1
-          
+
           # Verify version endpoint
           VERSION_RESPONSE=$(curl -s https://pms.example.com/healthz)
           echo "Deployed version: $VERSION_RESPONSE"
-          
+
           # Basic functionality test
           curl -f https://pms.example.com/api/docs || exit 1
 
@@ -307,7 +307,7 @@ jobs:
         run: |
           # Store current version
           aws ssm put-parameter --name "/pms/production/current-version" --value "${{ steps.deploy-version.outputs.version }}" --overwrite
-          
+
           # Store deployment metadata
           aws ssm put-parameter --name "/pms/production/last-deployment" --value '{"version":"${{ steps.deploy-version.outputs.version }}","gitSha":"${{ needs.build.outputs.git-sha }}","deployedAt":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","deployedBy":"${{ github.actor }}"}' --overwrite
 

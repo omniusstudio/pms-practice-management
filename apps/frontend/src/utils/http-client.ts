@@ -59,7 +59,7 @@ export function createHttpClient(baseURL?: string): AxiosInstance {
         correlationId: Logger.getCorrelationId() || "unknown",
       });
       return Promise.reject(error);
-    }
+    },
   );
 
   // Response interceptor - log responses and handle correlation IDs
@@ -82,7 +82,7 @@ export function createHttpClient(baseURL?: string): AxiosInstance {
         {
           correlationId,
           responseSize: JSON.stringify(response.data).length,
-        }
+        },
       );
 
       return response;
@@ -100,7 +100,7 @@ export function createHttpClient(baseURL?: string): AxiosInstance {
       });
 
       return Promise.reject(error);
-    }
+    },
   );
 
   return client;

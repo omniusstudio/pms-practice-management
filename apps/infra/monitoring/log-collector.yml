@@ -146,28 +146,28 @@ data:
     # Social Security Numbers
     ssn_pattern_1=\b\d{3}-\d{2}-\d{4}\b
     ssn_pattern_2=\b\d{9}\b
-    
+
     # Email Addresses
     email_pattern=\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b
-    
+
     # Phone Numbers
     phone_pattern_1=\b\(?\d{3}\)?[-.]?\d{3}[-.]?\d{4}\b
     phone_pattern_2=\b\d{3}[-.]\d{3}[-.]\d{4}\b
-    
+
     # Credit Card Numbers
     credit_card_pattern=\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b
-    
+
     # Medical Record Numbers
     mrn_pattern_1=\bMRN[-:\s]*\d+\b
     mrn_pattern_2=\bMR[-:\s]*\d+\b
-    
+
     # Date of Birth
     dob_pattern_1=\b\d{1,2}/\d{1,2}/\d{4}\b
     dob_pattern_2=\b\d{4}-\d{2}-\d{2}\b
-    
+
     # Insurance Numbers
     insurance_pattern=\bINS[-:\s]*[A-Z0-9]+\b
-    
+
     # Patient Names (contextual)
     patient_name_pattern=\bpatient[-_\s]+name[-:\s]*[A-Za-z\s]+\b
     first_name_pattern=\bfirst[-_\s]+name[-:\s]*[A-Za-z]+\b

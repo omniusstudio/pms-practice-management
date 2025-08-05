@@ -58,7 +58,7 @@ show_usage() {
 list_available_versions() {
     if [[ -n "$ENVIRONMENT" ]]; then
         log "Available versions for ${ENVIRONMENT}:"
-        
+
         # Get deployment history from SSM
         aws ssm get-parameters-by-path \
             --path "/pms/${ENVIRONMENT}/deployments/" \
@@ -66,7 +66,7 @@ list_available_versions() {
             --region "$AWS_REGION" \
             --query 'Parameters[*].[Name,Value]' \
             --output table 2>/dev/null || echo "No deployment history found"
-        
+
         # Get current version
         local current_version
         current_version=$(aws ssm get-parameter \
@@ -74,7 +74,7 @@ list_available_versions() {
             --query "Parameter.Value" \
             --output text 2>/dev/null || echo "unknown")
         echo "Current version: ${current_version}"
-        
+
         # Get previous version
         local previous_version
         previous_version=$(aws ssm get-parameter \
@@ -92,7 +92,7 @@ validate_inputs() {
         show_usage
         exit 1
     fi
-    
+
     if [[ ! "$ENVIRONMENT" =~ ^(staging|production)$ ]]; then
         log_error "Environment must be 'staging' or 'production'"
         exit 1
@@ -111,14 +111,14 @@ get_rollback_version() {
             --name "/pms/${ENVIRONMENT}/previous-version" \
             --query "Parameter.Value" \
             --output text 2>/dev/null || echo "")
-        
+
         if [[ -z "$previous_version" || "$previous_version" == "None" ]]; then
             log_error "No previous version found for rollback"
             log "Available options:"
             list_available_versions
             exit 1
         fi
-        
+
         log "Using previous version: ${previous_version}"
         echo "$previous_version"
     fi
@@ -128,24 +128,24 @@ get_rollback_version() {
 confirm_rollback() {
     local rollback_version=$1
     local current_version
-    
+
     current_version=$(aws ssm get-parameter \
         --name "/pms/${ENVIRONMENT}/current-version" \
         --query "Parameter.Value" \
         --output text 2>/dev/null || echo "unknown")
-    
+
     echo ""
     log_warning "🚨 ROLLBACK CONFIRMATION 🚨"
     echo "Environment: ${ENVIRONMENT}"
     echo "Current version: ${current_version}"
     echo "Rollback to version: ${rollback_version}"
     echo ""
-    
+
     if [[ "$ENVIRONMENT" == "production" ]]; then
         log_warning "This is a PRODUCTION rollback!"
         echo ""
     fi
-    
+
     read -p "Are you sure you want to proceed? (yes/no): " -r
     if [[ ! $REPLY =~ ^[Yy][Ee][Ss]$ ]]; then
         log "Rollback cancelled by user"
@@ -156,25 +156,25 @@ confirm_rollback() {
 # Perform rollback using GitHub Actions
 perform_rollback() {
     local rollback_version=$1
-    
+
     log "Initiating rollback via GitHub Actions..."
-    
+
     # Trigger GitHub Actions workflow for rollback
     if command -v gh &> /dev/null; then
         log "Using GitHub CLI to trigger rollback workflow"
-        
+
         gh workflow run cd.yml \
             --field environment="$ENVIRONMENT" \
             --field rollback=true \
             --field version="$rollback_version"
-        
+
         if [[ $? -eq 0 ]]; then
             log_success "Rollback workflow triggered successfully"
             log "Monitor the rollback progress at: https://github.com/your-org/pms/actions"
-            
+
             # Wait for workflow to start
             sleep 10
-            
+
             # Show recent workflow runs
             log "Recent workflow runs:"
             gh run list --workflow=cd.yml --limit=5
@@ -196,33 +196,33 @@ perform_rollback() {
 # Monitor rollback progress
 monitor_rollback() {
     local rollback_version=$1
-    
+
     log "Monitoring rollback progress..."
-    
+
     # Wait for deployment to complete
     local max_wait=1800  # 30 minutes
     local wait_interval=30
     local elapsed=0
-    
+
     while [[ $elapsed -lt $max_wait ]]; do
         # Check current deployed version
         local deployed_version
         deployed_version=$(curl -s "https://${ENVIRONMENT}.pms.example.com/healthz" | jq -r '.version' 2>/dev/null || echo "unknown")
-        
+
         if [[ "$deployed_version" == "$rollback_version" ]]; then
             log_success "Rollback completed successfully!"
             log_success "Deployed version: ${deployed_version}"
             return 0
         fi
-        
+
         log "Waiting for rollback to complete... (${elapsed}s/${max_wait}s)"
         log "Current deployed version: ${deployed_version}"
         log "Target version: ${rollback_version}"
-        
+
         sleep $wait_interval
         elapsed=$((elapsed + wait_interval))
     done
-    
+
     log_error "Rollback monitoring timed out after ${max_wait} seconds"
     log_error "Please check the deployment status manually"
     return 1
@@ -231,18 +231,18 @@ monitor_rollback() {
 # Verify rollback
 verify_rollback() {
     local rollback_version=$1
-    
+
     log "Verifying rollback..."
-    
+
     # Health check
     local health_url="https://${ENVIRONMENT}.pms.example.com/healthz"
-    
+
     if curl -f -s "$health_url" > /dev/null; then
         local response
         response=$(curl -s "$health_url")
         local deployed_version
         deployed_version=$(echo "$response" | jq -r '.version' 2>/dev/null || echo "unknown")
-        
+
         if [[ "$deployed_version" == "$rollback_version" ]]; then
             log_success "✅ Rollback verification successful!"
             log_success "Environment: ${ENVIRONMENT}"
@@ -262,17 +262,17 @@ verify_rollback() {
 # Main rollback function
 main() {
     log "🔄 Starting rollback process for ${ENVIRONMENT}"
-    
+
     # Get rollback version
     local rollback_version
     rollback_version=$(get_rollback_version)
-    
+
     # Confirm rollback
     confirm_rollback "$rollback_version"
-    
+
     # Perform rollback
     perform_rollback "$rollback_version"
-    
+
     # Monitor rollback (optional)
     if [[ "${MONITOR_ROLLBACK:-true}" == "true" ]]; then
         monitor_rollback "$rollback_version"
@@ -280,7 +280,7 @@ main() {
     else
         log "Rollback initiated. Monitor progress manually."
     fi
-    
+
     log_success "🎉 Rollback process completed!"
 }
 

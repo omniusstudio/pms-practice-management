@@ -83,7 +83,7 @@ class MetricsCollector {
     name: string,
     error: Error | string,
     component?: string,
-    tags?: Record<string, string>
+    tags?: Record<string, string>,
   ): void {
     if (!this.isEnabled) return;
 
@@ -114,7 +114,7 @@ class MetricsCollector {
     component: string,
     success: boolean = true,
     duration?: number,
-    tags?: Record<string, string>
+    tags?: Record<string, string>,
   ): void {
     if (!this.isEnabled) return;
 
@@ -157,7 +157,7 @@ class MetricsCollector {
         {
           page: pageName,
           type: "dom_ready",
-        }
+        },
       );
 
       this.recordPerformance("first_paint", navigation.responseEnd - navigation.fetchStart, {
@@ -175,7 +175,7 @@ class MetricsCollector {
     url: string,
     status: number,
     duration: number,
-    success: boolean
+    success: boolean,
   ): void {
     if (!this.isEnabled) return;
 
@@ -302,7 +302,7 @@ export const recordError = (
   name: string,
   error: Error | string,
   component?: string,
-  tags?: Record<string, string>
+  tags?: Record<string, string>,
 ) => {
   metrics.recordError(name, error, component, tags);
 };
@@ -312,7 +312,7 @@ export const recordUserAction = (
   component: string,
   success: boolean = true,
   duration?: number,
-  tags?: Record<string, string>
+  tags?: Record<string, string>,
 ) => {
   metrics.recordUserAction(action, component, success, duration, tags);
 };
@@ -326,7 +326,7 @@ export const recordApiCall = (
   url: string,
   status: number,
   duration: number,
-  success: boolean
+  success: boolean,
 ) => {
   metrics.recordApiCall(method, url, status, duration, success);
 };

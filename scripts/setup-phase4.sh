@@ -71,7 +71,7 @@ fi
 log_info "Installing Python quality tools..."
 if [ -d "apps/backend" ]; then
     cd apps/backend
-    
+
     # Check if virtual environment exists
     if [ ! -d "venv" ] && [ ! -d ".venv" ]; then
         log_info "Creating Python virtual environment..."
@@ -82,17 +82,17 @@ if [ -d "apps/backend" ]; then
     elif [ -d ".venv" ]; then
         source .venv/bin/activate
     fi
-    
+
     # Install quality tools
     pip install --upgrade pip
     pip install black isort flake8 mypy bandit safety pylint radon vulture pydocstyle
     pip install flake8-docstrings flake8-bugbear
-    
+
     # Install project dependencies
     if [ -f "requirements.txt" ]; then
         pip install -r requirements.txt
     fi
-    
+
     cd ../..
     log_success "Python quality tools installed"
 else
@@ -103,14 +103,14 @@ fi
 log_info "Installing Node.js quality tools..."
 if [ -d "apps/frontend" ] && [ -f "apps/frontend/package.json" ]; then
     cd apps/frontend
-    
+
     # Install dependencies
     npm ci
-    
+
     # Install global tools
     npm install -g markdownlint-cli alex write-good jscpd depcheck
     npm install -g lighthouse-ci typescript-analyzer
-    
+
     cd ../..
     log_success "Node.js quality tools installed"
 else
@@ -154,26 +154,26 @@ pre-commit run --all-files
 if [ -d "apps/backend" ]; then
     echo "2. Running backend quality checks..."
     cd apps/backend
-    
+
     # Activate virtual environment if it exists
     if [ -d "venv" ]; then
         source venv/bin/activate
     elif [ -d ".venv" ]; then
         source .venv/bin/activate
     fi
-    
+
     echo "   - Running Pylint..."
     pylint . || echo "Pylint completed with warnings"
-    
+
     echo "   - Running Bandit security scan..."
     bandit -r . || echo "Bandit completed with warnings"
-    
+
     echo "   - Running Safety dependency check..."
     safety check || echo "Safety check completed with warnings"
-    
+
     echo "   - Running complexity analysis..."
     radon cc . --min=B || echo "Complexity analysis completed"
-    
+
     cd ../..
 fi
 
@@ -181,16 +181,16 @@ fi
 if [ -d "apps/frontend" ] && [ -f "apps/frontend/package.json" ]; then
     echo "3. Running frontend quality checks..."
     cd apps/frontend
-    
+
     echo "   - Running TypeScript strict check..."
     npx tsc --noEmit --strict || echo "TypeScript check completed with warnings"
-    
+
     echo "   - Running duplicate code detection..."
     npx jscpd src --threshold 5 || echo "Duplicate code check completed"
-    
+
     echo "   - Running dependency check..."
     npx depcheck || echo "Dependency check completed"
-    
+
     cd ../..
 fi
 

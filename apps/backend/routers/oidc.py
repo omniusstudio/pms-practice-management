@@ -204,6 +204,7 @@ async def handle_oidc_callback(
     db: AsyncSession = Depends(get_db),
 ):
     """Handle OIDC callback from provider."""
+    settings = get_oidc_settings()
     try:
         # Handle OAuth2 errors
         if error:
@@ -313,6 +314,7 @@ async def refresh_access_token(
     request: RefreshRequest, db: AsyncSession = Depends(get_db)
 ) -> RefreshResponse:
     """Refresh access token using refresh token."""
+    settings = get_oidc_settings()
     try:
         # Validate refresh token
         auth_svc = AuthService(db)
@@ -434,6 +436,7 @@ async def logout(
 @router.get("/providers")
 async def get_available_providers():
     """Get list of available OIDC providers."""
+    settings = get_oidc_settings()
     providers = []
 
     if settings.oidc_google_client_id and settings.oidc_google_client_secret:

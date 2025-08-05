@@ -250,17 +250,17 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          
+
       - name: Install backend dependencies
         run: |
           cd apps/backend
           pip install -r requirements.txt
-          
+
       - name: Start backend server
         run: |
           cd apps/backend
@@ -268,17 +268,17 @@ jobs:
           sleep 10
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
-          
+
       - name: Install Artillery
         run: npm install -g artillery@latest
-        
+
       - name: Run performance tests
         run: |
           cd tests/performance
           artillery run artillery.yml \
             --output report.json
           artillery report report.json --output report.html
-          
+
       - name: Upload performance results
         uses: actions/upload-artifact@v4
         if: always()
@@ -329,7 +329,7 @@ jobs:
           fi
 
           echo "✅ All quality gates passed - ready for merge"
-          
+
       - name: Check coverage thresholds
         run: |
           echo "Verifying coverage meets minimum thresholds..."

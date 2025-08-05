@@ -18,7 +18,7 @@ export interface MetricsHookReturn {
     action: string,
     success?: boolean,
     duration?: number,
-    tags?: Record<string, string>
+    tags?: Record<string, string>,
   ) => void;
   trackError: (error: Error | string, tags?: Record<string, string>) => void;
   trackPerformance: (name: string, value: number, tags?: Record<string, string>) => void;
@@ -26,7 +26,7 @@ export interface MetricsHookReturn {
   trackAsyncAction: <T>(
     action: string,
     promise: Promise<T>,
-    tags?: Record<string, string>
+    tags?: Record<string, string>,
   ) => Promise<T>;
 }
 
@@ -79,7 +79,7 @@ export const useMetrics = (options: UseMetricsOptions): MetricsHookReturn => {
         component: componentName,
       });
     },
-    [componentName]
+    [componentName],
   );
 
   // Track error
@@ -90,7 +90,7 @@ export const useMetrics = (options: UseMetricsOptions): MetricsHookReturn => {
         component: componentName,
       });
     },
-    [componentName]
+    [componentName],
   );
 
   // Track performance metric
@@ -101,7 +101,7 @@ export const useMetrics = (options: UseMetricsOptions): MetricsHookReturn => {
         component: componentName,
       });
     },
-    [componentName]
+    [componentName],
   );
 
   // Start a timer and return a function to end it
@@ -116,7 +116,7 @@ export const useMetrics = (options: UseMetricsOptions): MetricsHookReturn => {
         return duration;
       };
     },
-    [trackPerformance]
+    [trackPerformance],
   );
 
   // Track async action with automatic success/error handling
@@ -151,7 +151,7 @@ export const useMetrics = (options: UseMetricsOptions): MetricsHookReturn => {
         throw error;
       }
     },
-    [trackAction, trackError]
+    [trackAction, trackError],
   );
 
   return {
@@ -204,7 +204,7 @@ export const useFormMetrics = (formName: string) => {
         form: formName,
       });
     },
-    [metricsHook, formName]
+    [metricsHook, formName],
   );
 
   const trackFormSubmission = useCallback(
@@ -221,7 +221,7 @@ export const useFormMetrics = (formName: string) => {
         });
       }
     },
-    [metricsHook, formName]
+    [metricsHook, formName],
   );
 
   const trackFormReset = useCallback(() => {
@@ -262,7 +262,7 @@ export const useApiMetrics = () => {
         throw error;
       }
     },
-    []
+    [],
   );
 
   return { trackApiCall };

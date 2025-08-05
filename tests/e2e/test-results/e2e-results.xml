@@ -1,0 +1,1257 @@
+<testsuites id="" name="" tests="30" failures="30" skipped="0" errors="0" time="157.906305">
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="chromium" tests="6" failures="6" skipped="0" time="158.787" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.815">
+<failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
+<![CDATA[  [chromium] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+
+    Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
+
+    Locator: locator('h1')
+    Expected string: "Sign In"
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for locator('h1')
+
+
+       9 |   test('should display login page for unauthenticated users', async ({ page }) => {
+      10 |     // Verify login page elements
+    > 11 |     await expect(page.locator('h1')).toContainText('Sign In');
+         |                                      ^
+      12 |     await expect(page.locator('input[type="email"]')).toBeVisible();
+      13 |     await expect(page.locator('input[type="password"]')).toBeVisible();
+      14 |     await expect(page.locator('button[type="submit"]')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-chromium/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.577">
+<failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
+<![CDATA[  [chromium] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('button[type="submit"]')
+
+
+      17 |   test('should show validation errors for invalid login', async ({ page }) => {
+      18 |     // Try to submit empty form
+    > 19 |     await page.click('button[type="submit"]');
+         |                ^
+      20 |     
+      21 |     // Check for validation messages
+      22 |     await expect(page.locator('text=Email is required')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-chromium/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.61">
+<failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
+<![CDATA[  [chromium] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      26 |   test('should show error for invalid credentials', async ({ page }) => {
+      27 |     // Fill in invalid credentials
+    > 28 |     await page.fill('input[type="email"]', 'invalid@example.com');
+         |                ^
+      29 |     await page.fill('input[type="password"]', 'wrongpassword');
+      30 |     await page.click('button[type="submit"]');
+      31 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-chromium/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.609">
+<failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
+<![CDATA[  [chromium] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      40 |   test('should successfully login with valid credentials', async ({ page }) => {
+      41 |     // Use test credentials (these should be configured in test environment)
+    > 42 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      43 |     await page.fill('input[type="password"]', 'testpassword123');
+      44 |     await page.click('button[type="submit"]');
+      45 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-chromium/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.602">
+<failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
+<![CDATA[  [chromium] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      51 |   test('should handle session timeout gracefully', async ({ page }) => {
+      52 |     // Login first
+    > 53 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      54 |     await page.fill('input[type="password"]', 'testpassword123');
+      55 |     await page.click('button[type="submit"]');
+      56 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-chromium/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.574">
+<failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
+<![CDATA[  [chromium] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully ───
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      74 |   test('should logout successfully', async ({ page }) => {
+      75 |     // Login first
+    > 76 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      77 |     await page.fill('input[type="password"]', 'testpassword123');
+      78 |     await page.click('button[type="submit"]');
+      79 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-chromium/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="firefox" tests="6" failures="6" skipped="0" time="155.972" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.607">
+<failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
+<![CDATA[  [firefox] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+
+    Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
+
+    Locator: locator('h1')
+    Expected string: "Sign In"
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for locator('h1')
+
+
+       9 |   test('should display login page for unauthenticated users', async ({ page }) => {
+      10 |     // Verify login page elements
+    > 11 |     await expect(page.locator('h1')).toContainText('Sign In');
+         |                                      ^
+      12 |     await expect(page.locator('input[type="email"]')).toBeVisible();
+      13 |     await expect(page.locator('input[type="password"]')).toBeVisible();
+      14 |     await expect(page.locator('button[type="submit"]')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-firefox/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.093">
+<failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
+<![CDATA[  [firefox] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('button[type="submit"]')
+
+
+      17 |   test('should show validation errors for invalid login', async ({ page }) => {
+      18 |     // Try to submit empty form
+    > 19 |     await page.click('button[type="submit"]');
+         |                ^
+      20 |     
+      21 |     // Check for validation messages
+      22 |     await expect(page.locator('text=Email is required')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-firefox/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.059">
+<failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
+<![CDATA[  [firefox] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      26 |   test('should show error for invalid credentials', async ({ page }) => {
+      27 |     // Fill in invalid credentials
+    > 28 |     await page.fill('input[type="email"]', 'invalid@example.com');
+         |                ^
+      29 |     await page.fill('input[type="password"]', 'wrongpassword');
+      30 |     await page.click('button[type="submit"]');
+      31 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-firefox/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.084">
+<failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
+<![CDATA[  [firefox] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      40 |   test('should successfully login with valid credentials', async ({ page }) => {
+      41 |     // Use test credentials (these should be configured in test environment)
+    > 42 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      43 |     await page.fill('input[type="password"]', 'testpassword123');
+      44 |     await page.click('button[type="submit"]');
+      45 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-firefox/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.069">
+<failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
+<![CDATA[  [firefox] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      51 |   test('should handle session timeout gracefully', async ({ page }) => {
+      52 |     // Login first
+    > 53 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      54 |     await page.fill('input[type="password"]', 'testpassword123');
+      55 |     await page.click('button[type="submit"]');
+      56 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-firefox/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.06">
+<failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
+<![CDATA[  [firefox] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully ────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      74 |   test('should logout successfully', async ({ page }) => {
+      75 |     // Login first
+    > 76 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      77 |     await page.fill('input[type="password"]', 'testpassword123');
+      78 |     await page.click('button[type="submit"]');
+      79 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-firefox/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="webkit" tests="6" failures="6" skipped="0" time="156.097" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.807">
+<failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
+<![CDATA[  [webkit] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+
+    Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
+
+    Locator: locator('h1')
+    Expected string: "Sign In"
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for locator('h1')
+
+
+       9 |   test('should display login page for unauthenticated users', async ({ page }) => {
+      10 |     // Verify login page elements
+    > 11 |     await expect(page.locator('h1')).toContainText('Sign In');
+         |                                      ^
+      12 |     await expect(page.locator('input[type="email"]')).toBeVisible();
+      13 |     await expect(page.locator('input[type="password"]')).toBeVisible();
+      14 |     await expect(page.locator('button[type="submit"]')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-webkit/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.055">
+<failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
+<![CDATA[  [webkit] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('button[type="submit"]')
+
+
+      17 |   test('should show validation errors for invalid login', async ({ page }) => {
+      18 |     // Try to submit empty form
+    > 19 |     await page.click('button[type="submit"]');
+         |                ^
+      20 |     
+      21 |     // Check for validation messages
+      22 |     await expect(page.locator('text=Email is required')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-webkit/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.061">
+<failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
+<![CDATA[  [webkit] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      26 |   test('should show error for invalid credentials', async ({ page }) => {
+      27 |     // Fill in invalid credentials
+    > 28 |     await page.fill('input[type="email"]', 'invalid@example.com');
+         |                ^
+      29 |     await page.fill('input[type="password"]', 'wrongpassword');
+      30 |     await page.click('button[type="submit"]');
+      31 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-webkit/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.057">
+<failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
+<![CDATA[  [webkit] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      40 |   test('should successfully login with valid credentials', async ({ page }) => {
+      41 |     // Use test credentials (these should be configured in test environment)
+    > 42 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      43 |     await page.fill('input[type="password"]', 'testpassword123');
+      44 |     await page.click('button[type="submit"]');
+      45 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-webkit/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.06">
+<failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
+<![CDATA[  [webkit] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      51 |   test('should handle session timeout gracefully', async ({ page }) => {
+      52 |     // Login first
+    > 53 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      54 |     await page.fill('input[type="password"]', 'testpassword123');
+      55 |     await page.click('button[type="submit"]');
+      56 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-webkit/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.057">
+<failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
+<![CDATA[  [webkit] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully ─────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      74 |   test('should logout successfully', async ({ page }) => {
+      75 |     // Login first
+    > 76 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      77 |     await page.fill('input[type="password"]', 'testpassword123');
+      78 |     await page.click('button[type="submit"]');
+      79 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-webkit/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="Mobile Chrome" tests="6" failures="6" skipped="0" time="158.003" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.381">
+<failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+
+    Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
+
+    Locator: locator('h1')
+    Expected string: "Sign In"
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for locator('h1')
+
+
+       9 |   test('should display login page for unauthenticated users', async ({ page }) => {
+      10 |     // Verify login page elements
+    > 11 |     await expect(page.locator('h1')).toContainText('Sign In');
+         |                                      ^
+      12 |     await expect(page.locator('input[type="email"]')).toBeVisible();
+      13 |     await expect(page.locator('input[type="password"]')).toBeVisible();
+      14 |     await expect(page.locator('button[type="submit"]')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Chrome/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.516">
+<failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('button[type="submit"]')
+
+
+      17 |   test('should show validation errors for invalid login', async ({ page }) => {
+      18 |     // Try to submit empty form
+    > 19 |     await page.click('button[type="submit"]');
+         |                ^
+      20 |     
+      21 |     // Check for validation messages
+      22 |     await expect(page.locator('text=Email is required')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Chrome/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.539">
+<failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      26 |   test('should show error for invalid credentials', async ({ page }) => {
+      27 |     // Fill in invalid credentials
+    > 28 |     await page.fill('input[type="email"]', 'invalid@example.com');
+         |                ^
+      29 |     await page.fill('input[type="password"]', 'wrongpassword');
+      30 |     await page.click('button[type="submit"]');
+      31 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Chrome/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.539">
+<failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      40 |   test('should successfully login with valid credentials', async ({ page }) => {
+      41 |     // Use test credentials (these should be configured in test environment)
+    > 42 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      43 |     await page.fill('input[type="password"]', 'testpassword123');
+      44 |     await page.click('button[type="submit"]');
+      45 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Chrome/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.515">
+<failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      51 |   test('should handle session timeout gracefully', async ({ page }) => {
+      52 |     // Login first
+    > 53 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      54 |     await page.fill('input[type="password"]', 'testpassword123');
+      55 |     await page.click('button[type="submit"]');
+      56 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Chrome/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.513">
+<failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      74 |   test('should logout successfully', async ({ page }) => {
+      75 |     // Login first
+    > 76 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      77 |     await page.fill('input[type="password"]', 'testpassword123');
+      78 |     await page.click('button[type="submit"]');
+      79 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Chrome/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="Mobile Safari" tests="6" failures="6" skipped="0" time="155.613" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.329">
+<failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+
+    Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
+
+    Locator: locator('h1')
+    Expected string: "Sign In"
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for locator('h1')
+
+
+       9 |   test('should display login page for unauthenticated users', async ({ page }) => {
+      10 |     // Verify login page elements
+    > 11 |     await expect(page.locator('h1')).toContainText('Sign In');
+         |                                      ^
+      12 |     await expect(page.locator('input[type="email"]')).toBeVisible();
+      13 |     await expect(page.locator('input[type="password"]')).toBeVisible();
+      14 |     await expect(page.locator('button[type="submit"]')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Safari/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Safari/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-ecfab-e-for-unauthenticated-users-Mobile-Safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.066">
+<failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('button[type="submit"]')
+
+
+      17 |   test('should show validation errors for invalid login', async ({ page }) => {
+      18 |     // Try to submit empty form
+    > 19 |     await page.click('button[type="submit"]');
+         |                ^
+      20 |     
+      21 |     // Check for validation messages
+      22 |     await expect(page.locator('text=Email is required')).toBeVisible();
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Safari/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Safari/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c8e41-on-errors-for-invalid-login-Mobile-Safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.055">
+<failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      26 |   test('should show error for invalid credentials', async ({ page }) => {
+      27 |     // Fill in invalid credentials
+    > 28 |     await page.fill('input[type="email"]', 'invalid@example.com');
+         |                ^
+      29 |     await page.fill('input[type="password"]', 'wrongpassword');
+      30 |     await page.click('button[type="submit"]');
+      31 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Safari/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Safari/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-79021-ror-for-invalid-credentials-Mobile-Safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.055">
+<failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      40 |   test('should successfully login with valid credentials', async ({ page }) => {
+      41 |     // Use test credentials (these should be configured in test environment)
+    > 42 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      43 |     await page.fill('input[type="password"]', 'testpassword123');
+      44 |     await page.click('button[type="submit"]');
+      45 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Safari/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Safari/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-1f327-ogin-with-valid-credentials-Mobile-Safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.05">
+<failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      51 |   test('should handle session timeout gracefully', async ({ page }) => {
+      52 |     // Login first
+    > 53 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      54 |     await page.fill('input[type="password"]', 'testpassword123');
+      55 |     await page.click('button[type="submit"]');
+      56 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Safari/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Safari/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-c5439--session-timeout-gracefully-Mobile-Safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.058">
+<failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[type="email"]')
+
+
+      74 |   test('should logout successfully', async ({ page }) => {
+      75 |     // Login first
+    > 76 |     await page.fill('input[type="email"]', 'test@example.com');
+         |                ^
+      77 |     await page.fill('input[type="password"]', 'testpassword123');
+      78 |     await page.click('button[type="submit"]');
+      79 |     
+        at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Safari/test-failed-1.png]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Safari/video.webm]]
+
+[[ATTACHMENT|auth-workflow-Authenticati-2262a--should-logout-successfully-Mobile-Safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

@@ -1,0 +1,10 @@
+{
+  "version": "1.0.1",
+  "releaseDate": "2025-08-05T02:42:10.255Z",
+  "gitCommit": "unknown",
+  "gitBranch": "unknown",
+  "buildNumber": "local",
+  "releaseType": "semantic",
+  "hipaaCompliant": true,
+  "sanitized": true
+}

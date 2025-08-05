@@ -1,6 +1,6 @@
 /**
  * Auth0 Frontend Integration Example
- * 
+ *
  * This example shows how to integrate the Auth0 authentication
  * endpoints with a frontend application.
  */
@@ -96,7 +96,7 @@ class Auth0Client {
 
         try {
             const response = await fetch(url, config);
-            
+
             if (response.status === 401) {
                 // Redirect to login if unauthorized
                 this.login(window.location.pathname);
@@ -121,7 +121,7 @@ const auth = new Auth0Client();
 // Check authentication status on page load
 document.addEventListener('DOMContentLoaded', async () => {
     const user = await auth.getCurrentUser();
-    
+
     if (user) {
         console.log('User is authenticated:', user);
         // Update UI for authenticated user

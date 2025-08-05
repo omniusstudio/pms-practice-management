@@ -90,7 +90,7 @@ export class Logger {
     url: string,
     status: number,
     duration: number,
-    context?: LogContext
+    context?: LogContext,
   ): void {
     const apiContext = {
       ...context,

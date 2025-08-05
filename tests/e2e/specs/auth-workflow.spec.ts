@@ -17,7 +17,7 @@ test.describe('Authentication Workflow', () => {
   test('should show validation errors for invalid login', async ({ page }) => {
     // Try to submit empty form
     await page.click('button[type="submit"]');
-    
+
     // Check for validation messages
     await expect(page.locator('text=Email is required')).toBeVisible();
     await expect(page.locator('text=Password is required')).toBeVisible();
@@ -28,10 +28,10 @@ test.describe('Authentication Workflow', () => {
     await page.fill('input[type="email"]', 'invalid@example.com');
     await page.fill('input[type="password"]', 'wrongpassword');
     await page.click('button[type="submit"]');
-    
+
     // Should show error message (no PHI exposed)
     await expect(page.locator('text=Invalid credentials')).toBeVisible();
-    
+
     // Should not expose any sensitive information
     await expect(page.locator('text=user not found')).not.toBeVisible();
     await expect(page.locator('text=password incorrect')).not.toBeVisible();
@@ -42,7 +42,7 @@ test.describe('Authentication Workflow', () => {
     await page.fill('input[type="email"]', 'test@example.com');
     await page.fill('input[type="password"]', 'testpassword123');
     await page.click('button[type="submit"]');
-    
+
     // Should redirect to dashboard
     await expect(page).toHaveURL(/.*\/dashboard/);
     await expect(page.locator('text=Dashboard')).toBeVisible();
@@ -53,19 +53,19 @@ test.describe('Authentication Workflow', () => {
     await page.fill('input[type="email"]', 'test@example.com');
     await page.fill('input[type="password"]', 'testpassword123');
     await page.click('button[type="submit"]');
-    
+
     // Wait for dashboard
     await expect(page).toHaveURL(/.*\/dashboard/);
-    
+
     // Simulate session expiration by clearing storage
     await page.evaluate(() => {
       localStorage.clear();
       sessionStorage.clear();
     });
-    
+
     // Try to access a protected resource
     await page.goto('/patients');
-    
+
     // Should redirect to login
     await expect(page).toHaveURL(/.*\/login/);
     await expect(page.locator('text=Session expired')).toBeVisible();
@@ -76,17 +76,17 @@ test.describe('Authentication Workflow', () => {
     await page.fill('input[type="email"]', 'test@example.com');
     await page.fill('input[type="password"]', 'testpassword123');
     await page.click('button[type="submit"]');
-    
+
     // Wait for dashboard
     await expect(page).toHaveURL(/.*\/dashboard/);
-    
+
     // Click logout
     await page.click('[data-testid="logout-button"]');
-    
+
     // Should redirect to login page
     await expect(page).toHaveURL(/.*\/login/);
     await expect(page.locator('h1')).toContainText('Sign In');
-    
+
     // Should not be able to access protected routes
     await page.goto('/dashboard');
     await expect(page).toHaveURL(/.*\/login/);

@@ -90,7 +90,7 @@ export function ProtectedRoute({
  */
 export function withAuth<P extends object>(
   Component: React.ComponentType<P>,
-  requiredRoles?: string[]
+  requiredRoles?: string[],
 ) {
   return function AuthenticatedComponent(props: P) {
     return (

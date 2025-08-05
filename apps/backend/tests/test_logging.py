@@ -11,6 +11,7 @@ sys.path.insert(0, parent_dir)
 
 # Import after path setup to avoid import errors
 from fastapi.testclient import TestClient  # noqa: E402
+
 from main import app  # noqa: E402
 from utils.audit_logger import (  # noqa: E402
     log_authentication_event,

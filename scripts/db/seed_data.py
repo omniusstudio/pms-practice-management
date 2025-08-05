@@ -20,10 +20,10 @@ from models.ledger import LedgerEntry, TransactionType, PaymentMethod
 
 async def create_seed_data():
     """Create seed data for local development."""
-    
+
     # Create tables first
     await create_tables()
-    
+
     async with AsyncSessionLocal() as session:
         try:
             # Create providers
@@ -44,7 +44,7 @@ async def create_seed_data():
                 office_zip_code="94102",
                 bio="Experienced psychiatrist specializing in anxiety and depression."
             )
-            
+
             provider2 = Provider(
                 first_name="Lisa",
                 last_name="Chen",
@@ -60,10 +60,10 @@ async def create_seed_data():
                 office_zip_code="94103",
                 bio="Licensed clinical social worker with expertise in trauma therapy."
             )
-            
+
             session.add_all([provider1, provider2])
             await session.commit()
-            
+
             # Create clients (anonymized data)
             client1 = Client(
                 first_name="John",
@@ -81,7 +81,7 @@ async def create_seed_data():
                 preferred_language="English",
                 primary_diagnosis="Generalized Anxiety Disorder"
             )
-            
+
             client2 = Client(
                 first_name="Jane",
                 last_name="Doe",
@@ -98,10 +98,10 @@ async def create_seed_data():
                 preferred_language="English",
                 primary_diagnosis="Major Depressive Disorder"
             )
-            
+
             session.add_all([client1, client2])
             await session.commit()
-            
+
             # Create appointments
             tomorrow = datetime.now() + timedelta(days=1)
             appointment1 = Appointment(
@@ -115,7 +115,7 @@ async def create_seed_data():
                 reason_for_visit="Initial psychiatric evaluation",
                 copay_amount="25.00"
             )
-            
+
             next_week = datetime.now() + timedelta(days=7)
             appointment2 = Appointment(
                 client_id=client2.id,
@@ -128,10 +128,10 @@ async def create_seed_data():
                 reason_for_visit="Weekly therapy session",
                 copay_amount="30.00"
             )
-            
+
             session.add_all([appointment1, appointment2])
             await session.commit()
-            
+
             # Create sample notes
             note1 = Note(
                 client_id=client1.id,
@@ -146,10 +146,10 @@ async def create_seed_data():
                 interventions="Cognitive behavioral therapy, relaxation techniques",
                 plan="Weekly therapy sessions, consider medication evaluation"
             )
-            
+
             session.add(note1)
             await session.commit()
-            
+
             # Create ledger entries
             charge1 = LedgerEntry(
                 client_id=client1.id,
@@ -160,7 +160,7 @@ async def create_seed_data():
                 billing_code="90791",
                 diagnosis_code="F41.1"
             )
-            
+
             payment1 = LedgerEntry(
                 client_id=client1.id,
                 transaction_type=TransactionType.COPAY,
@@ -170,17 +170,17 @@ async def create_seed_data():
                 payment_method=PaymentMethod.CREDIT_CARD,
                 reference_number="CC123456"
             )
-            
+
             session.add_all([charge1, payment1])
             await session.commit()
-            
+
             print("✅ Seed data created successfully!")
             print(f"Created {len([provider1, provider2])} providers")
             print(f"Created {len([client1, client2])} clients")
             print(f"Created {len([appointment1, appointment2])} appointments")
             print(f"Created 1 note")
             print(f"Created {len([charge1, payment1])} ledger entries")
-            
+
         except Exception as e:
             await session.rollback()
             print(f"❌ Error creating seed data: {e}")

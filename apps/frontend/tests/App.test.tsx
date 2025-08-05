@@ -18,7 +18,7 @@ describe('App Component', () => {
     await act(async () => {
       render(<App />);
     });
-    
+
     // App should render the router and auth provider
     expect(screen.getAllByTestId('mock-auth-provider')).toHaveLength(2);
     expect(screen.getByTestId('mock-router')).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe('App Component', () => {
     await act(async () => {
       render(<App />);
     });
-    
+
     // Wait for the dashboard to load
     await waitFor(() => {
       expect(screen.getByText(/Good (morning|afternoon|evening)/)).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('App Component', () => {
     await act(async () => {
       render(<App />);
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText('Good morning, John Doe!')).toBeInTheDocument();
     }, { timeout: 3000 });
@@ -49,7 +49,7 @@ describe('App Component', () => {
     await act(async () => {
       render(<App />);
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText('Welcome to the Patient Management System')).toBeInTheDocument();
     }, { timeout: 3000 });
@@ -59,7 +59,7 @@ describe('App Component', () => {
     await act(async () => {
       render(<App />);
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText('Quick Actions')).toBeInTheDocument();
     }, { timeout: 3000 });

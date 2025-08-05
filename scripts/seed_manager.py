@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 
 class SeedManager:
     """Centralized seed data management system."""
-    
+
     def __init__(self, session=None):
         """Initialize the seed manager."""
         self.session = session or SessionLocal()
@@ -77,18 +77,18 @@ class SeedManager:
             'encryption_keys': EncryptionKey,
             'fhir_mappings': FHIRMapping
         }
-    
+
     def generate_seed_data(
         self,
         counts: Optional[Dict[str, int]] = None,
         tenant_ids: Optional[List[str]] = None
     ) -> Dict[str, List]:
         """Generate seed data for all models.
-        
+
         Args:
             counts: Dictionary specifying count for each model type
             tenant_ids: List of tenant IDs for multi-tenant data
-            
+
         Returns:
             Dictionary containing generated objects by model type
         """
@@ -105,21 +105,21 @@ class SeedManager:
                 'encryption_keys': 10,
                 'fhir_mappings': 80
             }
-        
+
         if tenant_ids is None:
             tenant_ids = ['tenant_001', 'tenant_002', 'tenant_003']
-        
+
         # Configure all factories with the session
         for factory_class in self.factories.values():
             factory_class._meta.sqlalchemy_session = self.session
-        
+
         # Configure FHIR mapping factories with the session
         PatientMappingFactory._meta.sqlalchemy_session = self.session
         PractitionerMappingFactory._meta.sqlalchemy_session = self.session
         AppointmentMappingFactory._meta.sqlalchemy_session = self.session
-        
+
         generated_data = {}
-        
+
         try:
             # Generate practice profiles first (foundational)
             logger.info("Generating practice profiles...")
@@ -130,9 +130,9 @@ class SeedManager:
                 )
                 practice_profiles.append(profile)
                 logger.info(f"Created practice profile: {profile.name}")
-            
+
             generated_data['practice_profiles'] = practice_profiles
-            
+
             # Generate locations for each practice
             logger.info("Generating locations...")
             locations = []
@@ -143,9 +143,9 @@ class SeedManager:
                         tenant_id=profile.tenant_id
                     )
                     locations.append(location)
-            
+
             generated_data['locations'] = locations
-            
+
             # Generate clients
             logger.info("Generating clients...")
             clients = []
@@ -155,9 +155,9 @@ class SeedManager:
                     tenant_id=tenant_id
                 )
                 clients.append(client)
-            
+
             generated_data['clients'] = clients
-            
+
             # Generate providers
             logger.info("Generating providers...")
             providers = []
@@ -167,16 +167,16 @@ class SeedManager:
                     tenant_id=tenant_id
                 )
                 providers.append(provider)
-            
+
             generated_data['providers'] = providers
-            
+
             # Generate appointments
             logger.info("Generating appointments...")
             appointments = []
             for i in range(counts['appointments']):
                 client = clients[i % len(clients)]
                 provider = providers[i % len(providers)]
-                
+
                 # Ensure client and provider are from same tenant
                 if client.tenant_id != provider.tenant_id:
                     provider = next(
@@ -186,16 +186,16 @@ class SeedManager:
                         ),
                         providers[0]
                     )
-                
+
                 appointment = AppointmentFactory.create(
                     client=client,
                     provider=provider,
                     tenant_id=client.tenant_id
                 )
                 appointments.append(appointment)
-            
+
             generated_data['appointments'] = appointments
-            
+
             # Generate notes
             logger.info("Generating notes...")
             notes = []
@@ -208,9 +208,9 @@ class SeedManager:
                     tenant_id=appointment.tenant_id
                 )
                 notes.append(note)
-            
+
             generated_data['notes'] = notes
-            
+
             # Generate ledger entries
             logger.info("Generating ledger entries...")
             ledger_entries = []
@@ -221,9 +221,9 @@ class SeedManager:
                     tenant_id=client.tenant_id
                 )
                 ledger_entries.append(ledger_entry)
-            
+
             generated_data['ledger_entries'] = ledger_entries
-            
+
             # Generate auth tokens
             logger.info("Generating auth tokens...")
             auth_tokens = []
@@ -233,9 +233,9 @@ class SeedManager:
                     tenant_id=tenant_id
                 )
                 auth_tokens.append(auth_token)
-            
+
             generated_data['auth_tokens'] = auth_tokens
-            
+
             # Generate encryption keys
             logger.info("Generating encryption keys...")
             encryption_keys = []
@@ -245,13 +245,13 @@ class SeedManager:
                     tenant_id=tenant_id
                 )
                 encryption_keys.append(encryption_key)
-            
+
             generated_data['encryption_keys'] = encryption_keys
-            
+
             # Generate FHIR mappings
             logger.info("Generating FHIR mappings...")
             fhir_mappings = []
-            
+
             # Create mappings for clients (Patient resources)
             client_count = min(len(clients), counts['fhir_mappings'] // 3)
             for client in clients[:client_count]:
@@ -260,7 +260,7 @@ class SeedManager:
                     tenant_id=client.tenant_id
                 )
                 fhir_mappings.append(mapping)
-            
+
             # Create mappings for providers (Practitioner resources)
             provider_count = min(len(providers), counts['fhir_mappings'] // 3)
             for provider in providers[:provider_count]:
@@ -269,7 +269,7 @@ class SeedManager:
                     tenant_id=provider.tenant_id
                 )
                 fhir_mappings.append(mapping)
-            
+
             # Create mappings for appointments
             appointment_count = min(
                 len(appointments), counts['fhir_mappings'] // 3
@@ -280,27 +280,27 @@ class SeedManager:
                     tenant_id=appointment.tenant_id
                 )
                 fhir_mappings.append(mapping)
-            
+
             generated_data['fhir_mappings'] = fhir_mappings
-            
+
             # Commit all changes
             self.session.commit()
             logger.info("Successfully generated all seed data")
-            
+
             # Log summary
             for model_type, objects in generated_data.items():
                 logger.info(f"Generated {len(objects)} {model_type}")
-            
+
             return generated_data
-            
+
         except Exception as e:
             logger.error(f"Error generating seed data: {e}")
             self.session.rollback()
             raise
-    
+
     def clean_seed_data(self, confirm: bool = False) -> None:
         """Clean all seed data from the database.
-        
+
         Args:
             confirm: If True, proceed with deletion without prompt
         """
@@ -312,7 +312,7 @@ class SeedManager:
             if response.lower() != 'yes':
                 logger.info("Operation cancelled")
                 return
-        
+
         try:
             # Delete in reverse dependency order
             delete_order = [
@@ -320,36 +320,36 @@ class SeedManager:
                 'providers', 'clients', 'locations', 'practice_profiles',
                 'auth_tokens', 'encryption_keys'
             ]
-            
+
             for model_type in delete_order:
                 model_class = self.models[model_type]
                 count = self.session.query(model_class).count()
                 if count > 0:
                     self.session.query(model_class).delete()
                     logger.info(f"Deleted {count} {model_type}")
-            
+
             self.session.commit()
             logger.info("Successfully cleaned all seed data")
-            
+
         except Exception as e:
             logger.error(f"Error cleaning seed data: {e}")
             self.session.rollback()
             raise
-    
+
     def reset_database(self, environment: str = "development") -> None:
         """Reset database with fresh seed data.
-        
+
         Args:
             environment: Target environment (development, test, staging)
         """
         if environment == "production":
             raise ValueError("Cannot reset production database")
-        
+
         logger.info(f"Resetting {environment} database...")
-        
+
         # Clean existing data
         self.clean_seed_data(confirm=True)
-        
+
         # Generate new seed data
         counts = {
             "development": {
@@ -389,63 +389,63 @@ class SeedManager:
                 'fhir_mappings': 150
             }
         }
-        
+
         self.generate_seed_data(counts=counts.get(environment))
         logger.info(f"Successfully reset {environment} database")
-    
+
     def validate_data_integrity(self) -> Dict[str, bool]:
         """Validate data integrity and relationships.
-        
+
         Returns:
             Dictionary of validation results by check type
         """
         results = {}
-        
+
         try:
             # Check tenant isolation
             logger.info("Validating tenant isolation...")
             tenant_violations = []
-            
+
             # Check appointments have matching client/provider tenants
             appointments = self.session.query(Appointment).all()
             for apt in appointments:
                 if (apt.client.tenant_id != apt.provider.tenant_id or
                         apt.tenant_id != apt.client.tenant_id):
                     tenant_violations.append(f"Appointment {apt.id}")
-            
+
             results['tenant_isolation'] = len(tenant_violations) == 0
             if tenant_violations:
                 logger.warning(
                     f"Tenant violations found: {tenant_violations[:5]}"
                 )
-            
+
             # Check required relationships
             logger.info("Validating relationships...")
-            
+
             # Check notes have valid appointments
             notes_without_appointments = self.session.query(Note).filter(
                 Note.appointment_id.is_(None)
             ).count()
-            
+
             results['relationships'] = notes_without_appointments == 0
-            
+
             # Check HIPAA compliance markers
             logger.info("Validating HIPAA compliance...")
-            
+
             # Check for potentially real data patterns
             suspicious_emails = self.session.query(Client).filter(
                 ~Client.email.like('%.local')
             ).count()
-            
+
             results['hipaa_compliance'] = suspicious_emails == 0
-            
+
             logger.info(f"Validation results: {results}")
             return results
-            
+
         except Exception as e:
             logger.error(f"Error during validation: {e}")
             return {'error': False}
-    
+
     def close(self):
         """Close the database session."""
         if self.session:
@@ -457,9 +457,9 @@ def main():
     parser = argparse.ArgumentParser(
         description="HIPAA-compliant seed data management"
     )
-    
+
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
-    
+
     # Generate command
     generate_parser = subparsers.add_parser(
         'generate', help='Generate seed data'
@@ -472,7 +472,7 @@ def main():
         '--tenants', nargs='+', default=['tenant_001', 'tenant_002'],
         help='Tenant IDs to generate data for'
     )
-    
+
     # Clean command
     clean_parser = subparsers.add_parser(
         'clean', help='Clean all seed data'
@@ -481,7 +481,7 @@ def main():
         '--confirm', action='store_true',
         help='Skip confirmation prompt'
     )
-    
+
     # Reset command
     reset_parser = subparsers.add_parser(
         'reset', help='Reset database with fresh data'
@@ -490,21 +490,21 @@ def main():
         '--environment', choices=['development', 'test', 'staging'],
         default='development', help='Target environment'
     )
-    
+
     # Validate command
     subparsers.add_parser(
         'validate', help='Validate data integrity'
     )
-    
+
     args = parser.parse_args()
-    
+
     if not args.command:
         parser.print_help()
         return
-    
+
     # Initialize seed manager
     seed_manager = SeedManager()
-    
+
     try:
         if args.command == 'generate':
             base_count = args.count
@@ -524,26 +524,26 @@ def main():
                 counts=counts,
                 tenant_ids=args.tenants
             )
-            
+
         elif args.command == 'clean':
             seed_manager.clean_seed_data(confirm=args.confirm)
-            
+
         elif args.command == 'reset':
             seed_manager.reset_database(environment=args.environment)
-            
+
         elif args.command == 'validate':
             results = seed_manager.validate_data_integrity()
             for check, passed in results.items():
                 status = "PASS" if passed else "FAIL"
                 print(f"{check}: {status}")
-            
+
             if not all(results.values()):
                 sys.exit(1)
-    
+
     except Exception as e:
         logger.error(f"Command failed: {e}")
         sys.exit(1)
-    
+
     finally:
         seed_manager.close()
 

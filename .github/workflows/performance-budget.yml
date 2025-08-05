@@ -41,49 +41,49 @@ jobs:
     name: Performance Budget Validation
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+
     strategy:
       matrix:
         test-scenario: [baseline, load, stress]
-        
+
     environment:
       name: ${{ github.event.inputs.environment || 'staging' }}
       url: ${{ vars.APP_URL }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Need full history for baseline comparison
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: 'tests/performance/package-lock.json'
-      
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      
+
       - name: Install performance test dependencies
         working-directory: tests/performance
         run: |
           npm ci
           npm install -g artillery@latest
-      
+
       - name: Validate performance budget configuration
         working-directory: tests/performance
         run: |
           echo "🔍 Validating performance budget configuration..."
           node -e "const config = require('./performance-budgets.json'); console.log('✅ Performance budgets loaded successfully');"
-          
+
           # Check Artillery version and validate configuration
           echo "📋 Artillery version:"
           artillery --version
-          
+
           echo "🔍 Validating Artillery configuration..."
           # Artillery v2.x doesn't have validate command, so we'll check YAML syntax
           if node -e "const yaml = require('js-yaml'); const fs = require('fs'); try { yaml.load(fs.readFileSync('artillery.yml', 'utf8')); console.log('✅ Artillery configuration is valid'); } catch(e) { console.error('❌ Artillery configuration validation failed:', e.message); process.exit(1); }"; then
@@ -92,13 +92,13 @@ jobs:
             echo "❌ Artillery configuration validation failed"
             exit 1
           fi
-      
+
       - name: Wait for application to be ready
         run: |
           echo "⏳ Waiting for application to be ready..."
           timeout 300 bash -c 'until curl -f ${{ vars.APP_URL }}/api/health; do sleep 5; done'
           echo "✅ Application is ready"
-      
+
       - name: Load existing baseline
         id: load-baseline
         working-directory: tests/performance
@@ -112,7 +112,7 @@ jobs:
             echo "📊 No existing baseline found"
             echo "baseline_exists=false" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Run performance tests
         id: performance-test
         working-directory: tests/performance
@@ -126,7 +126,7 @@ jobs:
           TEST_DURATION: ${{ github.event.inputs.test_duration || '5' }}
         run: |
           echo "🚀 Running performance tests for scenario: ${{ matrix.test-scenario }}"
-          
+
           # Set test-specific configuration
           case "${{ matrix.test-scenario }}" in
             "baseline")
@@ -139,31 +139,31 @@ jobs:
               export ARTILLERY_PHASES="warm-up,normal,peak,stress"
               ;;
           esac
-          
+
           # Run the baseline test script
           node baseline-test.js --quiet
-          
+
           echo "test_completed=true" >> $GITHUB_OUTPUT
-      
+
       - name: Parse test results
         id: parse-results
         working-directory: tests/performance
         run: |
           # Find the latest results file
           LATEST_REPORT=$(ls -t reports/performance-report-*.json | head -n1)
-          
+
           if [ -f "$LATEST_REPORT" ]; then
             echo "📊 Parsing results from: $LATEST_REPORT"
-            
+
             # Extract key metrics
             OVERALL_STATUS=$(jq -r '.summary.overall_status' "$LATEST_REPORT")
             BUDGET_STATUS=$(jq -r '.summary.budget_status' "$LATEST_REPORT")
             REGRESSION_STATUS=$(jq -r '.summary.regression_status' "$LATEST_REPORT")
-            
+
             # Extract violation count
             VIOLATION_COUNT=$(jq '.budget_validation.violations | length' "$LATEST_REPORT")
             REGRESSION_COUNT=$(jq '.baseline_comparison.regressions | length // 0' "$LATEST_REPORT")
-            
+
             echo "overall_status=$OVERALL_STATUS" >> $GITHUB_OUTPUT
             echo "budget_status=$BUDGET_STATUS" >> $GITHUB_OUTPUT
             echo "regression_status=$REGRESSION_STATUS" >> $GITHUB_OUTPUT
@@ -174,43 +174,43 @@ jobs:
             echo "❌ No results file found"
             exit 1
           fi
-      
+
       - name: Generate performance summary
         id: summary
         working-directory: tests/performance
         run: |
           REPORT_FILE="${{ steps.parse-results.outputs.report_file }}"
-          
+
           # Create markdown summary
           cat > performance-summary.md << 'EOF'
           ## 📊 Performance Test Results - ${{ matrix.test-scenario }}
-          
+
           **Overall Status:** ${{ steps.parse-results.outputs.overall_status == 'PASS' && '✅ PASS' || '❌ FAIL' }}
-          
+
           ### Budget Validation
           **Status:** ${{ steps.parse-results.outputs.budget_status == 'PASS' && '✅ PASS' || '❌ FAIL' }}
           **Violations:** ${{ steps.parse-results.outputs.violation_count }}
-          
+
           ### Baseline Comparison
           **Status:** ${{ steps.parse-results.outputs.regression_status == 'PASS' && '✅ PASS' || '❌ FAIL' }}
           **Regressions:** ${{ steps.parse-results.outputs.regression_count }}
-          
+
           EOF
-          
+
           # Add violations if any
           if [ "${{ steps.parse-results.outputs.violation_count }}" -gt 0 ]; then
             echo "### 🚨 Budget Violations" >> performance-summary.md
             jq -r '.budget_validation.violations[] | "- **" + .metric + "**: " + .actual + " (budget: " + .budget + ", severity: " + .severity + ")"' "$REPORT_FILE" >> performance-summary.md
             echo "" >> performance-summary.md
           fi
-          
+
           # Add regressions if any
           if [ "${{ steps.parse-results.outputs.regression_count }}" -gt 0 ]; then
             echo "### 📉 Performance Regressions" >> performance-summary.md
             jq -r '.baseline_comparison.regressions[] | "- **" + .metric + "**: " + .current + " vs " + .baseline + " (" + .change + ")"' "$REPORT_FILE" >> performance-summary.md
             echo "" >> performance-summary.md
           fi
-          
+
           # Add improvements if any
           IMPROVEMENT_COUNT=$(jq '.baseline_comparison.improvements | length // 0' "$REPORT_FILE")
           if [ "$IMPROVEMENT_COUNT" -gt 0 ]; then
@@ -218,16 +218,16 @@ jobs:
             jq -r '.baseline_comparison.improvements[] | "- **" + .metric + "**: " + .current + " vs " + .baseline + " (" + .change + ")"' "$REPORT_FILE" >> performance-summary.md
             echo "" >> performance-summary.md
           fi
-          
+
           # Add environment info
           echo "### 🔧 Test Environment" >> performance-summary.md
           echo "- **Environment:** ${{ github.event.inputs.environment || 'staging' }}" >> performance-summary.md
           echo "- **Scenario:** ${{ matrix.test-scenario }}" >> performance-summary.md
           echo "- **Commit:** ${{ github.sha }}" >> performance-summary.md
           echo "- **Baseline Date:** ${{ steps.load-baseline.outputs.baseline_date || 'N/A' }}" >> performance-summary.md
-          
+
           echo "summary_file=performance-summary.md" >> $GITHUB_OUTPUT
-      
+
       - name: Upload performance results
         uses: actions/upload-artifact@v4
         with:
@@ -238,7 +238,7 @@ jobs:
             tests/performance/baseline-results.json
             tests/performance/performance-summary.md
           retention-days: ${{ env.PERFORMANCE_RESULTS_RETENTION_DAYS }}
-      
+
       - name: Comment on PR with results
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -246,22 +246,22 @@ jobs:
           script: |
             const fs = require('fs');
             const path = 'tests/performance/${{ steps.summary.outputs.summary_file }}';
-            
+
             if (fs.existsSync(path)) {
               const summary = fs.readFileSync(path, 'utf8');
-              
+
               // Find existing comment
               const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
               });
-              
-              const botComment = comments.find(comment => 
-                comment.user.type === 'Bot' && 
+
+              const botComment = comments.find(comment =>
+                comment.user.type === 'Bot' &&
                 comment.body.includes('Performance Test Results - ${{ matrix.test-scenario }}')
               );
-              
+
               if (botComment) {
                 // Update existing comment
                 await github.rest.issues.updateComment({
@@ -280,7 +280,7 @@ jobs:
                 });
               }
             }
-      
+
       - name: Fail job if performance budgets violated
         if: steps.parse-results.outputs.overall_status == 'FAIL'
         run: |
@@ -290,76 +290,76 @@ jobs:
           echo "  - Violations: ${{ steps.parse-results.outputs.violation_count }}"
           echo "  - Regressions: ${{ steps.parse-results.outputs.regression_count }}"
           exit 1
-  
+
   update-baseline:
     name: Update Performance Baseline
     runs-on: ubuntu-latest
     needs: performance-budget-validation
     if: |
-      always() && 
-      (github.event.inputs.save_baseline == 'true' || 
+      always() &&
+      (github.event.inputs.save_baseline == 'true' ||
        (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
        github.event_name == 'schedule')
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Download performance results
         uses: actions/download-artifact@v4
         with:
           name: performance-results-baseline-${{ github.sha }}
           path: tests/performance/
-      
+
       - name: Commit updated baseline
         run: |
           cd tests/performance
-          
+
           if [ -f "baseline-results.json" ]; then
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
-            
+
             git add baseline-results.json
             git commit -m "chore: update performance baseline [skip ci]
-            
+
             - Updated from commit: ${{ github.sha }}
             - Environment: ${{ github.event.inputs.environment || 'staging' }}
             - Triggered by: ${{ github.event_name }}
             " || echo "No changes to commit"
-            
+
             git push
             echo "✅ Performance baseline updated"
           else
             echo "⚠️ No baseline file found to commit"
           fi
-  
+
   performance-report:
     name: Generate Performance Report
     runs-on: ubuntu-latest
     needs: performance-budget-validation
     if: always()
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Download all performance results
         uses: actions/download-artifact@v4
         with:
           pattern: performance-results-*-${{ github.sha }}
           path: performance-artifacts/
           merge-multiple: true
-      
+
       - name: Generate consolidated report
         run: |
           echo "📊 Generating consolidated performance report..."
-          
+
           # Create consolidated report directory
           mkdir -p consolidated-report
-          
+
           # Combine all scenario results
           echo '{"scenarios": []}' > consolidated-report/combined-results.json
-          
+
           for scenario in baseline load stress; do
             if [ -d "performance-artifacts/reports" ]; then
               SCENARIO_REPORT=$(find performance-artifacts/reports -name "*performance-report-*.json" | head -n1)
@@ -369,16 +369,16 @@ jobs:
               fi
             fi
           done
-          
+
           echo "✅ Consolidated report generated"
-      
+
       - name: Upload consolidated report
         uses: actions/upload-artifact@v4
         with:
           name: performance-consolidated-report-${{ github.sha }}
           path: consolidated-report/
           retention-days: ${{ env.PERFORMANCE_RESULTS_RETENTION_DAYS }}
-      
+
       - name: Create job summary
         run: |
           echo "## 📊 Performance Test Summary" >> $GITHUB_STEP_SUMMARY
@@ -387,12 +387,12 @@ jobs:
           echo "**Environment:** ${{ github.event.inputs.environment || 'staging' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Add links to artifacts
           echo "### 📁 Artifacts" >> $GITHUB_STEP_SUMMARY
           echo "- [Consolidated Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
           echo "- [Performance Results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ -f "performance-artifacts/baseline-results.json" ]; then
             BASELINE_DATE=$(jq -r '.timestamp' performance-artifacts/baseline-results.json)
             echo "- **Baseline Date:** $BASELINE_DATE" >> $GITHUB_STEP_SUMMARY

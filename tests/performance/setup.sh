@@ -31,13 +31,13 @@ log_error() {
 
 check_prerequisites() {
     log_info "Checking prerequisites..."
-    
+
     if ! command -v node >/dev/null 2>&1; then
         log_error "Node.js is required but not installed"
         exit 1
     fi
     log_success "Node.js $(node --version) found"
-    
+
     if ! command -v npm >/dev/null 2>&1; then
         log_error "npm is required but not installed"
         exit 1
@@ -47,26 +47,26 @@ check_prerequisites() {
 
 install_dependencies() {
     log_info "Installing dependencies..."
-    
+
     if [ ! -f "package.json" ]; then
         log_error "package.json not found"
         exit 1
     fi
-    
+
     npm install
     log_success "Dependencies installed"
 }
 
 setup_directories() {
     log_info "Setting up directories..."
-    
+
     mkdir -p results reports baselines
     log_success "Directories created"
 }
 
 validate_config() {
     log_info "Validating configuration files..."
-    
+
     if [ -f "performance-budgets.json" ]; then
         if node -e "require('./performance-budgets.json'); console.log('Performance budgets valid');"; then
             log_success "Performance budgets configuration valid"
@@ -78,14 +78,14 @@ validate_config() {
         log_error "performance-budgets.json not found"
         exit 1
     fi
-    
+
     if [ -f "artillery.yml" ]; then
         log_success "Artillery configuration found"
     else
         log_error "artillery.yml not found"
         exit 1
     fi
-    
+
     if [ -f "baseline-test.js" ]; then
         if node -c "baseline-test.js" >/dev/null 2>&1; then
             log_success "baseline-test.js syntax valid"
@@ -101,11 +101,11 @@ validate_config() {
 
 setup_git_hooks() {
     log_info "Setting up Git hooks..."
-    
+
     if git rev-parse --git-dir >/dev/null 2>&1; then
         hooks_dir="$(git rev-parse --git-dir)/hooks"
         mkdir -p "$hooks_dir"
-        
+
         # Create pre-push hook
         cat > "$hooks_dir/pre-push" << 'HOOK_EOF'
 #!/bin/bash
@@ -119,7 +119,7 @@ if [ -f "performance-budgets.json" ]; then
 fi
 echo "Performance configuration is valid"
 HOOK_EOF
-        
+
         chmod +x "$hooks_dir/pre-push"
         log_success "Git pre-push hook installed"
     else
@@ -158,15 +158,15 @@ main() {
     echo "Mental Health Practice Management"
     echo "======================================"
     echo -e "${NC}"
-    
+
     check_prerequisites
     install_dependencies
     setup_directories
     validate_config
     setup_git_hooks
-    
+
     print_usage
-    
+
     log_success "Setup completed successfully!"
 }
 

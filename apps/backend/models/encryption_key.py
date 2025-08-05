@@ -3,12 +3,28 @@
 from datetime import datetime, timezone
 from enum import Enum
 
-from sqlalchemy import Boolean, Column, DateTime
+# from models.auth_token import JSONBType  # Disabled for OpenAPI schema
+# Using local JSON type instead
+from sqlalchemy import JSON, Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Index, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import sqltypes
 
-from models.auth_token import JSONBType
+
+class JSONBType(sqltypes.TypeDecorator):
+    """A type that uses JSONB for PostgreSQL and JSON for other databases."""
+
+    impl = JSON
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(JSONB())
+        else:
+            return dialect.type_descriptor(JSON())
+
 
 from .base import BaseModel
 from .types import UUID

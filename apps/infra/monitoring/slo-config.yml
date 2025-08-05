@@ -253,7 +253,7 @@ data:
         - name: "Error Budget Status"
           url: "/grafana/d/error-budget"
           description: "Current error budget consumption"
-      
+
       reports:
         - name: "Monthly SLO Report"
           schedule: "0 0 1 * *"  # First day of each month
@@ -273,12 +273,12 @@ data:
           - "Audit trail required for all SLO changes"
           - "Access controls must be enforced"
           - "Data retention policies must be followed"
-      
+
       audit:
         log_slo_changes: true
         log_threshold_breaches: true
         retention_days: 2555  # 7 years for HIPAA compliance
-        
+
       access_control:
         read_access: ["developers", "devops", "management"]
         write_access: ["devops", "sre"]

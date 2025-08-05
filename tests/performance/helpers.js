@@ -36,7 +36,7 @@ function generateTestData() {
   const firstNames = ['Test', 'Demo', 'Sample', 'Mock', 'Example'];
   const lastNames = ['User', 'Patient', 'Provider', 'Admin', 'Client'];
   const domains = ['example.com', 'test.org', 'demo.net'];
-  
+
   return {
     firstName: firstNames[Math.floor(Math.random() * firstNames.length)],
     lastName: lastNames[Math.floor(Math.random() * lastNames.length)],
@@ -123,7 +123,7 @@ function saveBaseline(results) {
       results: results,
       budgets: PERFORMANCE_BUDGETS
     };
-    
+
     fs.writeFileSync(BASELINE_FILE, JSON.stringify(baselineData, null, 2));
     console.log('Baseline saved successfully');
   } catch (error) {
@@ -146,7 +146,7 @@ function validateBudgets(stats) {
   if (stats.latency && stats.latency.p50) {
     const p50Ms = stats.latency.p50;
     results.summary.api_p50_ms = p50Ms;
-    
+
     if (p50Ms > PERFORMANCE_BUDGETS.api.p50_ms) {
       violations.push({
         metric: 'API P50 Latency',
@@ -160,7 +160,7 @@ function validateBudgets(stats) {
   if (stats.latency && stats.latency.p95) {
     const p95Ms = stats.latency.p95;
     results.summary.api_p95_ms = p95Ms;
-    
+
     if (p95Ms > PERFORMANCE_BUDGETS.api.p95_ms) {
       violations.push({
         metric: 'API P95 Latency',
@@ -177,10 +177,10 @@ function validateBudgets(stats) {
     const errorRequests = Object.entries(stats.codes)
       .filter(([code]) => code.startsWith('4') || code.startsWith('5'))
       .reduce((sum, [, count]) => sum + count, 0);
-    
+
     const errorRate = totalRequests > 0 ? (errorRequests / totalRequests) * 100 : 0;
     results.summary.error_rate_percent = errorRate;
-    
+
     if (errorRate > PERFORMANCE_BUDGETS.api.error_rate_percent) {
       violations.push({
         metric: 'API Error Rate',
@@ -193,7 +193,7 @@ function validateBudgets(stats) {
 
   results.violations = violations;
   results.passed = violations.length === 0;
-  
+
   return results;
 }
 
@@ -220,7 +220,7 @@ function compareWithBaseline(currentStats) {
     const baselineP50 = baseline.results.latency.p50 || 0;
     const currentP50 = currentStats.latency.p50 || 0;
     const regressionThreshold = baselineP50 * 1.2; // 20% regression threshold
-    
+
     if (currentP50 > regressionThreshold) {
       regressions.push({
         metric: 'P50 Latency',
@@ -241,7 +241,7 @@ function compareWithBaseline(currentStats) {
     const baselineP95 = baseline.results.latency.p95 || 0;
     const currentP95 = currentStats.latency.p95 || 0;
     const regressionThreshold = baselineP95 * 1.2;
-    
+
     if (currentP95 > regressionThreshold) {
       regressions.push({
         metric: 'P95 Latency',
@@ -265,7 +265,7 @@ function beforeTest(context, events, done) {
   console.log(`   API P50: < ${PERFORMANCE_BUDGETS.api.p50_ms}ms`);
   console.log(`   API P95: < ${PERFORMANCE_BUDGETS.api.p95_ms}ms`);
   console.log(`   Error Rate: < ${PERFORMANCE_BUDGETS.api.error_rate_percent}%`);
-  
+
   return done();
 }
 
@@ -274,12 +274,12 @@ function beforeTest(context, events, done) {
  */
 function afterTest(context, events, done) {
   const stats = context.vars.$artillery_report || {};
-  
+
   console.log('\n📈 Performance Test Results:');
-  
+
   // Validate against budgets
   const budgetResults = validateBudgets(stats);
-  
+
   if (budgetResults.passed) {
     console.log('✅ All performance budgets passed!');
   } else {
@@ -289,10 +289,10 @@ function afterTest(context, events, done) {
       console.log(`   ${icon} ${violation.metric}: ${violation.actual} (budget: ${violation.budget})`);
     });
   }
-  
+
   // Compare with baseline
   const comparison = compareWithBaseline(stats);
-  
+
   if (comparison.hasBaseline) {
     if (comparison.regressions.length > 0) {
       console.log('\n📉 Performance regressions detected:');
@@ -300,7 +300,7 @@ function afterTest(context, events, done) {
         console.log(`   🔻 ${regression.metric}: ${regression.current} vs ${regression.baseline} (${regression.regression} slower)`);
       });
     }
-    
+
     if (comparison.improvements.length > 0) {
       console.log('\n📈 Performance improvements:');
       comparison.improvements.forEach(improvement => {
@@ -308,11 +308,11 @@ function afterTest(context, events, done) {
       });
     }
   }
-  
+
   // Save results
   const timestamp = new Date().toISOString();
   const resultsFile = path.join(RESULTS_DIR, `results-${timestamp.replace(/[:.]/g, '-')}.json`);
-  
+
   const fullResults = {
     timestamp,
     stats,
@@ -324,26 +324,26 @@ function afterTest(context, events, done) {
       ci: process.env.CI === 'true'
     }
   };
-  
+
   try {
     fs.writeFileSync(resultsFile, JSON.stringify(fullResults, null, 2));
     console.log(`\n💾 Results saved to: ${resultsFile}`);
   } catch (error) {
     console.error('Failed to save results:', error.message);
   }
-  
+
   // Update baseline if this is a baseline run
   if (process.env.SAVE_BASELINE === 'true') {
     saveBaseline(stats);
     console.log('\n📊 New baseline saved');
   }
-  
+
   // Exit with error code if budgets failed (for CI/CD)
   if (!budgetResults.passed && process.env.CI === 'true') {
     console.log('\n❌ Exiting with error code due to budget violations');
     process.exit(1);
   }
-  
+
   return done();
 }
 
@@ -355,11 +355,11 @@ module.exports = {
   $randomLastName: randomLastName,
   $randomPhoneNumber: randomPhoneNumber,
   $randomUUID: randomUUID,
-  
+
   // Lifecycle hooks
   beforeTest,
   afterTest,
-  
+
   // Utility functions
   validateBudgets,
   compareWithBaseline,

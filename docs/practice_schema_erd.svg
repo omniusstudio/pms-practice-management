@@ -13,17 +13,17 @@
       .constraint-text { fill: #fd7e14; font-size: 8px; }
     </style>
   </defs>
-  
+
   <!-- Title -->
   <text x="700" y="30" text-anchor="middle" class="table-title" font-size="18">Practice Management System - Complete ERD</text>
-  
+
   <!-- Core Practice Tables -->
   <!-- PracticeProfile Table -->
   <g id="practice-profile">
     <rect x="50" y="60" width="250" height="280" class="table-box"/>
     <rect x="50" y="60" width="250" height="25" class="table-header"/>
     <text x="175" y="77" text-anchor="middle" class="table-title">PracticeProfile</text>
-    
+
     <text x="60" y="95" class="field-text pk-field">id (UUID, PK)</text>
     <text x="60" y="108" class="field-text">created_at (TIMESTAMP)</text>
     <text x="60" y="121" class="field-text">updated_at (TIMESTAMP)</text>
@@ -44,13 +44,13 @@
     <text x="60" y="316" class="field-text">default_appointment_duration (VARCHAR)</text>
     <text x="60" y="329" class="field-text">... (billing, description fields)</text>
   </g>
-  
+
   <!-- Location Table -->
   <g id="location">
     <rect x="350" y="60" width="250" height="280" class="table-box"/>
     <rect x="350" y="60" width="250" height="25" class="table-header"/>
     <text x="475" y="77" text-anchor="middle" class="table-title">Location</text>
-    
+
     <text x="360" y="95" class="field-text pk-field">id (UUID, PK)</text>
     <text x="360" y="108" class="field-text">created_at (TIMESTAMP)</text>
     <text x="360" y="121" class="field-text">updated_at (TIMESTAMP)</text>
@@ -71,14 +71,14 @@
     <text x="360" y="316" class="field-text">accepts_appointments (BOOLEAN)</text>
     <text x="360" y="329" class="field-text">... (parking, transport fields)</text>
   </g>
-  
+
   <!-- Core Entity Tables -->
   <!-- Client Table -->
   <g id="client">
     <rect x="50" y="380" width="250" height="300" class="table-box"/>
     <rect x="50" y="380" width="250" height="25" class="table-header"/>
     <text x="175" y="397" text-anchor="middle" class="table-title">Client</text>
-    
+
     <text x="60" y="415" class="field-text pk-field">id (UUID, PK)</text>
     <text x="60" y="428" class="field-text">created_at (TIMESTAMP)</text>
     <text x="60" y="441" class="field-text">updated_at (TIMESTAMP)</text>
@@ -100,13 +100,13 @@
     <text x="60" y="649" class="field-text">preferred_language (VARCHAR)</text>
     <text x="60" y="662" class="field-text">... (clinical, notes fields)</text>
   </g>
-  
+
   <!-- Provider Table -->
   <g id="provider">
     <rect x="350" y="380" width="250" height="300" class="table-box"/>
     <rect x="350" y="380" width="250" height="25" class="table-header"/>
     <text x="475" y="397" text-anchor="middle" class="table-title">Provider</text>
-    
+
     <text x="360" y="415" class="field-text pk-field">id (UUID, PK)</text>
     <text x="360" y="428" class="field-text">created_at (TIMESTAMP)</text>
     <text x="360" y="441" class="field-text">updated_at (TIMESTAMP)</text>
@@ -128,13 +128,13 @@
     <text x="360" y="649" class="field-text">bio (TEXT)</text>
     <text x="360" y="662" class="field-text">... (office, admin fields)</text>
   </g>
-  
+
   <!-- Appointment Table -->
   <g id="appointment">
     <rect x="650" y="380" width="250" height="300" class="table-box"/>
     <rect x="650" y="380" width="250" height="25" class="table-header"/>
     <text x="775" y="397" text-anchor="middle" class="table-title">Appointment</text>
-    
+
     <text x="660" y="415" class="field-text pk-field">id (UUID, PK)</text>
     <text x="660" y="428" class="field-text">created_at (TIMESTAMP)</text>
     <text x="660" y="441" class="field-text">updated_at (TIMESTAMP)</text>
@@ -156,13 +156,13 @@
     <text x="660" y="649" class="field-text">notes (TEXT)</text>
     <text x="660" y="662" class="field-text">... (reminder, billing fields)</text>
   </g>
-  
+
   <!-- Note Table -->
   <g id="note">
     <rect x="950" y="380" width="250" height="300" class="table-box"/>
     <rect x="950" y="380" width="250" height="25" class="table-header"/>
     <text x="1075" y="397" text-anchor="middle" class="table-title">Note</text>
-    
+
     <text x="960" y="415" class="field-text pk-field">id (UUID, PK)</text>
     <text x="960" y="428" class="field-text">created_at (TIMESTAMP)</text>
     <text x="960" y="441" class="field-text">updated_at (TIMESTAMP)</text>
@@ -184,13 +184,13 @@
     <text x="960" y="649" class="field-text">billable (BOOLEAN)</text>
     <text x="960" y="662" class="field-text">... (review, compliance fields)</text>
   </g>
-  
+
   <!-- Ledger Table -->
   <g id="ledger">
     <rect x="50" y="720" width="250" height="280" class="table-box"/>
     <rect x="50" y="720" width="250" height="25" class="table-header"/>
     <text x="175" y="737" text-anchor="middle" class="table-title">LedgerEntry</text>
-    
+
     <text x="60" y="755" class="field-text pk-field">id (UUID, PK)</text>
     <text x="60" y="768" class="field-text">created_at (TIMESTAMP)</text>
     <text x="60" y="781" class="field-text">updated_at (TIMESTAMP)</text>
@@ -210,14 +210,14 @@
     <text x="60" y="963" class="field-text">reconciliation_date (DATE)</text>
     <text x="60" y="976" class="field-text">... (insurance, notes fields)</text>
   </g>
-  
+
   <!-- Security & Compliance Tables -->
   <!-- AuthToken Table -->
   <g id="auth-token">
     <rect x="350" y="720" width="250" height="280" class="table-box"/>
     <rect x="350" y="720" width="250" height="25" class="table-header"/>
     <text x="475" y="737" text-anchor="middle" class="table-title">AuthToken</text>
-    
+
     <text x="360" y="755" class="field-text pk-field">id (UUID, PK)</text>
     <text x="360" y="768" class="field-text">created_at (TIMESTAMP)</text>
     <text x="360" y="781" class="field-text">updated_at (TIMESTAMP)</text>
@@ -237,13 +237,13 @@
     <text x="360" y="963" class="field-text">user_agent (TEXT)</text>
     <text x="360" y="976" class="field-text">... (refresh, parent fields)</text>
   </g>
-  
+
   <!-- EncryptionKey Table -->
   <g id="encryption-key">
     <rect x="650" y="720" width="250" height="280" class="table-box"/>
     <rect x="650" y="720" width="250" height="25" class="table-header"/>
     <text x="775" y="737" text-anchor="middle" class="table-title">EncryptionKey</text>
-    
+
     <text x="660" y="755" class="field-text pk-field">id (UUID, PK)</text>
     <text x="660" y="768" class="field-text">created_at (TIMESTAMP)</text>
     <text x="660" y="781" class="field-text">updated_at (TIMESTAMP)</text>
@@ -263,13 +263,13 @@
     <text x="660" y="963" class="field-text fk-field">rotation_policy_id (UUID, FK)</text>
     <text x="660" y="976" class="field-text">... (token, metadata fields)</text>
   </g>
-  
+
   <!-- KeyRotationPolicy Table -->
   <g id="key-rotation-policy">
     <rect x="950" y="720" width="250" height="280" class="table-box"/>
     <rect x="950" y="720" width="250" height="25" class="table-header"/>
     <text x="1075" y="737" text-anchor="middle" class="table-title">KeyRotationPolicy</text>
-    
+
     <text x="960" y="755" class="field-text pk-field">id (UUID, PK)</text>
     <text x="960" y="768" class="field-text">created_at (TIMESTAMP)</text>
     <text x="960" y="781" class="field-text">updated_at (TIMESTAMP)</text>
@@ -289,14 +289,14 @@
     <text x="960" y="963" class="field-text">next_rotation_due (TIMESTAMP)</text>
     <text x="960" y="976" class="field-text">... (compliance fields)</text>
   </g>
-  
+
   <!-- FHIR & Audit Tables -->
   <!-- FHIRMapping Table -->
   <g id="fhir-mapping">
     <rect x="1250" y="380" width="250" height="300" class="table-box"/>
     <rect x="1250" y="380" width="250" height="25" class="table-header"/>
     <text x="1375" y="397" text-anchor="middle" class="table-title">FHIRMapping</text>
-    
+
     <text x="1260" y="415" class="field-text pk-field">id (UUID, PK)</text>
     <text x="1260" y="428" class="field-text">created_at (TIMESTAMP)</text>
     <text x="1260" y="441" class="field-text">updated_at (TIMESTAMP)</text>
@@ -318,13 +318,13 @@
     <text x="1260" y="649" class="field-text">notes (TEXT)</text>
     <text x="1260" y="662" class="field-text constraint-text">UNIQUE(internal_id, fhir_resource_type)</text>
   </g>
-  
+
   <!-- AuditLog Table -->
   <g id="audit-log">
     <rect x="1250" y="720" width="250" height="280" class="table-box"/>
     <rect x="1250" y="720" width="250" height="25" class="table-header"/>
     <text x="1375" y="737" text-anchor="middle" class="table-title">AuditLog</text>
-    
+
     <text x="1260" y="755" class="field-text pk-field">id (UUID, PK)</text>
     <text x="1260" y="768" class="field-text">created_at (TIMESTAMP)</text>
     <text x="1260" y="781" class="field-text">updated_at (TIMESTAMP)</text>
@@ -342,52 +342,52 @@
     <text x="1260" y="937" class="field-text constraint-text">resource, created_at, action,</text>
     <text x="1260" y="950" class="field-text constraint-text">user_date composite</text>
   </g>
-  
+
   <!-- Relationships -->
   <!-- PracticeProfile to Location -->
   <path d="M 300 160 L 350 160" class="relationship-line"/>
   <polygon points="345,155 355,160 345,165" class="relationship-arrow"/>
   <text x="325" y="155" text-anchor="middle" class="field-text" font-size="8">1:N</text>
-  
+
   <!-- Client to Appointment -->
   <path d="M 300 480 L 650 480" class="relationship-line"/>
   <polygon points="645,475 655,480 645,485" class="relationship-arrow"/>
   <text x="475" y="475" text-anchor="middle" class="field-text" font-size="8">1:N</text>
-  
+
   <!-- Provider to Appointment -->
   <path d="M 600 493 L 650 493" class="relationship-line"/>
   <polygon points="645,488 655,493 645,498" class="relationship-arrow"/>
   <text x="625" y="488" text-anchor="middle" class="field-text" font-size="8">1:N</text>
-  
+
   <!-- Client to Note -->
   <path d="M 300 480 L 950 480" class="relationship-line"/>
   <polygon points="945,475 955,480 945,485" class="relationship-arrow"/>
   <text x="625" y="475" text-anchor="middle" class="field-text" font-size="8">1:N</text>
-  
+
   <!-- Provider to Note -->
   <path d="M 600 493 L 950 493" class="relationship-line"/>
   <polygon points="945,488 955,493 945,498" class="relationship-arrow"/>
   <text x="775" y="488" text-anchor="middle" class="field-text" font-size="8">1:N</text>
-  
+
   <!-- Appointment to Note -->
   <path d="M 900 506 L 950 506" class="relationship-line"/>
   <polygon points="945,501 955,506 945,511" class="relationship-arrow"/>
   <text x="925" y="501" text-anchor="middle" class="field-text" font-size="8">1:N</text>
-  
+
   <!-- Client to LedgerEntry -->
   <path d="M 175 680 L 175 720" class="relationship-line"/>
   <polygon points="170,715 175,725 180,715" class="relationship-arrow"/>
   <text x="185" y="700" text-anchor="middle" class="field-text" font-size="8">1:N</text>
-  
+
   <!-- EncryptionKey self-reference -->
   <path d="M 775 950 Q 825 975 775 1000 Q 725 975 775 950" class="relationship-line"/>
   <text x="825" y="975" text-anchor="middle" class="field-text" font-size="8">parent</text>
-  
+
   <!-- KeyRotationPolicy to EncryptionKey -->
   <path d="M 950 963 L 900 963" class="relationship-line"/>
   <polygon points="905,958 895,963 905,968" class="relationship-arrow"/>
   <text x="925" y="958" text-anchor="middle" class="field-text" font-size="8">1:N</text>
-  
+
   <!-- Multi-tenancy and Constraints Notes -->
   <text x="700" y="1050" text-anchor="middle" class="field-text" font-size="14" font-weight="bold">Key Features:</text>
   <text x="700" y="1070" text-anchor="middle" class="field-text" font-size="12">• Multi-Tenancy: All tables include tenant_id for data isolation</text>
@@ -395,13 +395,13 @@
   <text x="700" y="1100" text-anchor="middle" class="field-text" font-size="12">• Performance: Comprehensive indexing strategy for all queries</text>
   <text x="700" y="1115" text-anchor="middle" class="field-text" font-size="12">• Security: Token-based auth, encrypted PHI, key rotation policies</text>
   <text x="700" y="1130" text-anchor="middle" class="field-text" font-size="12">• Interoperability: FHIR mappings for external system integration</text>
-  
+
   <!-- Legend -->
   <g id="legend">
     <rect x="50" y="1050" width="200" height="120" class="table-box"/>
     <rect x="50" y="1050" width="200" height="25" class="table-header"/>
     <text x="150" y="1067" text-anchor="middle" class="table-title">Legend</text>
-    
+
     <text x="60" y="1085" class="field-text pk-field">Primary Key (PK)</text>
     <text x="60" y="1100" class="field-text fk-field">Foreign Key (FK)</text>
     <text x="60" y="1115" class="field-text index-field">Indexed Field (IDX)</text>

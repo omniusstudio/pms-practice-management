@@ -101,15 +101,15 @@ async def lifespan(app: FastAPI):
 def load_version_info():
     """Load version information from various sources."""
     import json
-    
+
     version_info = {
         "version": os.getenv("VERSION", "1.0.0"),
         "gitSha": os.getenv("GIT_SHA", "unknown"),
         "environment": os.getenv("ENVIRONMENT", "development"),
         "releaseType": "unknown",
-        "buildTime": "unknown"
+        "buildTime": "unknown",
     }
-    
+
     # Try to read from version.json if it exists
     try:
         with open("version.json", "r") as f:
@@ -119,7 +119,7 @@ def load_version_info():
         logger.info("version.json not found, using environment variables")
     except Exception as e:
         logger.warning("Failed to read version.json", error=str(e))
-    
+
     return version_info
 
 
@@ -195,10 +195,8 @@ async def healthz():
     return {
         "status": "healthy",
         "service": "pms-backend",
-        "timestamp": os.getenv(
-            "BUILD_TIMESTAMP", "unknown"
-        ),
-        **current_version_info
+        "timestamp": os.getenv("BUILD_TIMESTAMP", "unknown"),
+        **current_version_info,
     }
 
 
@@ -211,7 +209,7 @@ async def get_version():
         "service": "pms-backend",
         "timestamp": os.getenv("BUILD_TIMESTAMP", "unknown"),
         "deployment": {"status": "active", "health": "healthy"},
-        **current_version_info
+        **current_version_info,
     }
 
 

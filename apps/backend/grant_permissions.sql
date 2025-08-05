@@ -33,7 +33,7 @@ GRANT CREATE ON DATABASE pmsdb TO omniusstudio;
 -- ALTER USER omniusstudio WITH SUPERUSER;
 
 -- Verify permissions (optional check)
-SELECT 
+SELECT
     current_user as current_user,
     has_schema_privilege('omniusstudio', 'public', 'CREATE') as can_create_tables,
     has_schema_privilege('omniusstudio', 'public', 'USAGE') as can_use_schema;

@@ -116,7 +116,7 @@ class MigrationRollbackTester:
             'appointments', 'notes', 'ledger', 'auth_tokens',
             'encryption_keys', 'fhir_mappings', 'audit_log'
         ]
-        
+
         try:
             with self.engine.connect() as conn:
                 for table in tables:
@@ -138,7 +138,7 @@ class MigrationRollbackTester:
     def validate_database_integrity(self):
         """Validate database integrity after migration operations."""
         logger.info("Validating database integrity...")
-        
+
         integrity_checks = [
             # Check foreign key constraints
             "SELECT conname, conrelid::regclass FROM pg_constraint "
@@ -156,7 +156,7 @@ class MigrationRollbackTester:
             "SELECT schemaname, tablename, indexname FROM pg_indexes "
             "WHERE schemaname = 'public'"
         ]
-        
+
         try:
             with self.engine.connect() as conn:
                 for i, check in enumerate(integrity_checks, 1):
@@ -177,7 +177,7 @@ class MigrationRollbackTester:
     def test_rollback_to_revision(self, target_revision):
         """Test rollback to a specific revision."""
         logger.info(f"Testing rollback to revision: {target_revision}")
-        
+
         # Record pre-rollback state
         pre_counts = self.get_table_count()
         self.validate_database_integrity()
@@ -186,7 +186,7 @@ class MigrationRollbackTester:
         rollback_result = self.run_command(
             f"alembic downgrade {target_revision}"
         )
-        
+
         if rollback_result.returncode != 0:
             self.test_results.append({
                 'test': f'rollback_to_{target_revision}',
@@ -195,7 +195,7 @@ class MigrationRollbackTester:
                 'timestamp': datetime.now()
             })
             return False
-        
+
         # Verify rollback
         current_revision = self.get_current_revision()
         if current_revision != target_revision:
@@ -207,11 +207,11 @@ class MigrationRollbackTester:
                 'timestamp': datetime.now()
             })
             return False
-        
+
         # Validate post-rollback state
         post_counts = self.get_table_count()
         post_integrity = self.validate_database_integrity()
-        
+
         # Record test result
         self.test_results.append({
             'test': f'rollback_to_{target_revision}',
@@ -221,24 +221,24 @@ class MigrationRollbackTester:
             'integrity_maintained': post_integrity,
             'timestamp': datetime.now()
         })
-        
+
         logger.info(
             f"Rollback to {target_revision} completed successfully"
         )
         return True
-    
+
     def test_forward_migration(self, target_revision):
         """Test forward migration to a specific revision."""
         logger.info(
             f"Testing forward migration to revision: {target_revision}"
         )
-        
+
         # Record pre-migration state
         pre_counts = self.get_table_count()
-        
+
         # Perform forward migration
         upgrade_result = self.run_command(f"alembic upgrade {target_revision}")
-        
+
         if upgrade_result.returncode != 0:
             self.test_results.append({
                 'test': f'upgrade_to_{target_revision}',
@@ -247,7 +247,7 @@ class MigrationRollbackTester:
                 'timestamp': datetime.now()
             })
             return False
-        
+
         # Verify migration
         current_revision = self.get_current_revision()
         if current_revision != target_revision:
@@ -259,11 +259,11 @@ class MigrationRollbackTester:
                 'timestamp': datetime.now()
             })
             return False
-        
+
         # Validate post-migration state
         post_counts = self.get_table_count()
         post_integrity = self.validate_database_integrity()
-        
+
         # Record test result
         self.test_results.append({
             'test': f'upgrade_to_{target_revision}',
@@ -273,24 +273,24 @@ class MigrationRollbackTester:
             'integrity_maintained': post_integrity,
             'timestamp': datetime.now()
         })
-        
+
         logger.info(
             f"Forward migration to {target_revision} completed successfully"
         )
         return True
-    
+
     def run_comprehensive_rollback_test(self, target_revision=None):
         """Run a comprehensive rollback test."""
         logger.info("Starting comprehensive rollback test...")
-        
+
         # Get initial state
         self.original_revision = self.get_current_revision()
         if not self.original_revision:
             logger.error("Could not determine current revision")
             return False
-        
+
         logger.info(f"Original revision: {self.original_revision}")
-        
+
         # Get migration history to find a suitable target
         if not target_revision:
             history = self.get_migration_history()
@@ -308,7 +308,7 @@ class MigrationRollbackTester:
                                 break
                         if target_revision:
                             break
-        
+
         if not target_revision:
             logger.warning(
                 "No suitable target revision found for rollback test"
@@ -322,68 +322,68 @@ class MigrationRollbackTester:
             else:
                 logger.error("Could not perform rollback test")
                 return False
-        
+
         logger.info(
             "Target revision for rollback test: %s", target_revision
         )
-        
+
         # Test sequence: rollback -> validate -> forward migration -> validate
         success = True
-        
+
         # Step 1: Test rollback
         if not self.test_rollback_to_revision(target_revision):
             success = False
-        
+
         # Step 2: Test forward migration back to original
         if success and not self.test_forward_migration(self.original_revision):
             success = False
-        
+
         # Generate test report
         self.generate_test_report()
-        
+
         return success
-    
+
     def generate_test_report(self):
         """Generate a comprehensive test report."""
         report_file = (
             f"rollback_test_report_"
             f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         )
-        
+
         with open(report_file, 'w') as f:
             f.write("MIGRATION ROLLBACK TEST REPORT\n")
             f.write("=" * 50 + "\n\n")
             f.write(f"Test Date: {datetime.now()}\n")
             f.write(f"Original Revision: {self.original_revision}\n")
             f.write(f"Dry Run Mode: {self.dry_run}\n\n")
-            
+
             f.write("TEST RESULTS:\n")
             f.write("-" * 20 + "\n")
-            
+
             passed = 0
             failed = 0
-            
+
             for result in self.test_results:
                 status = result['status']
                 if status == 'PASSED':
                     passed += 1
                 else:
                     failed += 1
-                
+
                 f.write(f"Test: {result['test']}\n")
                 f.write(f"Status: {status}\n")
                 f.write(f"Timestamp: {result['timestamp']}\n")
-                
+
                 if 'error' in result:
                     f.write(f"Error: {result['error']}\n")
-                
+
                 if 'integrity_maintained' in result:
                     f.write(
                         f"Integrity Maintained: {result['integrity_maintained']}\n"
                     )
-                
+
                 f.write("\n")
-            
+
             f.write("SUMMARY:\n")
             f.write(f"Total Tests: {len(self.test_results)}\n")
             f.write(f"Passed: {passed}\n")
@@ -393,7 +393,7 @@ class MigrationRollbackTester:
                 f.write(f"Success Rate: {success_rate:.1f}%\n")
             else:
                 f.write("No tests run\n")
-        
+
         logger.info("Test report generated: %s", report_file)
 
         # Also log summary
@@ -413,14 +413,14 @@ def main():
         '--target-revision',
         help='Specific revision to test rollback to'
     )
-    
+
     args = parser.parse_args()
-    
+
     tester = MigrationRollbackTester(dry_run=args.dry_run)
-    
+
     try:
         success = tester.run_comprehensive_rollback_test(args.target_revision)
-        
+
         if success:
             logger.info("All rollback tests passed successfully!")
             sys.exit(0)
@@ -429,7 +429,7 @@ def main():
                 "Some rollback tests failed. Check the logs for details."
             )
             sys.exit(1)
-            
+
     except KeyboardInterrupt:
         logger.info("Test interrupted by user")
         sys.exit(1)

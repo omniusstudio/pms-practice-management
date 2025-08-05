@@ -2,7 +2,7 @@
 /**
  * Performance Baseline Test Runner
  * Mental Health Practice Management System - HIPAA Compliant
- * 
+ *
  * This script runs performance tests to establish baselines and validate budgets
  */
 
@@ -69,39 +69,39 @@ function runArtilleryTest(options = {}) {
   return new Promise((resolve, reject) => {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const reportFile = path.join(CONFIG.reportsDir, `report-${timestamp}.json`);
-    
+
     console.log('🚀 Starting Artillery performance test...');
     console.log(`📊 Report will be saved to: ${reportFile}`);
-    
+
     const env = {
       ...process.env,
       ARTILLERY_REPORT_FILE: reportFile
     };
-    
+
     // Add baseline flag if requested
     if (options.saveBaseline) {
       env.SAVE_BASELINE = 'true';
     }
-    
+
     const artilleryArgs = [
       'run',
       CONFIG.artilleryConfig,
       '--output', reportFile
     ];
-    
+
     if (options.quiet) {
       artilleryArgs.push('--quiet');
     }
-    
+
     const artillery = spawn('npx', ['artillery', ...artilleryArgs], {
       stdio: 'inherit',
       env
     });
-    
+
     artillery.on('close', (code) => {
       if (code === 0) {
         console.log('✅ Artillery test completed successfully');
-        
+
         // Load and return results
         try {
           const results = JSON.parse(fs.readFileSync(reportFile, 'utf8'));
@@ -113,7 +113,7 @@ function runArtilleryTest(options = {}) {
         reject(new Error(`Artillery test failed with exit code ${code}`));
       }
     });
-    
+
     artillery.on('error', (error) => {
       reject(new Error(`Failed to start Artillery: ${error.message}`));
     });
@@ -127,13 +127,13 @@ function validateBudgets(results) {
   const budgets = loadBudgets();
   const violations = [];
   const warnings = [];
-  
+
   console.log('\n📋 Validating performance budgets...');
-  
+
   // API latency validation
   if (results.aggregate && results.aggregate.latency) {
     const { p50, p95, p99 } = results.aggregate.latency;
-    
+
     // P50 validation
     if (p50 > budgets.api.p50_latency_ms) {
       violations.push({
@@ -143,7 +143,7 @@ function validateBudgets(results) {
         severity: p50 > budgets.api.p50_latency_ms * 1.2 ? 'critical' : 'warning'
       });
     }
-    
+
     // P95 validation
     if (p95 > budgets.api.p95_latency_ms) {
       violations.push({
@@ -153,7 +153,7 @@ function validateBudgets(results) {
         severity: 'critical'
       });
     }
-    
+
     // P99 validation
     if (p99 > budgets.api.p99_latency_ms) {
       violations.push({
@@ -164,7 +164,7 @@ function validateBudgets(results) {
       });
     }
   }
-  
+
   // Error rate validation
   if (results.aggregate && results.aggregate.codes) {
     const codes = results.aggregate.codes;
@@ -172,9 +172,9 @@ function validateBudgets(results) {
     const errorRequests = Object.entries(codes)
       .filter(([code]) => parseInt(code) >= 400)
       .reduce((sum, [, count]) => sum + count, 0);
-    
+
     const errorRate = totalRequests > 0 ? (errorRequests / totalRequests) * 100 : 0;
-    
+
     if (errorRate > budgets.api.error_rate_percent) {
       violations.push({
         metric: 'API Error Rate',
@@ -184,7 +184,7 @@ function validateBudgets(results) {
       });
     }
   }
-  
+
   return {
     passed: violations.length === 0,
     violations,
@@ -202,25 +202,25 @@ function validateBudgets(results) {
  */
 function compareWithBaseline(currentResults) {
   const baseline = loadBaseline();
-  
+
   if (!baseline) {
     return {
       hasBaseline: false,
       message: 'No baseline found - current results will become the baseline'
     };
   }
-  
+
   console.log('\n📊 Comparing with baseline...');
   console.log(`📅 Baseline date: ${baseline.timestamp}`);
-  
+
   const regressions = [];
   const improvements = [];
-  
+
   // Compare latency metrics
   if (baseline.results.aggregate && currentResults.aggregate) {
     const baselineLatency = baseline.results.aggregate.latency;
     const currentLatency = currentResults.aggregate.latency;
-    
+
     if (baselineLatency && currentLatency) {
       // P50 comparison
       const p50Change = ((currentLatency.p50 - baselineLatency.p50) / baselineLatency.p50) * 100;
@@ -241,7 +241,7 @@ function compareWithBaseline(currentResults) {
           });
         }
       }
-      
+
       // P95 comparison
       const p95Change = ((currentLatency.p95 - baselineLatency.p95) / baselineLatency.p95) * 100;
       if (Math.abs(p95Change) > 5) {
@@ -263,7 +263,7 @@ function compareWithBaseline(currentResults) {
       }
     }
   }
-  
+
   return {
     hasBaseline: true,
     baseline_date: baseline.timestamp,
@@ -283,7 +283,7 @@ function compareWithBaseline(currentResults) {
 function generateReport(testResults, budgetValidation, baselineComparison) {
   const timestamp = new Date().toISOString();
   const reportFile = path.join(CONFIG.reportsDir, `performance-report-${timestamp.replace(/[:.]/g, '-')}.json`);
-  
+
   const report = {
     timestamp,
     environment: {
@@ -300,10 +300,10 @@ function generateReport(testResults, budgetValidation, baselineComparison) {
       regression_status: baselineComparison.regressions?.length === 0 ? 'PASS' : 'FAIL'
     }
   };
-  
+
   fs.writeFileSync(reportFile, JSON.stringify(report, null, 2));
   console.log(`\n📄 Performance report saved: ${reportFile}`);
-  
+
   return report;
 }
 
@@ -314,15 +314,15 @@ function printSummary(report) {
   console.log('\n' + '='.repeat(60));
   console.log('📊 PERFORMANCE TEST SUMMARY');
   console.log('='.repeat(60));
-  
+
   // Overall status
   const statusIcon = report.summary.overall_status === 'PASS' ? '✅' : '❌';
   console.log(`${statusIcon} Overall Status: ${report.summary.overall_status}`);
-  
+
   // Budget validation
   const budgetIcon = report.budget_validation.passed ? '✅' : '❌';
   console.log(`${budgetIcon} Budget Validation: ${report.summary.budget_status}`);
-  
+
   if (report.budget_validation.violations.length > 0) {
     console.log('   Budget Violations:');
     report.budget_validation.violations.forEach(violation => {
@@ -330,19 +330,19 @@ function printSummary(report) {
       console.log(`   ${icon} ${violation.metric}: ${violation.actual} (budget: ${violation.budget})`);
     });
   }
-  
+
   // Baseline comparison
   if (report.baseline_comparison.hasBaseline) {
     const regressionIcon = report.baseline_comparison.regressions.length === 0 ? '✅' : '❌';
     console.log(`${regressionIcon} Regression Check: ${report.summary.regression_status}`);
-    
+
     if (report.baseline_comparison.regressions.length > 0) {
       console.log('   Performance Regressions:');
       report.baseline_comparison.regressions.forEach(regression => {
         console.log(`   📉 ${regression.metric}: ${regression.current} vs ${regression.baseline} (${regression.change})`);
       });
     }
-    
+
     if (report.baseline_comparison.improvements.length > 0) {
       console.log('   Performance Improvements:');
       report.baseline_comparison.improvements.forEach(improvement => {
@@ -352,7 +352,7 @@ function printSummary(report) {
   } else {
     console.log('ℹ️  No baseline found - this will become the new baseline');
   }
-  
+
   console.log('='.repeat(60));
 }
 
@@ -366,42 +366,42 @@ async function main() {
     quiet: args.includes('--quiet'),
     skipBudgets: args.includes('--skip-budgets')
   };
-  
+
   console.log('🎯 Performance Baseline Test Runner');
   console.log('====================================');
-  
+
   if (options.saveBaseline) {
     console.log('📊 Running in baseline mode - results will be saved as new baseline');
   }
-  
+
   try {
     // Run performance test
     const testResults = await runArtilleryTest(options);
-    
+
     // Validate against budgets
     let budgetValidation = { passed: true, violations: [], warnings: [] };
     if (!options.skipBudgets) {
       budgetValidation = validateBudgets(testResults.results);
     }
-    
+
     // Compare with baseline
     const baselineComparison = compareWithBaseline(testResults.results);
-    
+
     // Generate report
     const report = generateReport(testResults, budgetValidation, baselineComparison);
-    
+
     // Print summary
     printSummary(report);
-    
+
     // Exit with appropriate code
     const shouldFail = !budgetValidation.passed || (baselineComparison.regressions && baselineComparison.regressions.length > 0);
     if (shouldFail && process.env.CI === 'true') {
       console.log('\n❌ Exiting with error code due to performance issues');
       process.exit(1);
     }
-    
+
     console.log('\n✅ Performance test completed successfully');
-    
+
   } catch (error) {
     console.error('❌ Performance test failed:', error.message);
     process.exit(1);

@@ -67,7 +67,7 @@ jobs:
         run: |
           # Install commitlint
           npm install -g @commitlint/cli @commitlint/config-conventional
-          
+
           # Check recent commits follow conventional format
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)
           git log ${LAST_TAG}..HEAD --oneline | while read commit; do
@@ -128,7 +128,7 @@ jobs:
           else
             echo "🚀 Running semantic-release"
             npx semantic-release
-            
+
             # Check if a release was created
             if [ -f "VERSION" ]; then
               VERSION=$(cat VERSION)
@@ -175,7 +175,7 @@ jobs:
                 environment: 'staging'
               }
             });
-            
+
             console.log('✅ Triggered CD pipeline for version ${{ needs.release.outputs.version }}');
 
   # Notify stakeholders

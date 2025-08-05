@@ -16,10 +16,10 @@ from models.location import Location  # noqa: E402
 
 async def create_practice_seed_data():
     """Create seed data for practice profiles and locations."""
-    
+
     # Create tables first
     await create_tables()
-    
+
     async with AsyncSessionLocal() as session:
         try:
             # Create sample practice profiles
@@ -49,7 +49,7 @@ async def create_practice_seed_data():
                            "specializing in anxiety, depression, and trauma.",
                 tenant_id="tenant_mindful_health"
             )
-            
+
             practice2 = PracticeProfile(
                 name="Bay Area Therapy Center",
                 legal_name="Bay Area Therapy Center Inc",
@@ -75,10 +75,10 @@ async def create_practice_seed_data():
                            "individual and group therapy services.",
                 tenant_id="tenant_bay_area_therapy"
             )
-            
+
             session.add_all([practice1, practice2])
             await session.commit()
-            
+
             # Create locations for practice1
             location1_main = Location(
                 practice_profile_id=practice1.id,
@@ -104,7 +104,7 @@ async def create_practice_seed_data():
                 description="Main office location with full services",
                 tenant_id="tenant_mindful_health"
             )
-            
+
             location1_satellite = Location(
                 practice_profile_id=practice1.id,
                 name="Downtown Satellite Office",
@@ -128,7 +128,7 @@ async def create_practice_seed_data():
                 description="Convenient downtown location",
                 tenant_id="tenant_mindful_health"
             )
-            
+
             # Create locations for practice2
             location2_main = Location(
                 practice_profile_id=practice2.id,
@@ -154,7 +154,7 @@ async def create_practice_seed_data():
                 description="Full-service therapy center",
                 tenant_id="tenant_bay_area_therapy"
             )
-            
+
             location2_telehealth = Location(
                 practice_profile_id=practice2.id,
                 name="Telehealth Services",
@@ -178,13 +178,13 @@ async def create_practice_seed_data():
                 description="Remote therapy services via secure video",
                 tenant_id="tenant_bay_area_therapy"
             )
-            
+
             session.add_all([
                 location1_main, location1_satellite,
                 location2_main, location2_telehealth
             ])
             await session.commit()
-            
+
             print("✅ Practice seed data created successfully!")
             print(f"Created {len([practice1, practice2])} practice profiles")
             locations_count = len([
@@ -192,7 +192,7 @@ async def create_practice_seed_data():
                 location2_main, location2_telehealth
             ])
             print(f"Created {locations_count} locations")
-            
+
             # Display created data
             print("\n📋 Practice Profiles:")
             for practice in [practice1, practice2]:
@@ -204,7 +204,7 @@ async def create_practice_seed_data():
                 print(f"    Email: {practice.email}")
                 print(f"    Phone: {practice.phone}")
                 print()
-            
+
             print("📍 Locations:")
             for location in [
                 location1_main, location1_satellite,
@@ -218,7 +218,7 @@ async def create_practice_seed_data():
                 print(f"    Primary: {location.is_primary}")
                 print(f"    Active: {location.is_active}")
                 print()
-            
+
         except Exception as e:
             await session.rollback()
             print(f"❌ Error creating practice seed data: {e}")

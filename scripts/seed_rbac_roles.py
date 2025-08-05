@@ -23,7 +23,7 @@ def get_permissions_for_roles(roles):
         "biller": ["read", "write", "manage_billing", "view_financial_reports"],
         "front_desk": ["read", "write", "manage_appointments", "manage_patients"]
     }
-    
+
     permissions = set()
     for role in roles:
         permissions.update(role_permissions.get(role, []))
@@ -32,7 +32,7 @@ def get_permissions_for_roles(roles):
 
 async def seed_rbac_roles():
     """Create users with different RBAC roles for testing."""
-    
+
     # Get database session
     async for db in get_db():
         try:
@@ -59,16 +59,16 @@ async def seed_rbac_roles():
                     "roles": ["front_desk"]
                 }
             ]
-            
+
             print("Starting RBAC role seeding...")
-            
+
             for user_data in test_users:
                 # Check if user already exists
                 result = await db.execute(
                     select(User).where(User.email == user_data["email"])
                 )
                 existing_user = result.scalar_one_or_none()
-                
+
                 if existing_user:
                     # Update existing user's roles
                     existing_user.roles = user_data["roles"]
@@ -91,10 +91,10 @@ async def seed_rbac_roles():
                     roles_str = ', '.join(user_data['roles'])
                     print(f"Created user {user_data['email']} "
                           f"with roles: {roles_str}")
-            
+
             # Commit all changes
             await db.commit()
-            
+
             print("\nRBAC role seeding completed successfully!")
             print("\nCreated/Updated users:")
             for user_data in test_users:
@@ -106,7 +106,7 @@ async def seed_rbac_roles():
                 print(f"  - {email} ({name}):")
                 print(f"    Roles: {roles_str}")
                 print(f"    Permissions: {permissions_str}\n")
-                
+
         except Exception as e:
             await db.rollback()
             print(f"Error seeding RBAC roles: {e}")

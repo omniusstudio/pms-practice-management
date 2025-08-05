@@ -13,7 +13,7 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
-  
+
   default_tags {
     tags = {
       Project     = "Mental Health PMS"
@@ -112,23 +112,23 @@ resource "aws_security_group" "redis" {
 resource "aws_elasticache_replication_group" "redis" {
   replication_group_id         = "${var.project_name}-${var.environment}-redis"
   description                  = "Redis cluster for event bus"
-  
+
   node_type                    = var.environment == "prod" ? "cache.r6g.large" : "cache.t3.micro"
   port                         = 6379
   parameter_group_name         = "default.redis7"
-  
+
   num_cache_clusters           = var.environment == "prod" ? 3 : 1
-  
+
   subnet_group_name            = aws_elasticache_subnet_group.redis.name
   security_group_ids           = [aws_security_group.redis.id]
-  
+
   at_rest_encryption_enabled   = true
   transit_encryption_enabled   = true
   auth_token                   = var.redis_auth_token
-  
+
   automatic_failover_enabled   = var.environment == "prod" ? true : false
   multi_az_enabled            = var.environment == "prod" ? true : false
-  
+
   log_delivery_configuration {
     destination      = aws_cloudwatch_log_group.redis.name
     destination_type = "cloudwatch-logs"

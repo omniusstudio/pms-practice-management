@@ -3,6 +3,7 @@
 
 import asyncio
 import os
+from pathlib import Path
 
 import pytest
 from sqlalchemy import create_engine
@@ -10,13 +11,23 @@ from sqlalchemy.orm import sessionmaker
 
 from models import Base  # noqa: E402
 
-# Set test environment variables
-os.environ["DATABASE_URL"] = "sqlite:///:memory:"
-os.environ["ASYNC_DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
-os.environ["ENVIRONMENT"] = "test"
-os.environ["SECRET_KEY"] = "test-secret-key-for-testing-only"
-os.environ["JWT_SECRET_KEY"] = "test-jwt-secret-key-for-testing-only"
-os.environ["REDIS_URL"] = "redis://localhost:6379/0"
+# Load test environment variables from .env.test file
+test_env_file = Path(__file__).parent.parent.parent.parent / ".env.test"
+if test_env_file.exists():
+    with open(test_env_file) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, value = line.split('=', 1)
+                os.environ[key] = value
+else:
+    # Fallback to hardcoded values if .env.test doesn't exist
+    os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+    os.environ["ASYNC_DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
+    os.environ["ENVIRONMENT"] = "test"
+    os.environ["SECRET_KEY"] = "test-secret-key-for-testing-only"
+    os.environ["JWT_SECRET_KEY"] = "test-jwt-secret-key-for-testing-only"
+    os.environ["REDIS_URL"] = "redis://localhost:6379/0"
 
 
 @pytest.fixture(scope="session")

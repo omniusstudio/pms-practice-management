@@ -1,6 +1,5 @@
 # Infrastructure as Code
 terraform-compliance==1.3.40
-terraform-docs==0.16.0
 
 # AWS SDK
 boto3==1.34.0

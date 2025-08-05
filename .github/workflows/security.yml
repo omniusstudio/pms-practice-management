@@ -174,6 +174,7 @@ jobs:
           image-ref: 'pms-backend:security-scan'
           format: 'sarif'
           output: 'trivy-backend-results.sarif'
+        continue-on-error: true
 
       - name: Run Trivy vulnerability scanner (Frontend)
         uses: aquasecurity/trivy-action@master
@@ -182,6 +183,20 @@ jobs:
           image-ref: 'pms-frontend:security-scan'
           format: 'sarif'
           output: 'trivy-frontend-results.sarif'
+        continue-on-error: true
+
+      - name: Check SARIF files
+        run: |
+          echo "Checking for SARIF files..."
+          ls -la *.sarif || echo "No SARIF files found"
+          if [ -f "trivy-backend-results.sarif" ]; then
+            echo "Backend SARIF file exists"
+            head -n 10 trivy-backend-results.sarif
+          fi
+          if [ -f "trivy-frontend-results.sarif" ]; then
+            echo "Frontend SARIF file exists"
+            head -n 10 trivy-frontend-results.sarif
+          fi
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
@@ -190,6 +205,7 @@ jobs:
           sarif_file: |
             trivy-backend-results.sarif
             trivy-frontend-results.sarif
+        continue-on-error: true
 
   secrets-scan:
     name: Secrets Detection

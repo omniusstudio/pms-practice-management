@@ -1,3 +1,24 @@
+## 1.0.0 (2025-08-05)
+
+### ⚠ BREAKING CHANGES
+
+* The old authentication endpoints have been removed.
+
+### Features
+
+* add infrastructure testing documentation for workflow validation ([3e89bef](https://github.com/omniusstudio/pms-practice-management/commit/3e89bef36614c17d6bcaef64c2f5a58c00e43034))
+* add test feature to demonstrate conventional commits ([dd01a55](https://github.com/omniusstudio/pms-practice-management/commit/dd01a55c6d9771c81e32830516d31a0d03318bc9))
+* add testing infrastructure documentation ([aabeb90](https://github.com/omniusstudio/pms-practice-management/commit/aabeb90cfec462c54575df1736508c603d8ea13f))
+* configure semantic-release with GitHub repository URL ([80ad814](https://github.com/omniusstudio/pms-practice-management/commit/80ad814f5d3ffd4930a41ec5f3fa83da7cf7658e))
+* initial commit with semantic versioning and release management system ([d218666](https://github.com/omniusstudio/pms-practice-management/commit/d21866623f9a3c9e854b1f2a9c3f23e932cd8c79))
+* migrate to new authentication system ([25c58f9](https://github.com/omniusstudio/pms-practice-management/commit/25c58f98b2ab92addc548fa670624097b0336eae))
+
+### Bug Fixes
+
+* remove npm plugin from semantic-release config ([fbc9930](https://github.com/omniusstudio/pms-practice-management/commit/fbc99300d6c97b54629a8626d4ecdf24f70b3b00))
+* **auth:** resolve login timeout issue for better user experience ([3c3ab77](https://github.com/omniusstudio/pms-practice-management/commit/3c3ab77bc05c64ef9eaa89c74c5785176ebee614))
+* update semantic-release config for local testing ([3e9262b](https://github.com/omniusstudio/pms-practice-management/commit/3e9262bc45a083e3be189dd298df87faa8e19e9f))
+
 # Release v1.1.0
 
 **Release Date:** 2025-08-05

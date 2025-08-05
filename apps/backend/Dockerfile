@@ -1,5 +1,5 @@
 # Production Dockerfile for Backend
-FROM python:3.11-slim AS builder
+FROM python:3.13-slim AS builder
 
 # Build arguments
 ARG VERSION=unknown
@@ -31,7 +31,7 @@ COPY . .
 RUN echo "{\"version\":\"${VERSION}\",\"gitSha\":\"${GIT_SHA}\",\"buildTime\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > version.json
 
 # Production stage
-FROM python:3.11-slim AS production
+FROM python:3.13-slim AS production
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \

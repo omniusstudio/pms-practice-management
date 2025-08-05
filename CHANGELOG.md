@@ -1,3 +1,10 @@
+## [1.0.8](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.7...v1.0.8) (2025-08-05)
+
+
+### Bug Fixes
+
+* remove unused React import from App.tsx ([54dfa63](https://github.com/omniusstudio/pms-practice-management/commit/54dfa6301ba2374ad6536c66844e0c93858e5bce))
+
 ## [1.0.7](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.6...v1.0.7) (2025-08-05)
 
 

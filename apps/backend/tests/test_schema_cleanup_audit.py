@@ -25,7 +25,12 @@ from sqlalchemy.orm import sessionmaker
 from models import User
 from models.auth_token import AuthToken, TokenStatus, TokenType
 from models.base import Base
-from models.encryption_key import EncryptionKey, KeyProvider, KeyStatus, KeyType
+from models.encryption_key import (
+    EncryptionKey,
+    KeyProvider,
+    KeyStatus,
+    KeyType,
+)
 from models.fhir_mapping import FHIRMapping, FHIRResourceType
 from models.location import Location
 from models.practice_profile import PracticeProfile
@@ -375,7 +380,11 @@ class TestIndexUsage:
 
         result = db_session.execute(
             query,
-            {"user_id": str(test_user_id), "status": "active", "token_type": "ACCESS"},
+            {
+                "user_id": str(test_user_id),
+                "status": "active",
+                "token_type": "ACCESS",
+            },
         )
         plan = result.fetchone()[0]
 
@@ -417,7 +426,12 @@ class TestIndexUsage:
         # Create test data to ensure indexes are used
         from datetime import datetime, timedelta, timezone
 
-        from models.encryption_key import EncryptionKey, KeyProvider, KeyStatus, KeyType
+        from models.encryption_key import (
+            EncryptionKey,
+            KeyProvider,
+            KeyStatus,
+            KeyType,
+        )
 
         # Insert test keys
         test_tenant_id = str(uuid4())

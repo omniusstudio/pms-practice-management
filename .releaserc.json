@@ -13,12 +13,6 @@
     "@semantic-release/release-notes-generator",
     "@semantic-release/changelog",
     [
-      "@semantic-release/npm",
-      {
-        "npmPublish": false
-      }
-    ],
-    [
       "@semantic-release/exec",
       {
         "prepareCmd": "./scripts/update-version.sh ${nextRelease.version}",
@@ -39,7 +33,8 @@
           }
         ]
       }
-    ]
+    ],
+    "@semantic-release/git"
   ],
   "preset": "conventionalcommits",
   "releaseRules": [

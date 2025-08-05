@@ -32,9 +32,10 @@
     "npm": ">=8.0.0"
   },
   "dependencies": {
-    "artillery": "^2.0.0",
+    "artillery": "^2.0.23",
     "artillery-plugin-metrics-by-endpoint": "^1.0.0",
-    "artillery-plugin-prometheus": "^1.0.0"
+    "artillery-plugin-prometheus": "^1.0.0",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

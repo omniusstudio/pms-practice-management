@@ -32,7 +32,7 @@ on:
         type: string
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
   PYTHON_VERSION: '3.11'
   PERFORMANCE_RESULTS_RETENTION_DAYS: 30
 
@@ -80,9 +80,18 @@ jobs:
           echo "🔍 Validating performance budget configuration..."
           node -e "const config = require('./performance-budgets.json'); console.log('✅ Performance budgets loaded successfully');"
           
-          # Validate Artillery configuration
-          artillery validate artillery.yml
-          echo "✅ Artillery configuration is valid"
+          # Check Artillery version and validate configuration
+          echo "📋 Artillery version:"
+          artillery --version
+          
+          echo "🔍 Validating Artillery configuration..."
+          # Artillery v2.x doesn't have validate command, so we'll check YAML syntax
+          if node -e "const yaml = require('js-yaml'); const fs = require('fs'); try { yaml.load(fs.readFileSync('artillery.yml', 'utf8')); console.log('✅ Artillery configuration is valid'); } catch(e) { console.error('❌ Artillery configuration validation failed:', e.message); process.exit(1); }"; then
+            echo "✅ YAML syntax validation passed"
+          else
+            echo "❌ Artillery configuration validation failed"
+            exit 1
+          fi
       
       - name: Wait for application to be ready
         run: |

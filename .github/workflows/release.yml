@@ -64,8 +64,10 @@ jobs:
           # Check recent commits follow conventional format
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)
           git log ${LAST_TAG}..HEAD --oneline | while read commit; do
-            echo "$commit" | commitlint --config .commitlintrc.json || {
-              echo "❌ Commit does not follow conventional format: $commit"
+            # Extract just the commit message (everything after the first space)
+            message=$(echo "$commit" | cut -d' ' -f2-)
+            echo "$message" | commitlint --config .commitlintrc.json || {
+              echo "❌ Commit does not follow conventional format: $message"
               echo "Please ensure all commits follow: type(scope): description"
               exit 1
             }

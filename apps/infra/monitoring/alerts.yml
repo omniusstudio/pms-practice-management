@@ -1,0 +1,306 @@
+# Prometheus Alerting Rules for Mental Health PMS
+# HIPAA-compliant monitoring with PHI-safe alerts
+
+groups:
+  - name: pms_slo_alerts
+    rules:
+      # API SLO Alerts
+      - alert: HighErrorRate
+        expr: |
+          (
+            rate(pms_http_requests_total{status_code=~"4..|5.."}[5m]) /
+            rate(pms_http_requests_total[5m])
+          ) * 100 > 5
+        for: 2m
+        labels:
+          severity: warning
+          service: pms-api
+          slo: error_rate
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }}% for the last 5 minutes, exceeding 5% threshold"
+          runbook_url: "https://docs.pms.example.com/runbooks/high-error-rate"
+
+      - alert: CriticalErrorRate
+        expr: |
+          (
+            rate(pms_http_requests_total{status_code=~"4..|5.."}[5m]) /
+            rate(pms_http_requests_total[5m])
+          ) * 100 > 10
+        for: 1m
+        labels:
+          severity: critical
+          service: pms-api
+          slo: error_rate
+        annotations:
+          summary: "Critical error rate detected"
+          description: "Error rate is {{ $value }}% for the last 5 minutes, exceeding 10% critical threshold"
+          runbook_url: "https://docs.pms.example.com/runbooks/critical-error-rate"
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, rate(pms_http_request_duration_seconds_bucket[5m])) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+          service: pms-api
+          slo: latency
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile latency is {{ $value }}s, exceeding 500ms SLO"
+          runbook_url: "https://docs.pms.example.com/runbooks/high-latency"
+
+      - alert: CriticalLatency
+        expr: |
+          histogram_quantile(0.95, rate(pms_http_request_duration_seconds_bucket[5m])) > 2.0
+        for: 1m
+        labels:
+          severity: critical
+          service: pms-api
+          slo: latency
+        annotations:
+          summary: "Critical API latency detected"
+          description: "95th percentile latency is {{ $value }}s, exceeding 2s critical threshold"
+          runbook_url: "https://docs.pms.example.com/runbooks/critical-latency"
+
+      - alert: LowAvailability
+        expr: |
+          (
+            1 - (
+              rate(pms_http_requests_total{status_code=~"5.."}[1h]) /
+              rate(pms_http_requests_total[1h])
+            )
+          ) * 100 < 99.9
+        for: 5m
+        labels:
+          severity: critical
+          service: pms-api
+          slo: availability
+        annotations:
+          summary: "SLO availability breach"
+          description: "Service availability is {{ $value }}%, below 99.9% SLO"
+          runbook_url: "https://docs.pms.example.com/runbooks/low-availability"
+
+  - name: pms_resource_alerts
+    rules:
+      # Resource Utilization Alerts
+      - alert: HighActiveRequests
+        expr: pms_http_requests_active > 100
+        for: 2m
+        labels:
+          severity: warning
+          service: pms-api
+          type: resource
+        annotations:
+          summary: "High number of active requests"
+          description: "{{ $value }} active requests, may indicate performance issues"
+          runbook_url: "https://docs.pms.example.com/runbooks/high-active-requests"
+
+      - alert: CriticalActiveRequests
+        expr: pms_http_requests_active > 200
+        for: 1m
+        labels:
+          severity: critical
+          service: pms-api
+          type: resource
+        annotations:
+          summary: "Critical number of active requests"
+          description: "{{ $value }} active requests, system may be overloaded"
+          runbook_url: "https://docs.pms.example.com/runbooks/critical-active-requests"
+
+  - name: pms_security_alerts
+    rules:
+      # Security and Audit Alerts
+      - alert: HighFailedAuthRate
+        expr: |
+          rate(pms_auth_events_total{success="false"}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: pms-api
+          type: security
+        annotations:
+          summary: "High failed authentication rate"
+          description: "{{ $value }} failed auth attempts per second, possible brute force attack"
+          runbook_url: "https://docs.pms.example.com/runbooks/failed-auth"
+
+      - alert: CriticalFailedAuthRate
+        expr: |
+          rate(pms_auth_events_total{success="false"}[5m]) > 0.5
+        for: 1m
+        labels:
+          severity: critical
+          service: pms-api
+          type: security
+        annotations:
+          summary: "Critical failed authentication rate"
+          description: "{{ $value }} failed auth attempts per second, likely attack in progress"
+          runbook_url: "https://docs.pms.example.com/runbooks/critical-failed-auth"
+
+      - alert: UnusualAuditActivity
+        expr: |
+          rate(pms_audit_events_total[5m]) > (
+            avg_over_time(rate(pms_audit_events_total[5m])[1h:5m]) * 3
+          )
+        for: 5m
+        labels:
+          severity: warning
+          service: pms-api
+          type: security
+        annotations:
+          summary: "Unusual audit activity detected"
+          description: "Audit event rate is {{ $value }}, 3x higher than normal"
+          runbook_url: "https://docs.pms.example.com/runbooks/unusual-audit-activity"
+
+  - name: pms_frontend_alerts
+    rules:
+      # Frontend Performance Alerts
+      - alert: HighFrontendErrorRate
+        expr: |
+          rate(pms_frontend_errors_total[5m]) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          service: pms-frontend
+          type: performance
+        annotations:
+          summary: "High frontend error rate"
+          description: "Frontend error rate is {{ $value }} errors/sec"
+          runbook_url: "https://docs.pms.example.com/runbooks/frontend-errors"
+
+      - alert: SlowPageLoads
+        expr: |
+          histogram_quantile(0.95, rate(pms_frontend_page_load_time_bucket[5m])) > 3000
+        for: 5m
+        labels:
+          severity: warning
+          service: pms-frontend
+          type: performance
+        annotations:
+          summary: "Slow page load times"
+          description: "95th percentile page load time is {{ $value }}ms, exceeding 3s threshold"
+          runbook_url: "https://docs.pms.example.com/runbooks/slow-page-loads"
+
+      - alert: HighLayoutShifts
+        expr: |
+          rate(pms_frontend_layout_shift_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: pms-frontend
+          type: performance
+        annotations:
+          summary: "High layout shift rate"
+          description: "Layout shift rate is {{ $value }}/sec, affecting user experience"
+          runbook_url: "https://docs.pms.example.com/runbooks/layout-shifts"
+
+      - alert: FrequentLongTasks
+        expr: |
+          rate(pms_frontend_long_task_total[5m]) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+          service: pms-frontend
+          type: performance
+        annotations:
+          summary: "Frequent long tasks detected"
+          description: "Long task rate is {{ $value }}/sec, may cause UI freezing"
+          runbook_url: "https://docs.pms.example.com/runbooks/long-tasks"
+
+  - name: pms_business_alerts
+    rules:
+      # Business Logic Alerts
+      - alert: LowUserActivity
+        expr: |
+          rate(pms_user_actions_total[1h]) < 0.01
+        for: 10m
+        labels:
+          severity: warning
+          service: pms-api
+          type: business
+        annotations:
+          summary: "Low user activity detected"
+          description: "User action rate is {{ $value }}/sec, unusually low"
+          runbook_url: "https://docs.pms.example.com/runbooks/low-user-activity"
+
+      - alert: HighPHIScrubbing
+        expr: |
+          rate(pms_phi_scrub_total[5m]) > (
+            avg_over_time(rate(pms_phi_scrub_total[5m])[24h:5m]) * 5
+          )
+        for: 5m
+        labels:
+          severity: warning
+          service: pms-api
+          type: security
+        annotations:
+          summary: "Unusually high PHI scrubbing activity"
+          description: "PHI scrubbing rate is {{ $value }}/sec, 5x higher than normal"
+          runbook_url: "https://docs.pms.example.com/runbooks/high-phi-scrubbing"
+
+  - name: pms_system_alerts
+    rules:
+      # System Health Alerts
+      - alert: ServiceDown
+        expr: up{job=~"pms-.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+          type: availability
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.job }} service is not responding"
+          runbook_url: "https://docs.pms.example.com/runbooks/service-down"
+
+      - alert: HighMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          type: resource
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}%, exceeding 85% threshold"
+          runbook_url: "https://docs.pms.example.com/runbooks/high-memory"
+
+      - alert: CriticalMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+          type: resource
+        annotations:
+          summary: "Critical memory usage"
+          description: "Memory usage is {{ $value }}%, exceeding 95% critical threshold"
+          runbook_url: "https://docs.pms.example.com/runbooks/critical-memory"
+
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          type: resource
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%, exceeding 80% threshold"
+          runbook_url: "https://docs.pms.example.com/runbooks/high-cpu"
+
+      - alert: DiskSpaceLow
+        expr: |
+          (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          type: resource
+        annotations:
+          summary: "Low disk space"
+          description: "Disk usage is {{ $value }}% on {{ $labels.mountpoint }}"
+          runbook_url: "https://docs.pms.example.com/runbooks/low-disk-space"

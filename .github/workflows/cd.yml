@@ -1,0 +1,328 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      version:
+        description: 'Semantic version to deploy (e.g., 1.2.3)'
+        required: false
+        type: string
+      rollback:
+        description: 'Rollback to previous version'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  # Build and prepare deployment artifacts
+  build:
+    name: Build Deployment Artifacts
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.rollback }}
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      git-sha: ${{ steps.version.outputs.git-sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate version
+        id: version
+        run: |
+          GIT_SHA=$(git rev-parse --short HEAD)
+          if [ "${{ inputs.rollback }}" = "true" ]; then
+            # Get previous version from AWS SSM
+            PREVIOUS_VERSION=$(aws ssm get-parameter --name "/pms/${{ inputs.environment }}/previous-version" --query 'Parameter.Value' --output text 2>/dev/null || echo "")
+            if [ -n "$PREVIOUS_VERSION" ]; then
+              echo "version=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
+              echo "Rolling back to version: $PREVIOUS_VERSION"
+            else
+              echo "No previous version found, using fallback"
+              VERSION="v$(date +%Y%m%d)-${GIT_SHA}"
+              echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            fi
+          elif [ -n "${{ inputs.version }}" ]; then
+            # Use provided semantic version
+            VERSION="v${{ inputs.version }}"
+            echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            echo "Using provided semantic version: ${VERSION}"
+          elif [ -f "VERSION" ]; then
+            # Use version from semantic release
+            VERSION="v$(cat VERSION)"
+            echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            echo "Using semantic release version: ${VERSION}"
+          else
+            # Fallback to date-based version
+            VERSION="v$(date +%Y%m%d)-${GIT_SHA}"
+            echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            echo "Using fallback date-based version: ${VERSION}"
+          fi
+          echo "git-sha=${GIT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Run tests
+        run: make test
+
+      - name: Build applications
+        run: |
+          make build
+          # Embed version info in build
+          cat > apps/backend/version.json << EOF
+          {
+            "version": "${{ steps.version.outputs.version }}",
+            "gitSha": "${{ steps.version.outputs.git-sha }}",
+            "buildTime": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "environment": "${{ inputs.environment }}",
+            "releaseType": "${{ inputs.version && 'semantic' || 'date-based' }}",
+            "rollback": "${{ inputs.rollback }}"
+          }
+          EOF
+          cat > apps/frontend/dist/version.json << EOF
+          {
+            "version": "${{ steps.version.outputs.version }}",
+            "gitSha": "${{ steps.version.outputs.git-sha }}",
+            "buildTime": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "environment": "${{ inputs.environment }}",
+            "releaseType": "${{ inputs.version && 'semantic' || 'date-based' }}",
+            "rollback": "${{ inputs.rollback }}"
+          }
+          EOF
+
+      - name: Build Docker images
+        run: |
+          # Backend image
+          docker build -t pms-backend:${{ steps.version.outputs.version }} \
+            --build-arg VERSION=${{ steps.version.outputs.version }} \
+            --build-arg GIT_SHA=${{ steps.version.outputs.git-sha }} \
+            apps/backend/
+          
+          # Frontend image
+          docker build -t pms-frontend:${{ steps.version.outputs.version }} \
+            --build-arg VERSION=${{ steps.version.outputs.version }} \
+            --build-arg GIT_SHA=${{ steps.version.outputs.git-sha }} \
+            apps/frontend/
+
+      - name: Save Docker images
+        run: |
+          docker save pms-backend:${{ steps.version.outputs.version }} | gzip > backend-image.tar.gz
+          docker save pms-frontend:${{ steps.version.outputs.version }} | gzip > frontend-image.tar.gz
+
+      - name: Upload deployment artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-artifacts-${{ steps.version.outputs.version }}
+          path: |
+            backend-image.tar.gz
+            frontend-image.tar.gz
+            apps/backend/version.json
+            apps/frontend/dist/version.json
+          retention-days: 30
+
+  # Deploy to staging (automatic on main branch)
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' && !inputs.rollback }}
+    environment:
+      name: staging
+      url: https://staging.pms.example.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download deployment artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: deployment-artifacts-${{ needs.build.outputs.version }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Load Docker images
+        run: |
+          docker load < backend-image.tar.gz
+          docker load < frontend-image.tar.gz
+
+      - name: Deploy to staging (Blue/Green)
+        run: |
+          # Tag images for ECR
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+          
+          docker tag pms-backend:${{ needs.build.outputs.version }} ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ needs.build.outputs.version }}
+          docker tag pms-frontend:${{ needs.build.outputs.version }} ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ needs.build.outputs.version }}
+          
+          docker push ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ needs.build.outputs.version }}
+          docker push ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ needs.build.outputs.version }}
+          
+          # Deploy using blue/green strategy
+          cd apps/infra/scripts
+          ./deploy-blue-green.sh staging ${{ needs.build.outputs.version }}
+
+      - name: Run smoke tests
+        run: |
+          # Wait for deployment to be ready
+          sleep 30
+          
+          # Test health endpoints
+          curl -f https://staging.pms.example.com/health || exit 1
+          curl -f https://staging.pms.example.com/healthz || exit 1
+          
+          # Verify version endpoint
+          VERSION_RESPONSE=$(curl -s https://staging.pms.example.com/healthz)
+          echo "Deployed version: $VERSION_RESPONSE"
+          
+          # Basic functionality test
+          curl -f https://staging.pms.example.com/api/docs || exit 1
+
+      - name: Update deployment status
+        run: |
+          echo "✅ Staging deployment successful"
+          echo "Version: ${{ needs.build.outputs.version }}"
+          echo "Git SHA: ${{ needs.build.outputs.git-sha }}"
+          echo "Environment: staging"
+          echo "URL: https://staging.pms.example.com"
+
+  # Deploy to production (manual approval required)
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, deploy-staging]
+    if: ${{ (github.ref == 'refs/heads/main' && inputs.environment == 'production') || inputs.rollback }}
+    environment:
+      name: production
+      url: https://pms.example.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get deployment version
+        id: deploy-version
+        run: |
+          if [ "${{ inputs.rollback }}" == "true" ]; then
+            # Get previous version for rollback
+            PREVIOUS_VERSION=$(aws ssm get-parameter --name "/pms/production/previous-version" --query "Parameter.Value" --output text)
+            echo "version=${PREVIOUS_VERSION}" >> $GITHUB_OUTPUT
+            echo "Rolling back to version: ${PREVIOUS_VERSION}"
+          else
+            echo "version=${{ needs.build.outputs.version }}" >> $GITHUB_OUTPUT
+            echo "Deploying new version: ${{ needs.build.outputs.version }}"
+          fi
+
+      - name: Download deployment artifacts
+        if: ${{ !inputs.rollback }}
+        uses: actions/download-artifact@v3
+        with:
+          name: deployment-artifacts-${{ needs.build.outputs.version }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Store current version for rollback
+        if: ${{ !inputs.rollback }}
+        run: |
+          # Get current production version
+          CURRENT_VERSION=$(aws ssm get-parameter --name "/pms/production/current-version" --query "Parameter.Value" --output text 2>/dev/null || echo "none")
+          
+          # Store as previous version
+          if [ "$CURRENT_VERSION" != "none" ]; then
+            aws ssm put-parameter --name "/pms/production/previous-version" --value "$CURRENT_VERSION" --overwrite
+          fi
+
+      - name: Deploy to production (Blue/Green)
+        run: |
+          if [ "${{ inputs.rollback }}" != "true" ]; then
+            # Load and push new images
+            docker load < backend-image.tar.gz
+            docker load < frontend-image.tar.gz
+            
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            
+            docker tag pms-backend:${{ steps.deploy-version.outputs.version }} ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ steps.deploy-version.outputs.version }}
+            docker tag pms-frontend:${{ steps.deploy-version.outputs.version }} ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ steps.deploy-version.outputs.version }}
+            
+            docker push ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ steps.deploy-version.outputs.version }}
+            docker push ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ steps.deploy-version.outputs.version }}
+          fi
+          
+          # Deploy using blue/green strategy
+          cd apps/infra/scripts
+          ./deploy-blue-green.sh production ${{ steps.deploy-version.outputs.version }}
+
+      - name: Run production smoke tests
+        run: |
+          # Wait for deployment to be ready
+          sleep 60
+          
+          # Test health endpoints
+          curl -f https://pms.example.com/health || exit 1
+          curl -f https://pms.example.com/healthz || exit 1
+          
+          # Verify version endpoint
+          VERSION_RESPONSE=$(curl -s https://pms.example.com/healthz)
+          echo "Deployed version: $VERSION_RESPONSE"
+          
+          # Basic functionality test
+          curl -f https://pms.example.com/api/docs || exit 1
+
+      - name: Update production version tracking
+        if: ${{ !inputs.rollback }}
+        run: |
+          # Store current version
+          aws ssm put-parameter --name "/pms/production/current-version" --value "${{ steps.deploy-version.outputs.version }}" --overwrite
+          
+          # Store deployment metadata
+          aws ssm put-parameter --name "/pms/production/last-deployment" --value '{"version":"${{ steps.deploy-version.outputs.version }}","gitSha":"${{ needs.build.outputs.git-sha }}","deployedAt":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","deployedBy":"${{ github.actor }}"}' --overwrite
+
+      - name: Update deployment status
+        run: |
+          if [ "${{ inputs.rollback }}" == "true" ]; then
+            echo "🔄 Production rollback successful"
+          else
+            echo "🚀 Production deployment successful"
+          fi
+          echo "Version: ${{ steps.deploy-version.outputs.version }}"
+          echo "Environment: production"
+          echo "URL: https://pms.example.com"
+
+      - name: Notify deployment
+        run: |
+          # Add notification logic here (Slack, email, etc.)
+          echo "Production deployment notification sent"

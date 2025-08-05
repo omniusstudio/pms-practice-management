@@ -1,0 +1,4 @@
+[tool.isort]
+profile = "black"
+skip_glob = ["tests/test_logging.py"]
+known_first_party = ["main", "utils", "middleware"]

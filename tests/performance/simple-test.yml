@@ -1,0 +1,18 @@
+config:
+  target: 'http://localhost:8000'
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: "Simple test"
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+
+scenarios:
+  - name: "Health Check Only"
+    weight: 100
+    flow:
+      - get:
+          url: "/healthz"
+          expect:
+            - statusCode: 200

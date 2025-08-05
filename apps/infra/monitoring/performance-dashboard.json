@@ -1,0 +1,434 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Performance Budget & Baseline Dashboard",
+    "tags": ["performance", "budgets", "baseline", "pms"],
+    "style": "dark",
+    "timezone": "browser",
+    "refresh": "30s",
+    "schemaVersion": 27,
+    "version": 1,
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "environment",
+          "type": "query",
+          "query": "label_values(pms_api_request_duration_seconds, environment)",
+          "refresh": 1,
+          "includeAll": false,
+          "multi": false,
+          "current": {
+            "value": "development",
+            "text": "development"
+          }
+        },
+        {
+          "name": "service",
+          "type": "query",
+          "query": "label_values(pms_api_request_duration_seconds{environment=\"$environment\"}, service)",
+          "refresh": 1,
+          "includeAll": true,
+          "multi": true,
+          "current": {
+            "value": "All",
+            "text": "All"
+          }
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Performance Baseline Updates",
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "changes(pms_performance_baseline_timestamp[1d]) > 0",
+          "iconColor": "blue",
+          "titleFormat": "Baseline Updated",
+          "textFormat": "New performance baseline established"
+        },
+        {
+          "name": "Budget Violations",
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "pms_performance_budget_violation > 0",
+          "iconColor": "red",
+          "titleFormat": "Budget Violation",
+          "textFormat": "Performance budget exceeded"
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Performance Budget Status",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "pms_performance_budget_status{environment=\"$environment\"}",
+            "legendFormat": "Budget Status",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {"options": {"0": {"text": "VIOLATED", "color": "red"}}, "type": "value"},
+              {"options": {"1": {"text": "HEALTHY", "color": "green"}}, "type": "value"}
+            ],
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "orientation": "auto",
+          "textMode": "auto",
+          "colorMode": "background"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Baseline Comparison Status",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "pms_performance_regression_detected{environment=\"$environment\"}",
+            "legendFormat": "Regression Status",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {"options": {"0": {"text": "NO REGRESSION", "color": "green"}}, "type": "value"},
+              {"options": {"1": {"text": "REGRESSION DETECTED", "color": "red"}}, "type": "value"}
+            ],
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "red", "value": 1}
+              ]
+            }
+          }
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "orientation": "auto",
+          "textMode": "auto",
+          "colorMode": "background"
+        }
+      },
+      {
+        "id": 3,
+        "title": "API Latency vs Budget (P95)",
+        "type": "timeseries",
+        "gridPos": {"h": 9, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(pms_api_request_duration_seconds_bucket{environment=\"$environment\", service=~\"$service\"}[5m])) * 1000",
+            "legendFormat": "P95 Latency (ms)",
+            "refId": "A"
+          },
+          {
+            "expr": "pms_performance_budget_api_p95_ms{environment=\"$environment\"}",
+            "legendFormat": "P95 Budget (ms)",
+            "refId": "B"
+          },
+          {
+            "expr": "pms_performance_baseline_api_p95_ms{environment=\"$environment\"}",
+            "legendFormat": "P95 Baseline (ms)",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "spanNulls": false,
+              "insertNulls": false,
+              "showPoints": "never",
+              "pointSize": 5,
+              "stacking": {"mode": "none", "group": "A"},
+              "axisPlacement": "auto",
+              "axisLabel": "",
+              "scaleDistribution": {"type": "linear"},
+              "hideFrom": {"legend": false, "tooltip": false, "vis": false},
+              "thresholdsStyle": {"mode": "off"}
+            },
+            "unit": "ms",
+            "min": 0
+          },
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "P95 Budget (ms)"},
+              "properties": [
+                {"id": "custom.drawStyle", "value": "line"},
+                {"id": "custom.lineStyle", "value": {"dash": [10, 10], "fill": "dash"}},
+                {"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}
+              ]
+            },
+            {
+              "matcher": {"id": "byName", "options": "P95 Baseline (ms)"},
+              "properties": [
+                {"id": "custom.drawStyle", "value": "line"},
+                {"id": "custom.lineStyle", "value": {"dash": [5, 5], "fill": "dash"}},
+                {"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}
+              ]
+            }
+          ]
+        },
+        "options": {
+          "tooltip": {"mode": "single", "sort": "none"},
+          "legend": {"displayMode": "visible", "placement": "bottom"}
+        }
+      },
+      {
+        "id": 4,
+        "title": "API Error Rate vs Budget",
+        "type": "timeseries",
+        "gridPos": {"h": 9, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(pms_api_requests_total{environment=\"$environment\", service=~\"$service\", status=~\"4..|5..\"}[5m]) / rate(pms_api_requests_total{environment=\"$environment\", service=~\"$service\"}[5m]) * 100",
+            "legendFormat": "Error Rate (%)",
+            "refId": "A"
+          },
+          {
+            "expr": "pms_performance_budget_api_error_rate_percent{environment=\"$environment\"}",
+            "legendFormat": "Error Rate Budget (%)",
+            "refId": "B"
+          },
+          {
+            "expr": "pms_performance_baseline_api_error_rate_percent{environment=\"$environment\"}",
+            "legendFormat": "Error Rate Baseline (%)",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "spanNulls": false,
+              "insertNulls": false,
+              "showPoints": "never",
+              "pointSize": 5,
+              "stacking": {"mode": "none", "group": "A"},
+              "axisPlacement": "auto",
+              "axisLabel": "",
+              "scaleDistribution": {"type": "linear"},
+              "hideFrom": {"legend": false, "tooltip": false, "vis": false},
+              "thresholdsStyle": {"mode": "off"}
+            },
+            "unit": "percent",
+            "min": 0,
+            "max": 10
+          },
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "Error Rate Budget (%)"},
+              "properties": [
+                {"id": "custom.drawStyle", "value": "line"},
+                {"id": "custom.lineStyle", "value": {"dash": [10, 10], "fill": "dash"}},
+                {"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}
+              ]
+            },
+            {
+              "matcher": {"id": "byName", "options": "Error Rate Baseline (%)"},
+              "properties": [
+                {"id": "custom.drawStyle", "value": "line"},
+                {"id": "custom.lineStyle", "value": {"dash": [5, 5], "fill": "dash"}},
+                {"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}
+              ]
+            }
+          ]
+        },
+        "options": {
+          "tooltip": {"mode": "single", "sort": "none"},
+          "legend": {"displayMode": "visible", "placement": "bottom"}
+        }
+      },
+      {
+        "id": 5,
+        "title": "Performance Budget Violations (Last 24h)",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 17},
+        "targets": [
+          {
+            "expr": "increase(pms_performance_budget_violations_total{environment=\"$environment\"}[24h])",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {"Time": true, "__name__": true},
+              "indexByName": {},
+              "renameByName": {
+                "metric": "Metric",
+                "severity": "Severity",
+                "service": "Service",
+                "Value": "Violations (24h)"
+              }
+            }
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 1},
+                {"color": "red", "value": 5}
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "Violations (24h)"},
+              "properties": [
+                {"id": "custom.displayMode", "value": "color-background"}
+              ]
+            }
+          ]
+        },
+        "options": {
+          "showHeader": true
+        }
+      },
+      {
+        "id": 6,
+        "title": "Performance Trend Analysis",
+        "type": "timeseries",
+        "gridPos": {"h": 9, "w": 12, "x": 0, "y": 25},
+        "targets": [
+          {
+            "expr": "pms_performance_trend_score{environment=\"$environment\", service=~\"$service\"}",
+            "legendFormat": "Performance Trend Score",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "lineWidth": 2,
+              "fillOpacity": 20,
+              "gradientMode": "opacity",
+              "spanNulls": false,
+              "insertNulls": false,
+              "showPoints": "auto",
+              "pointSize": 5,
+              "stacking": {"mode": "none", "group": "A"},
+              "axisPlacement": "auto",
+              "axisLabel": "",
+              "scaleDistribution": {"type": "linear"},
+              "hideFrom": {"legend": false, "tooltip": false, "vis": false},
+              "thresholdsStyle": {"mode": "area"}
+            },
+            "unit": "short",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 70},
+                {"color": "green", "value": 85}
+              ]
+            }
+          }
+        },
+        "options": {
+          "tooltip": {"mode": "single", "sort": "none"},
+          "legend": {"displayMode": "visible", "placement": "bottom"}
+        }
+      },
+      {
+        "id": 7,
+        "title": "Critical Endpoint Performance",
+        "type": "heatmap",
+        "gridPos": {"h": 9, "w": 12, "x": 12, "y": 25},
+        "targets": [
+          {
+            "expr": "rate(pms_api_request_duration_seconds_bucket{environment=\"$environment\", endpoint=~\"/api/(auth|patients|appointments).*\"}[5m])",
+            "format": "heatmap",
+            "legendFormat": "{{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "hideFrom": {"legend": false, "tooltip": false, "vis": false},
+              "scaleDistribution": {"type": "linear"}
+            }
+          }
+        },
+        "options": {
+          "calculate": false,
+          "cellGap": 2,
+          "cellValues": {},
+          "color": {
+            "exponent": 0.5,
+            "fill": "dark-orange",
+            "mode": "spectrum",
+            "reverse": false,
+            "scale": "exponential",
+            "scheme": "Spectral",
+            "steps": 64
+          },
+          "exemplars": {"color": "rgba(255,0,255,0.7)"},
+          "filterValues": {"le": 1e-9},
+          "legend": {"show": false},
+          "rowsFrame": {"layout": "auto"},
+          "tooltip": {"show": true, "yHistogram": false},
+          "yAxis": {
+            "axisPlacement": "left",
+            "reverse": false,
+            "unit": "s"
+          }
+        }
+      }
+    ]
+  }
+}

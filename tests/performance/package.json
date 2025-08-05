@@ -1,0 +1,65 @@
+{
+  "name": "pms-performance-tests",
+  "version": "1.0.0",
+  "description": "Performance testing suite for Mental Health Practice Management System",
+  "main": "baseline-test.js",
+  "scripts": {
+    "test": "node baseline-test.js",
+    "test:baseline": "node baseline-test.js --save-baseline",
+    "test:quiet": "node baseline-test.js --quiet",
+    "test:skip-budgets": "node baseline-test.js --skip-budgets",
+    "artillery:run": "artillery run artillery.yml",
+    "artillery:validate": "artillery validate artillery.yml",
+    "artillery:report": "artillery report",
+    "validate:config": "node -e \"require('./performance-budgets.json'); console.log('✅ Configuration valid')\"",
+    "clean": "rm -rf results/* reports/*",
+    "install:global": "npm install -g artillery@latest"
+  },
+  "keywords": [
+    "performance",
+    "testing",
+    "artillery",
+    "load-testing",
+    "baseline",
+    "budget",
+    "hipaa",
+    "healthcare"
+  ],
+  "author": "PMS Development Team",
+  "license": "PROPRIETARY",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "artillery": "^2.0.0",
+    "artillery-plugin-metrics-by-endpoint": "^1.0.0",
+    "artillery-plugin-prometheus": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/company/pms.git",
+    "directory": "tests/performance"
+  },
+  "bugs": {
+    "url": "https://github.com/company/pms/issues"
+  },
+  "homepage": "https://github.com/company/pms#readme",
+  "config": {
+    "artillery": {
+      "config": "artillery.yml",
+      "processor": "helpers.js"
+    }
+  },
+  "files": [
+    "*.js",
+    "*.yml",
+    "*.json",
+    "README.md"
+  ]
+}

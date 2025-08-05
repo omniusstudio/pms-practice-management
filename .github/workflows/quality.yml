@@ -1,0 +1,349 @@
+name: Code Quality Checks
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run quality checks weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  pre-commit-validation:
+    name: Pre-commit Hooks Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install pre-commit
+        run: |
+          pip install pre-commit
+          pre-commit --version
+
+      - name: Cache pre-commit hooks
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-
+
+      - name: Install pre-commit hooks
+        run: pre-commit install --install-hooks
+
+      - name: Run pre-commit on all files
+        run: pre-commit run --all-files --show-diff-on-failure
+
+      - name: Upload pre-commit results
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: pre-commit-failures
+          path: |
+            .pre-commit.log
+            bandit-report.json
+          retention-days: 7
+
+  advanced-python-analysis:
+    name: Advanced Python Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install analysis tools
+        run: |
+          pip install --upgrade pip
+          pip install pylint radon vulture pydocstyle complexity-report
+          if [ -f "apps/backend/requirements.txt" ]; then
+            pip install -r apps/backend/requirements.txt
+          fi
+
+      - name: Run Pylint analysis
+        run: |
+          if [ -d "apps/backend" ]; then
+            cd apps/backend
+            pylint --output-format=json --reports=y --score=y . > pylint-report.json || true
+            pylint --score=y . || echo "Pylint analysis completed with warnings"
+          fi
+
+      - name: Run code complexity analysis
+        run: |
+          if [ -d "apps/backend" ]; then
+            cd apps/backend
+            radon cc . --json > complexity-report.json
+            radon cc . --min=B || echo "Complexity analysis completed"
+            radon mi . --json > maintainability-report.json
+            radon mi . --min=B || echo "Maintainability analysis completed"
+          fi
+
+      - name: Run dead code detection
+        run: |
+          if [ -d "apps/backend" ]; then
+            cd apps/backend
+            vulture . --json > vulture-report.json || true
+            vulture . || echo "Dead code detection completed"
+          fi
+
+      - name: Run docstring analysis
+        run: |
+          if [ -d "apps/backend" ]; then
+            cd apps/backend
+            pydocstyle . > pydocstyle-report.txt || true
+            pydocstyle . || echo "Docstring analysis completed"
+          fi
+
+      - name: Upload Python analysis reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: python-analysis-reports
+          path: |
+            apps/backend/pylint-report.json
+            apps/backend/complexity-report.json
+            apps/backend/maintainability-report.json
+            apps/backend/vulture-report.json
+            apps/backend/pydocstyle-report.txt
+          retention-days: 30
+
+  advanced-frontend-analysis:
+    name: Advanced Frontend Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install frontend dependencies
+        run: |
+          if [ -f "apps/frontend/package.json" ]; then
+            cd apps/frontend
+            npm ci
+          fi
+
+      - name: Install analysis tools
+        run: |
+          npm install -g typescript-analyzer jscpd depcheck bundle-analyzer
+
+      - name: Run TypeScript strict analysis
+        run: |
+          if [ -f "apps/frontend/tsconfig.json" ]; then
+            cd apps/frontend
+            npx tsc --noEmit --strict --exactOptionalPropertyTypes > typescript-strict.log 2>&1 || true
+            cat typescript-strict.log
+          fi
+
+      - name: Run duplicate code detection
+        run: |
+          if [ -d "apps/frontend/src" ]; then
+            cd apps/frontend
+            npx jscpd src --reporters json --output jscpd-report.json || true
+            npx jscpd src --threshold 5 || echo "Duplicate code detection completed"
+          fi
+
+      - name: Run unused dependencies check
+        run: |
+          if [ -f "apps/frontend/package.json" ]; then
+            cd apps/frontend
+            npx depcheck --json > depcheck-report.json || true
+            npx depcheck || echo "Dependency check completed"
+          fi
+
+      - name: Analyze bundle size
+        run: |
+          if [ -f "apps/frontend/package.json" ]; then
+            cd apps/frontend
+            npm run build
+            npx webpack-bundle-analyzer dist/assets/*.js --report --mode static --report-filename bundle-analysis.html || true
+          fi
+
+      - name: Upload frontend analysis reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: frontend-analysis-reports
+          path: |
+            apps/frontend/typescript-strict.log
+            apps/frontend/jscpd-report.json
+            apps/frontend/depcheck-report.json
+            apps/frontend/bundle-analysis.html
+          retention-days: 30
+
+  documentation-quality:
+    name: Documentation Quality Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install documentation tools
+        run: |
+          pip install doc8 rstcheck markdown-link-check
+          npm install -g markdownlint-cli alex write-good
+
+      - name: Check Markdown files
+        run: |
+          find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | xargs markdownlint --json > markdownlint-report.json || true
+          find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | xargs markdownlint || echo "Markdown linting completed"
+
+      - name: Check for inclusive language
+        run: |
+          find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | xargs alex --json > alex-report.json || true
+          find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | xargs alex || echo "Inclusive language check completed"
+
+      - name: Check writing quality
+        run: |
+          find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | xargs write-good > write-good-report.txt || true
+          find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | xargs write-good || echo "Writing quality check completed"
+
+      - name: Check for broken links
+        run: |
+          find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | xargs markdown-link-check --config .markdown-link-check.json > link-check-report.txt || true
+
+      - name: Upload documentation reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: documentation-reports
+          path: |
+            markdownlint-report.json
+            alex-report.json
+            write-good-report.txt
+            link-check-report.txt
+          retention-days: 30
+
+  performance-analysis:
+    name: Performance Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install performance analysis tools
+        run: |
+          pip install py-spy memory-profiler line-profiler
+          npm install -g lighthouse-ci clinic
+
+      - name: Analyze Python import time
+        run: |
+          if [ -d "apps/backend" ]; then
+            cd apps/backend
+            python -X importtime -c "import main" 2> import-time-report.txt || true
+            cat import-time-report.txt
+          fi
+
+      - name: Run Lighthouse CI (if frontend exists)
+        run: |
+          if [ -f "apps/frontend/package.json" ]; then
+            cd apps/frontend
+            npm run build
+            npx lhci autorun --config=.lighthouserc.json || echo "Lighthouse analysis completed"
+          fi
+
+      - name: Upload performance reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: performance-reports
+          path: |
+            apps/backend/import-time-report.txt
+            apps/frontend/.lighthouseci/
+          retention-days: 30
+
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [pre-commit-validation, advanced-python-analysis, advanced-frontend-analysis, documentation-quality, performance-analysis]
+    if: always()
+    steps:
+      - name: Check quality gate status
+        run: |
+          echo "Quality Gate Results:"
+          echo "- Pre-commit Validation: ${{ needs.pre-commit-validation.result }}"
+          echo "- Python Analysis: ${{ needs.advanced-python-analysis.result }}"
+          echo "- Frontend Analysis: ${{ needs.advanced-frontend-analysis.result }}"
+          echo "- Documentation Quality: ${{ needs.documentation-quality.result }}"
+          echo "- Performance Analysis: ${{ needs.performance-analysis.result }}"
+          
+          # Fail if critical checks failed
+          if [ "${{ needs.pre-commit-validation.result }}" = "failure" ]; then
+            echo "❌ Quality gate failed: Pre-commit validation failed"
+            exit 1
+          fi
+          
+          echo "✅ Quality gate passed"
+
+      - name: Generate quality report
+        run: |
+          echo "# Code Quality Report" > quality-report.md
+          echo "" >> quality-report.md
+          echo "## Summary" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "- **Pre-commit Validation**: ${{ needs.pre-commit-validation.result }}" >> quality-report.md
+          echo "- **Python Analysis**: ${{ needs.advanced-python-analysis.result }}" >> quality-report.md
+          echo "- **Frontend Analysis**: ${{ needs.advanced-frontend-analysis.result }}" >> quality-report.md
+          echo "- **Documentation Quality**: ${{ needs.documentation-quality.result }}" >> quality-report.md
+          echo "- **Performance Analysis**: ${{ needs.performance-analysis.result }}" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "Generated on: $(date)" >> quality-report.md
+          
+          cat quality-report.md
+
+      - name: Upload quality report
+        uses: actions/upload-artifact@v3
+        with:
+          name: quality-report
+          path: quality-report.md
+          retention-days: 30

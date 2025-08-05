@@ -1,0 +1,62 @@
+# Global owners - these users will be requested for review on all PRs
+* @tech-lead @security-team
+
+# Backend code
+/apps/backend/ @backend-team @security-team
+/apps/backend/auth/ @backend-team @security-team @auth-team
+/apps/backend/api/ @backend-team @api-team
+/apps/backend/models/ @backend-team @data-team
+/apps/backend/migrations/ @backend-team @data-team @dba-team
+
+# Frontend code
+/apps/frontend/ @frontend-team @ux-team
+/apps/frontend/src/components/auth/ @frontend-team @security-team
+/apps/frontend/src/pages/ @frontend-team @ux-team
+/apps/frontend/src/hooks/ @frontend-team
+
+# Infrastructure
+/apps/infra/ @devops-team @security-team
+/apps/infra/terraform/ @devops-team @infrastructure-team
+/apps/infra/kubernetes/ @devops-team @platform-team
+/apps/infra/monitoring/ @devops-team @observability-team
+
+# Shared packages
+/packages/ @backend-team @frontend-team
+/packages/shared-types/ @backend-team @frontend-team @api-team
+/packages/shared-config/ @devops-team @backend-team @frontend-team
+
+# Documentation
+/docs/ @tech-lead @technical-writers
+/docs/security/ @security-team @compliance-team
+/docs/api/ @api-team @technical-writers
+
+# Configuration files
+/.github/ @devops-team @tech-lead
+/docker-compose*.yml @devops-team
+/Dockerfile* @devops-team
+/.env* @devops-team @security-team
+
+# Security-sensitive files
+/SECURITY.md @security-team @compliance-team
+/apps/backend/auth/ @security-team @auth-team
+/apps/backend/middleware/security.py @security-team
+/apps/frontend/src/utils/auth.ts @security-team @frontend-team
+
+# Database and migrations
+/apps/backend/migrations/ @data-team @dba-team @backend-team
+/apps/backend/models/ @data-team @backend-team
+/scripts/db/ @data-team @dba-team
+
+# CI/CD and deployment
+/.github/workflows/ @devops-team @tech-lead
+/scripts/deploy/ @devops-team @platform-team
+/Makefile @devops-team @tech-lead
+
+# Root configuration files
+/package.json @frontend-team @devops-team
+/requirements.txt @backend-team @devops-team
+/pyproject.toml @backend-team @devops-team
+/.editorconfig @tech-lead
+/.gitignore @tech-lead @devops-team
+/README.md @tech-lead @technical-writers
+/CONTRIBUTING.md @tech-lead @technical-writers

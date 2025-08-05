@@ -1,0 +1,368 @@
+groups:
+  - name: performance_budgets
+    rules:
+      # Performance Budget Violations
+      - alert: PerformanceBudgetP95Violated
+        expr: |
+          (
+            histogram_quantile(0.95, rate(pms_api_request_duration_seconds_bucket[5m])) * 1000
+          ) > on() (
+            pms_performance_budget_api_p95_ms
+          )
+        for: 2m
+        labels:
+          severity: critical
+          category: performance
+          budget_type: latency
+        annotations:
+          summary: "API P95 latency budget exceeded"
+          description: |
+            API P95 latency ({{ $value }}ms) has exceeded the performance budget 
+            for {{ $labels.service }} in {{ $labels.environment }} environment.
+            Budget: {{ query "pms_performance_budget_api_p95_ms" | first | value }}ms
+          runbook_url: "https://runbooks.company.com/performance/budget-violations"
+          dashboard_url: "https://grafana.company.com/d/performance-budget"
+
+      - alert: PerformanceBudgetP50Violated
+        expr: |
+          (
+            histogram_quantile(0.50, rate(pms_api_request_duration_seconds_bucket[5m])) * 1000
+          ) > on() (
+            pms_performance_budget_api_p50_ms
+          )
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+          budget_type: latency
+        annotations:
+          summary: "API P50 latency budget exceeded"
+          description: |
+            API P50 latency ({{ $value }}ms) has exceeded the performance budget 
+            for {{ $labels.service }} in {{ $labels.environment }} environment.
+            Budget: {{ query "pms_performance_budget_api_p50_ms" | first | value }}ms
+          runbook_url: "https://runbooks.company.com/performance/budget-violations"
+
+      - alert: PerformanceBudgetErrorRateViolated
+        expr: |
+          (
+            rate(pms_api_requests_total{status=~"4..|5.."}[5m]) / 
+            rate(pms_api_requests_total[5m]) * 100
+          ) > on() (
+            pms_performance_budget_api_error_rate_percent
+          )
+        for: 2m
+        labels:
+          severity: critical
+          category: performance
+          budget_type: error_rate
+        annotations:
+          summary: "API error rate budget exceeded"
+          description: |
+            API error rate ({{ $value }}%) has exceeded the performance budget 
+            for {{ $labels.service }} in {{ $labels.environment }} environment.
+            Budget: {{ query "pms_performance_budget_api_error_rate_percent" | first | value }}%
+          runbook_url: "https://runbooks.company.com/performance/budget-violations"
+
+      - alert: PerformanceBudgetThroughputViolated
+        expr: |
+          (
+            rate(pms_api_requests_total[5m])
+          ) < on() (
+            pms_performance_budget_api_throughput_rps * 0.8
+          )
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+          budget_type: throughput
+        annotations:
+          summary: "API throughput below budget threshold"
+          description: |
+            API throughput ({{ $value }} RPS) has fallen below 80% of the performance budget 
+            for {{ $labels.service }} in {{ $labels.environment }} environment.
+            Budget: {{ query "pms_performance_budget_api_throughput_rps" | first | value }} RPS
+          runbook_url: "https://runbooks.company.com/performance/throughput-issues"
+
+  - name: performance_regressions
+    rules:
+      # Baseline Regression Detection
+      - alert: PerformanceRegressionP95Latency
+        expr: |
+          (
+            histogram_quantile(0.95, rate(pms_api_request_duration_seconds_bucket[5m])) * 1000
+          ) > on() (
+            pms_performance_baseline_api_p95_ms * 1.2
+          )
+        for: 10m
+        labels:
+          severity: warning
+          category: performance
+          regression_type: latency
+        annotations:
+          summary: "Performance regression detected in P95 latency"
+          description: |
+            API P95 latency ({{ $value }}ms) has regressed by more than 20% compared to baseline 
+            for {{ $labels.service }} in {{ $labels.environment }} environment.
+            Baseline: {{ query "pms_performance_baseline_api_p95_ms" | first | value }}ms
+            Regression: {{ with query "(histogram_quantile(0.95, rate(pms_api_request_duration_seconds_bucket[5m])) * 1000 - pms_performance_baseline_api_p95_ms) / pms_performance_baseline_api_p95_ms * 100" }}{{ . | first | value | humanize }}%{{ end }}
+          runbook_url: "https://runbooks.company.com/performance/regression-analysis"
+
+      - alert: PerformanceRegressionP50Latency
+        expr: |
+          (
+            histogram_quantile(0.50, rate(pms_api_request_duration_seconds_bucket[5m])) * 1000
+          ) > on() (
+            pms_performance_baseline_api_p50_ms * 1.3
+          )
+        for: 15m
+        labels:
+          severity: warning
+          category: performance
+          regression_type: latency
+        annotations:
+          summary: "Performance regression detected in P50 latency"
+          description: |
+            API P50 latency ({{ $value }}ms) has regressed by more than 30% compared to baseline 
+            for {{ $labels.service }} in {{ $labels.environment }} environment.
+            Baseline: {{ query "pms_performance_baseline_api_p50_ms" | first | value }}ms
+          runbook_url: "https://runbooks.company.com/performance/regression-analysis"
+
+      - alert: PerformanceRegressionErrorRate
+        expr: |
+          (
+            rate(pms_api_requests_total{status=~"4..|5.."}[5m]) / 
+            rate(pms_api_requests_total[5m]) * 100
+          ) > on() (
+            pms_performance_baseline_api_error_rate_percent * 1.5
+          )
+        for: 5m
+        labels:
+          severity: critical
+          category: performance
+          regression_type: error_rate
+        annotations:
+          summary: "Performance regression detected in error rate"
+          description: |
+            API error rate ({{ $value }}%) has regressed by more than 50% compared to baseline 
+            for {{ $labels.service }} in {{ $labels.environment }} environment.
+            Baseline: {{ query "pms_performance_baseline_api_error_rate_percent" | first | value }}%
+          runbook_url: "https://runbooks.company.com/performance/error-rate-regression"
+
+  - name: performance_critical_endpoints
+    rules:
+      # Critical Endpoint Performance
+      - alert: CriticalEndpointLatencyBudgetViolated
+        expr: |
+          histogram_quantile(0.95, 
+            rate(pms_api_request_duration_seconds_bucket{
+              endpoint=~"/api/(auth/login|patients|appointments).*"
+            }[5m])
+          ) * 1000 > 500
+        for: 2m
+        labels:
+          severity: critical
+          category: performance
+          endpoint_type: critical
+        annotations:
+          summary: "Critical endpoint {{ $labels.endpoint }} exceeding latency budget"
+          description: |
+            Critical endpoint {{ $labels.endpoint }} P95 latency ({{ $value }}ms) 
+            has exceeded the 500ms budget in {{ $labels.environment }} environment.
+            This affects core business functionality.
+          runbook_url: "https://runbooks.company.com/performance/critical-endpoints"
+
+      - alert: AuthenticationLatencyHigh
+        expr: |
+          histogram_quantile(0.95, 
+            rate(pms_api_request_duration_seconds_bucket{
+              endpoint="/api/auth/login"
+            }[5m])
+          ) * 1000 > 300
+        for: 1m
+        labels:
+          severity: critical
+          category: performance
+          endpoint_type: authentication
+        annotations:
+          summary: "Authentication endpoint latency is high"
+          description: |
+            Authentication endpoint P95 latency ({{ $value }}ms) exceeds 300ms budget.
+            This directly impacts user login experience and system access.
+          runbook_url: "https://runbooks.company.com/performance/auth-performance"
+
+  - name: performance_frontend
+    rules:
+      # Frontend Performance Budgets
+      - alert: FrontendPageLoadBudgetViolated
+        expr: |
+          histogram_quantile(0.95, 
+            rate(pms_frontend_page_load_duration_seconds_bucket[5m])
+          ) * 1000 > on() (
+            pms_performance_budget_frontend_page_load_p95_ms
+          )
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+          component: frontend
+        annotations:
+          summary: "Frontend page load budget exceeded"
+          description: |
+            Frontend P95 page load time ({{ $value }}ms) has exceeded the performance budget.
+            Budget: {{ query "pms_performance_budget_frontend_page_load_p95_ms" | first | value }}ms
+          runbook_url: "https://runbooks.company.com/performance/frontend-performance"
+
+      - alert: FrontendErrorRateBudgetViolated
+        expr: |
+          (
+            rate(pms_frontend_errors_total[5m]) / 
+            rate(pms_frontend_page_views_total[5m]) * 100
+          ) > on() (
+            pms_performance_budget_frontend_error_rate_percent
+          )
+        for: 3m
+        labels:
+          severity: warning
+          category: performance
+          component: frontend
+        annotations:
+          summary: "Frontend error rate budget exceeded"
+          description: |
+            Frontend error rate ({{ $value }}%) has exceeded the performance budget.
+            Budget: {{ query "pms_performance_budget_frontend_error_rate_percent" | first | value }}%
+          runbook_url: "https://runbooks.company.com/performance/frontend-errors"
+
+  - name: performance_database
+    rules:
+      # Database Performance Budgets
+      - alert: DatabaseQueryLatencyBudgetViolated
+        expr: |
+          histogram_quantile(0.95, 
+            rate(pms_database_query_duration_seconds_bucket[5m])
+          ) * 1000 > on() (
+            pms_performance_budget_database_query_p95_ms
+          )
+        for: 3m
+        labels:
+          severity: warning
+          category: performance
+          component: database
+        annotations:
+          summary: "Database query latency budget exceeded"
+          description: |
+            Database P95 query latency ({{ $value }}ms) has exceeded the performance budget.
+            Budget: {{ query "pms_performance_budget_database_query_p95_ms" | first | value }}ms
+          runbook_url: "https://runbooks.company.com/performance/database-performance"
+
+      - alert: DatabaseConnectionPoolUtilizationHigh
+        expr: |
+          (
+            pms_database_connections_active / pms_database_connections_max * 100
+          ) > on() (
+            pms_performance_budget_database_connection_pool_utilization_percent
+          )
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+          component: database
+        annotations:
+          summary: "Database connection pool utilization budget exceeded"
+          description: |
+            Database connection pool utilization ({{ $value }}%) has exceeded the performance budget.
+            Budget: {{ query "pms_performance_budget_database_connection_pool_utilization_percent" | first | value }}%
+            This may lead to connection timeouts and degraded performance.
+          runbook_url: "https://runbooks.company.com/performance/database-connections"
+
+  - name: performance_hipaa_compliance
+    rules:
+      # HIPAA-specific Performance Requirements
+      - alert: AuditLogLatencyHigh
+        expr: |
+          histogram_quantile(0.95, 
+            rate(pms_audit_log_write_duration_seconds_bucket[5m])
+          ) * 1000 > 200
+        for: 2m
+        labels:
+          severity: critical
+          category: performance
+          compliance: hipaa
+        annotations:
+          summary: "HIPAA audit log write latency is high"
+          description: |
+            Audit log write P95 latency ({{ $value }}ms) exceeds 200ms budget.
+            This may impact HIPAA compliance requirements for audit trail integrity.
+          runbook_url: "https://runbooks.company.com/compliance/audit-performance"
+
+      - alert: PHIScrubbingLatencyHigh
+        expr: |
+          histogram_quantile(0.95, 
+            rate(pms_phi_scrubbing_duration_seconds_bucket[5m])
+          ) * 1000 > 100
+        for: 1m
+        labels:
+          severity: critical
+          category: performance
+          compliance: hipaa
+        annotations:
+          summary: "PHI scrubbing latency is high"
+          description: |
+            PHI scrubbing P95 latency ({{ $value }}ms) exceeds 100ms budget.
+            This may impact data privacy protection and HIPAA compliance.
+          runbook_url: "https://runbooks.company.com/compliance/phi-scrubbing"
+
+      - alert: EncryptionOverheadHigh
+        expr: |
+          (
+            (pms_encryption_processing_time_seconds - pms_baseline_processing_time_seconds) / 
+            pms_baseline_processing_time_seconds * 100
+          ) > 5
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+          compliance: hipaa
+        annotations:
+          summary: "Encryption overhead exceeds budget"
+          description: |
+            Encryption processing overhead ({{ $value }}%) exceeds 5% budget.
+            This may indicate inefficient encryption implementation.
+          runbook_url: "https://runbooks.company.com/compliance/encryption-performance"
+
+  - name: performance_trends
+    rules:
+      # Performance Trend Analysis
+      - alert: PerformanceTrendDegrading
+        expr: |
+          (
+            avg_over_time(pms_performance_trend_score[1h]) < 70
+          ) and (
+            deriv(pms_performance_trend_score[30m]) < -0.5
+          )
+        for: 15m
+        labels:
+          severity: warning
+          category: performance
+          trend: degrading
+        annotations:
+          summary: "Performance trend is degrading"
+          description: |
+            Performance trend score ({{ $value }}) is below 70 and decreasing.
+            This indicates a sustained degradation in system performance.
+          runbook_url: "https://runbooks.company.com/performance/trend-analysis"
+
+      - alert: PerformanceBaselineOutdated
+        expr: |
+          (time() - pms_performance_baseline_timestamp) > (7 * 24 * 3600)
+        for: 0m
+        labels:
+          severity: info
+          category: performance
+          maintenance: baseline
+        annotations:
+          summary: "Performance baseline is outdated"
+          description: |
+            Performance baseline is more than 7 days old ({{ $value | humanizeDuration }}).
+            Consider updating the baseline to reflect current system performance.
+          runbook_url: "https://runbooks.company.com/performance/baseline-maintenance"

@@ -1,0 +1,285 @@
+# Service Level Objectives (SLO) Configuration
+# Mental Health Practice Management System
+# HIPAA-compliant monitoring objectives
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pms-slo-config
+  namespace: pms-monitoring
+data:
+  slo-config.yaml: |
+    # API Service Level Objectives
+    slos:
+      - name: api-availability
+        description: "API service availability SLO"
+        service: pms-api
+        sli:
+          type: availability
+          query: |
+            (
+              sum(rate(pms_http_requests_total[5m])) -
+              sum(rate(pms_http_requests_total{status_code=~"5.."}[5m]))
+            ) / sum(rate(pms_http_requests_total[5m]))
+        objectives:
+          - target: 0.999  # 99.9% availability
+            window: 30d
+            alerting:
+              burn_rate_short: 14.4  # 1h window
+              burn_rate_long: 6      # 6h window
+          - target: 0.995   # 99.5% availability (warning)
+            window: 7d
+            alerting:
+              burn_rate_short: 9.6
+              burn_rate_long: 4
+        labels:
+          team: backend
+          severity: critical
+          hipaa_compliant: "true"
+
+      - name: api-latency
+        description: "API response time SLO"
+        service: pms-api
+        sli:
+          type: latency
+          query: |
+            histogram_quantile(0.95,
+              sum(rate(pms_http_request_duration_seconds_bucket[5m]))
+              by (le)
+            )
+        objectives:
+          - target: 0.5     # 500ms for 95th percentile
+            window: 30d
+            alerting:
+              burn_rate_short: 14.4
+              burn_rate_long: 6
+          - target: 1.0     # 1s warning threshold
+            window: 7d
+            alerting:
+              burn_rate_short: 9.6
+              burn_rate_long: 4
+        labels:
+          team: backend
+          severity: warning
+          hipaa_compliant: "true"
+
+      - name: api-error-rate
+        description: "API error rate SLO"
+        service: pms-api
+        sli:
+          type: error_rate
+          query: |
+            sum(rate(pms_http_requests_total{status_code=~"4..|5.."}[5m])) /
+            sum(rate(pms_http_requests_total[5m]))
+        objectives:
+          - target: 0.01    # 1% error rate
+            window: 30d
+            alerting:
+              burn_rate_short: 14.4
+              burn_rate_long: 6
+          - target: 0.05    # 5% warning threshold
+            window: 7d
+            alerting:
+              burn_rate_short: 9.6
+              burn_rate_long: 4
+        labels:
+          team: backend
+          severity: warning
+          hipaa_compliant: "true"
+
+      # Frontend Service Level Objectives
+      - name: frontend-page-load
+        description: "Frontend page load time SLO"
+        service: pms-frontend
+        sli:
+          type: latency
+          query: |
+            histogram_quantile(0.95,
+              sum(rate(pms_frontend_page_load_time_bucket[5m]))
+              by (le)
+            )
+        objectives:
+          - target: 2000    # 2 seconds for 95th percentile (ms)
+            window: 30d
+            alerting:
+              burn_rate_short: 14.4
+              burn_rate_long: 6
+          - target: 3000    # 3 seconds warning threshold
+            window: 7d
+            alerting:
+              burn_rate_short: 9.6
+              burn_rate_long: 4
+        labels:
+          team: frontend
+          severity: warning
+          hipaa_compliant: "true"
+
+      - name: frontend-error-rate
+        description: "Frontend error rate SLO"
+        service: pms-frontend
+        sli:
+          type: error_rate
+          query: |
+            sum(rate(pms_frontend_errors_total[5m])) /
+            sum(rate(pms_frontend_user_actions_total[5m]))
+        objectives:
+          - target: 0.02    # 2% error rate
+            window: 30d
+            alerting:
+              burn_rate_short: 14.4
+              burn_rate_long: 6
+          - target: 0.05    # 5% warning threshold
+            window: 7d
+            alerting:
+              burn_rate_short: 9.6
+              burn_rate_long: 4
+        labels:
+          team: frontend
+          severity: warning
+          hipaa_compliant: "true"
+
+      # Security and Compliance SLOs
+      - name: auth-success-rate
+        description: "Authentication success rate SLO"
+        service: pms-api
+        sli:
+          type: success_rate
+          query: |
+            sum(rate(pms_auth_events_total{success="true"}[5m])) /
+            sum(rate(pms_auth_events_total[5m]))
+        objectives:
+          - target: 0.98    # 98% success rate
+            window: 30d
+            alerting:
+              burn_rate_short: 14.4
+              burn_rate_long: 6
+          - target: 0.95    # 95% warning threshold
+            window: 7d
+            alerting:
+              burn_rate_short: 9.6
+              burn_rate_long: 4
+        labels:
+          team: security
+          severity: warning
+          hipaa_compliant: "true"
+
+      - name: audit-completeness
+        description: "Audit logging completeness SLO"
+        service: pms-api
+        sli:
+          type: completeness
+          query: |
+            sum(rate(pms_audit_events_total[5m])) /
+            sum(rate(pms_user_actions_total[5m]))
+        objectives:
+          - target: 0.99    # 99% of user actions should generate audit logs
+            window: 30d
+            alerting:
+              burn_rate_short: 14.4
+              burn_rate_long: 6
+          - target: 0.95    # 95% warning threshold
+            window: 7d
+            alerting:
+              burn_rate_short: 9.6
+              burn_rate_long: 4
+        labels:
+          team: security
+          severity: critical
+          hipaa_compliant: "true"
+
+      # Business Logic SLOs
+      - name: data-processing-latency
+        description: "Data processing latency SLO"
+        service: pms-api
+        sli:
+          type: latency
+          query: |
+            histogram_quantile(0.95,
+              sum(rate(pms_http_request_duration_seconds_bucket{endpoint=~"/api/.*/(create|update)"}[5m]))
+              by (le)
+            )
+        objectives:
+          - target: 1.0     # 1 second for data operations
+            window: 30d
+            alerting:
+              burn_rate_short: 14.4
+              burn_rate_long: 6
+          - target: 2.0     # 2 seconds warning threshold
+            window: 7d
+            alerting:
+              burn_rate_short: 9.6
+              burn_rate_long: 4
+        labels:
+          team: backend
+          severity: warning
+          hipaa_compliant: "true"
+
+    # Error Budget Policies
+    error_budget_policies:
+      - name: default-policy
+        description: "Default error budget policy for all SLOs"
+        rules:
+          - condition: "burn_rate > 14.4"  # 1h to exhaust 30d budget
+            action: "page"
+            severity: "critical"
+            notification_channels: ["pagerduty", "slack-critical"]
+          - condition: "burn_rate > 6"     # 6h to exhaust 30d budget
+            action: "alert"
+            severity: "warning"
+            notification_channels: ["slack-alerts"]
+          - condition: "burn_rate > 3"     # 12h to exhaust 30d budget
+            action: "ticket"
+            severity: "info"
+            notification_channels: ["jira"]
+
+      - name: security-policy
+        description: "Strict policy for security-related SLOs"
+        rules:
+          - condition: "burn_rate > 10"    # Stricter for security
+            action: "page"
+            severity: "critical"
+            notification_channels: ["pagerduty", "slack-security", "security-team"]
+          - condition: "burn_rate > 5"
+            action: "alert"
+            severity: "warning"
+            notification_channels: ["slack-security"]
+
+    # SLO Reporting Configuration
+    reporting:
+      dashboards:
+        - name: "SLO Overview"
+          url: "/grafana/d/slo-overview"
+          description: "High-level SLO compliance dashboard"
+        - name: "Error Budget Status"
+          url: "/grafana/d/error-budget"
+          description: "Current error budget consumption"
+      
+      reports:
+        - name: "Monthly SLO Report"
+          schedule: "0 0 1 * *"  # First day of each month
+          format: "pdf"
+          recipients: ["tech-lead@example.com", "devops@example.com"]
+        - name: "Weekly SLO Summary"
+          schedule: "0 9 * * 1"  # Every Monday at 9 AM
+          format: "email"
+          recipients: ["team@example.com"]
+
+    # Compliance and Audit Configuration
+    compliance:
+      hipaa:
+        enabled: true
+        requirements:
+          - "All SLO metrics must be PHI-scrubbed"
+          - "Audit trail required for all SLO changes"
+          - "Access controls must be enforced"
+          - "Data retention policies must be followed"
+      
+      audit:
+        log_slo_changes: true
+        log_threshold_breaches: true
+        retention_days: 2555  # 7 years for HIPAA compliance
+        
+      access_control:
+        read_access: ["developers", "devops", "management"]
+        write_access: ["devops", "sre"]
+        admin_access: ["tech-lead", "security-team"]

@@ -1,0 +1,18 @@
+{
+  "version": "1.2.3",
+  "release_date": "2025-08-05T01:20:30Z",
+  "git_commit": "",
+  "git_branch": "",
+  "build_number": "local",
+  "release_type": "semantic",
+  "components": {
+    "backend": {
+      "version": "1.2.3",
+      "python_version": "Python 3.11.8"
+    },
+    "frontend": {
+      "version": "1.2.3",
+      "node_version": "v24.0.0"
+    }
+  }
+}

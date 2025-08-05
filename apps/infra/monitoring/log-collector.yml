@@ -1,0 +1,456 @@
+# Centralized Log Collection Configuration
+# HIPAA-compliant logging infrastructure with PHI scrubbing and retention policies
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-collector-config
+  namespace: pms-logging
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush         5
+        Daemon        off
+        Log_Level     info
+        Parsers_File  parsers.conf
+        HTTP_Server   On
+        HTTP_Listen   0.0.0.0
+        HTTP_Port     2020
+        Health_Check  On
+
+    # Input from application containers
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/pms-backend-*.log
+        Parser            docker
+        Tag               backend.*
+        Refresh_Interval  5
+        Mem_Buf_Limit     50MB
+        Skip_Long_Lines   On
+        Skip_Empty_Lines  On
+
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/pms-frontend-*.log
+        Parser            docker
+        Tag               frontend.*
+        Refresh_Interval  5
+        Mem_Buf_Limit     50MB
+        Skip_Long_Lines   On
+        Skip_Empty_Lines  On
+
+    # Input from nginx access logs
+    [INPUT]
+        Name              tail
+        Path              /var/log/nginx/access.log
+        Parser            nginx
+        Tag               nginx.access
+        Refresh_Interval  5
+
+    # Filter to parse JSON logs
+    [FILTER]
+        Name                parser
+        Match               backend.*
+        Key_Name            log
+        Parser              json
+        Reserve_Data        On
+        Preserve_Key        On
+
+    # Filter to add metadata
+    [FILTER]
+        Name                kubernetes
+        Match               *
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_Tag_Prefix     kube.var.log.containers.
+        Merge_Log           On
+        Keep_Log            Off
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+        Annotations         Off
+        Labels              On
+
+    # Filter for PHI scrubbing (custom plugin)
+    [FILTER]
+        Name                phi_scrubber
+        Match               *
+        Scrub_Fields        message,log,event
+        PHI_Patterns_File   /etc/fluent-bit/phi-patterns.conf
+        Redaction_Text      [REDACTED]
+
+    # Filter to add correlation ID index
+    [FILTER]
+        Name                modify
+        Match               *
+        Add                 log_source fluent-bit
+        Add                 environment ${ENVIRONMENT}
+        Add                 cluster_name ${CLUSTER_NAME}
+
+    # Output to Elasticsearch for operational logs (7 days retention)
+    [OUTPUT]
+        Name                es
+        Match               *
+        Host                ${ELASTICSEARCH_HOST}
+        Port                ${ELASTICSEARCH_PORT}
+        Index               pms-logs-operational
+        Type                _doc
+        HTTP_User           ${ELASTICSEARCH_USER}
+        HTTP_Passwd         ${ELASTICSEARCH_PASSWORD}
+        tls                 On
+        tls.verify          On
+        tls.ca_file         /etc/ssl/certs/elasticsearch-ca.crt
+        Retry_Limit         3
+        Buffer_Size         4KB
+        Workers             2
+
+    # Output to long-term storage for audit logs (7 years retention)
+    [OUTPUT]
+        Name                s3
+        Match               *audit*
+        bucket              ${S3_AUDIT_BUCKET}
+        region              ${AWS_REGION}
+        total_file_size     50M
+        upload_timeout      10m
+        use_put_object      On
+        s3_key_format       /audit-logs/year=%Y/month=%m/day=%d/hour=%H/pms-audit-%Y%m%d-%H%M%S
+        compression         gzip
+        content_type        application/json
+        store_dir           /tmp/fluent-bit-s3
+        store_dir_limit_size 100M
+
+  parsers.conf: |
+    [PARSER]
+        Name        docker
+        Format      json
+        Time_Key    time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+        Time_Keep   On
+
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+        Time_Keep   On
+
+    [PARSER]
+        Name        nginx
+        Format      regex
+        Regex       ^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")
+        Time_Key    time
+        Time_Format %d/%b/%Y:%H:%M:%S %z
+
+  phi-patterns.conf: |
+    # PHI Detection Patterns for Log Scrubbing
+    # Social Security Numbers
+    ssn_pattern_1=\b\d{3}-\d{2}-\d{4}\b
+    ssn_pattern_2=\b\d{9}\b
+    
+    # Email Addresses
+    email_pattern=\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b
+    
+    # Phone Numbers
+    phone_pattern_1=\b\(?\d{3}\)?[-.]?\d{3}[-.]?\d{4}\b
+    phone_pattern_2=\b\d{3}[-.]\d{3}[-.]\d{4}\b
+    
+    # Credit Card Numbers
+    credit_card_pattern=\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b
+    
+    # Medical Record Numbers
+    mrn_pattern_1=\bMRN[-:\s]*\d+\b
+    mrn_pattern_2=\bMR[-:\s]*\d+\b
+    
+    # Date of Birth
+    dob_pattern_1=\b\d{1,2}/\d{1,2}/\d{4}\b
+    dob_pattern_2=\b\d{4}-\d{2}-\d{2}\b
+    
+    # Insurance Numbers
+    insurance_pattern=\bINS[-:\s]*[A-Z0-9]+\b
+    
+    # Patient Names (contextual)
+    patient_name_pattern=\bpatient[-_\s]+name[-:\s]*[A-Za-z\s]+\b
+    first_name_pattern=\bfirst[-_\s]+name[-:\s]*[A-Za-z]+\b
+    last_name_pattern=\blast[-_\s]+name[-:\s]*[A-Za-z]+\b
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: pms-logging
+  labels:
+    app: fluent-bit
+spec:
+  selector:
+    matchLabels:
+      app: fluent-bit
+  template:
+    metadata:
+      labels:
+        app: fluent-bit
+    spec:
+      serviceAccountName: fluent-bit
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: fluent-bit
+        image: fluent/fluent-bit:2.2.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 2020
+          name: http
+        env:
+        - name: FLUENT_CONF
+          value: "/fluent-bit/etc/fluent-bit.conf"
+        - name: ENVIRONMENT
+          value: "production"
+        - name: CLUSTER_NAME
+          value: "pms-cluster"
+        - name: ELASTICSEARCH_HOST
+          valueFrom:
+            secretKeyRef:
+              name: elasticsearch-credentials
+              key: host
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: ELASTICSEARCH_USER
+          valueFrom:
+            secretKeyRef:
+              name: elasticsearch-credentials
+              key: username
+        - name: ELASTICSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: elasticsearch-credentials
+              key: password
+        - name: S3_AUDIT_BUCKET
+          valueFrom:
+            secretKeyRef:
+              name: s3-credentials
+              key: audit-bucket
+        - name: AWS_REGION
+          value: "us-east-1"
+        resources:
+          limits:
+            memory: 200Mi
+            cpu: 100m
+          requests:
+            memory: 100Mi
+            cpu: 50m
+        volumeMounts:
+        - name: config
+          mountPath: /fluent-bit/etc
+        - name: varlog
+          mountPath: /var/log
+          readOnly: true
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: elasticsearch-ca
+          mountPath: /etc/ssl/certs/elasticsearch-ca.crt
+          subPath: ca.crt
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: log-collector-config
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: elasticsearch-ca
+        secret:
+          secretName: elasticsearch-ca-cert
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluent-bit
+  namespace: pms-logging
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-bit
+rules:
+- apiGroups: [""]
+  resources: ["pods", "namespaces"]
+  verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent-bit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fluent-bit
+subjects:
+- kind: ServiceAccount
+  name: fluent-bit
+  namespace: pms-logging
+
+---
+# Elasticsearch Index Template for Operational Logs
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elasticsearch-index-template
+  namespace: pms-logging
+data:
+  operational-logs-template.json: |
+    {
+      "index_patterns": ["pms-logs-operational-*"],
+      "template": {
+        "settings": {
+          "number_of_shards": 2,
+          "number_of_replicas": 1,
+          "index.lifecycle.name": "pms-operational-policy",
+          "index.lifecycle.rollover_alias": "pms-logs-operational"
+        },
+        "mappings": {
+          "properties": {
+            "@timestamp": {
+              "type": "date"
+            },
+            "correlation_id": {
+              "type": "keyword",
+              "index": true
+            },
+            "level": {
+              "type": "keyword"
+            },
+            "event": {
+              "type": "keyword"
+            },
+            "user_id": {
+              "type": "keyword"
+            },
+            "resource_type": {
+              "type": "keyword"
+            },
+            "resource_id": {
+              "type": "keyword"
+            },
+            "duration_ms": {
+              "type": "float"
+            },
+            "status_code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "text",
+              "analyzer": "standard"
+            },
+            "kubernetes": {
+              "properties": {
+                "namespace_name": {
+                  "type": "keyword"
+                },
+                "pod_name": {
+                  "type": "keyword"
+                },
+                "container_name": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  lifecycle-policy.json: |
+    {
+      "policy": {
+        "phases": {
+          "hot": {
+            "actions": {
+              "rollover": {
+                "max_size": "10GB",
+                "max_age": "1d"
+              },
+              "set_priority": {
+                "priority": 100
+              }
+            }
+          },
+          "warm": {
+            "min_age": "2d",
+            "actions": {
+              "set_priority": {
+                "priority": 50
+              },
+              "allocate": {
+                "number_of_replicas": 0
+              }
+            }
+          },
+          "delete": {
+            "min_age": "7d",
+            "actions": {
+              "delete": {}
+            }
+          }
+        }
+      }
+    }
+
+---
+# Log Retention Job for S3 Audit Logs
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: audit-log-retention
+  namespace: pms-logging
+spec:
+  schedule: "0 2 * * 0"  # Weekly on Sunday at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: retention-cleanup
+            image: amazon/aws-cli:2.13.0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Delete audit logs older than 7 years (2557 days)
+              CUTOFF_DATE=$(date -d '2557 days ago' '+%Y-%m-%d')
+              aws s3api list-objects-v2 \
+                --bucket $S3_AUDIT_BUCKET \
+                --prefix audit-logs/ \
+                --query "Contents[?LastModified<='$CUTOFF_DATE'].Key" \
+                --output text | \
+              while read key; do
+                if [ "$key" != "None" ]; then
+                  echo "Deleting old audit log: $key"
+                  aws s3 rm "s3://$S3_AUDIT_BUCKET/$key"
+                fi
+              done
+            env:
+            - name: S3_AUDIT_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: audit-bucket
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: secret-access-key
+          restartPolicy: OnFailure

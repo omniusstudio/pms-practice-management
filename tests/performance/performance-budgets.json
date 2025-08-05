@@ -1,0 +1,128 @@
+{
+  "$schema": "./performance-budget-schema.json",
+  "version": "1.0.0",
+  "description": "Performance budgets for Mental Health Practice Management System",
+  "updated": "2024-01-15T00:00:00Z",
+  "environments": {
+    "development": {
+      "api": {
+        "p50_latency_ms": 300,
+        "p95_latency_ms": 800,
+        "p99_latency_ms": 1500,
+        "error_rate_percent": 2.0,
+        "availability_percent": 99.0,
+        "throughput_rps": 50
+      },
+      "frontend": {
+        "page_load_p50_ms": 1500,
+        "page_load_p95_ms": 3000,
+        "first_contentful_paint_ms": 1200,
+        "largest_contentful_paint_ms": 2500,
+        "cumulative_layout_shift": 0.1,
+        "error_rate_percent": 3.0
+      },
+      "database": {
+        "query_p95_ms": 100,
+        "connection_pool_utilization_percent": 80
+      }
+    },
+    "staging": {
+      "api": {
+        "p50_latency_ms": 250,
+        "p95_latency_ms": 600,
+        "p99_latency_ms": 1200,
+        "error_rate_percent": 1.5,
+        "availability_percent": 99.5,
+        "throughput_rps": 100
+      },
+      "frontend": {
+        "page_load_p50_ms": 1200,
+        "page_load_p95_ms": 2500,
+        "first_contentful_paint_ms": 1000,
+        "largest_contentful_paint_ms": 2000,
+        "cumulative_layout_shift": 0.08,
+        "error_rate_percent": 2.0
+      },
+      "database": {
+        "query_p95_ms": 80,
+        "connection_pool_utilization_percent": 70
+      }
+    },
+    "production": {
+      "api": {
+        "p50_latency_ms": 200,
+        "p95_latency_ms": 500,
+        "p99_latency_ms": 1000,
+        "error_rate_percent": 1.0,
+        "availability_percent": 99.9,
+        "throughput_rps": 200
+      },
+      "frontend": {
+        "page_load_p50_ms": 1000,
+        "page_load_p95_ms": 2000,
+        "first_contentful_paint_ms": 800,
+        "largest_contentful_paint_ms": 1500,
+        "cumulative_layout_shift": 0.05,
+        "error_rate_percent": 1.0
+      },
+      "database": {
+        "query_p95_ms": 50,
+        "connection_pool_utilization_percent": 60
+      }
+    }
+  },
+  "critical_endpoints": {
+    "/api/auth/login": {
+      "p95_latency_ms": 300,
+      "error_rate_percent": 0.5,
+      "description": "Authentication is critical for system access"
+    },
+    "/api/patients": {
+      "p95_latency_ms": 400,
+      "error_rate_percent": 1.0,
+      "description": "Patient data access - core functionality"
+    },
+    "/api/appointments": {
+      "p95_latency_ms": 500,
+      "error_rate_percent": 1.0,
+      "description": "Appointment scheduling - business critical"
+    },
+    "/api/health": {
+      "p95_latency_ms": 100,
+      "error_rate_percent": 0.1,
+      "description": "Health check endpoint"
+    }
+  },
+  "regression_thresholds": {
+    "latency_increase_percent": 20,
+    "error_rate_increase_percent": 50,
+    "throughput_decrease_percent": 15
+  },
+  "alerting": {
+    "budget_violation_severity": {
+      "warning": {
+        "latency_threshold_percent": 80,
+        "error_rate_threshold_percent": 75
+      },
+      "critical": {
+        "latency_threshold_percent": 100,
+        "error_rate_threshold_percent": 100
+      }
+    },
+    "notification_channels": {
+      "slack_webhook": "${SLACK_PERFORMANCE_WEBHOOK}",
+      "email_list": ["devops@company.com", "performance@company.com"]
+    }
+  },
+  "compliance": {
+    "hipaa": {
+      "audit_log_latency_ms": 200,
+      "phi_scrubbing_latency_ms": 100,
+      "encryption_overhead_percent": 5
+    },
+    "data_retention": {
+      "performance_data_days": 90,
+      "baseline_data_days": 365
+    }
+  }
+}

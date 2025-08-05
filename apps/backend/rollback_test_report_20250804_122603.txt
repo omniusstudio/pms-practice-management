@@ -1,0 +1,24 @@
+MIGRATION ROLLBACK TEST REPORT
+==================================================
+
+Test Date: 2025-08-04 12:26:03.908009
+Original Revision: [DRY
+Dry Run Mode: True
+
+TEST RESULTS:
+--------------------
+Test: rollback_to_[DRY
+Status: PASSED
+Timestamp: 2025-08-04 12:26:03.895658
+Integrity Maintained: True
+
+Test: upgrade_to_[DRY
+Status: PASSED
+Timestamp: 2025-08-04 12:26:03.907756
+Integrity Maintained: True
+
+SUMMARY:
+Total Tests: 2
+Passed: 2
+Failed: 0
+Success Rate: 100.0%

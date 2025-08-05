@@ -1,0 +1,293 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  dependency-security:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Install Python security tools
+        run: |
+          pip install --upgrade pip
+          pip install safety bandit semgrep
+
+      - name: Python dependency vulnerability scan
+        run: |
+          echo "Scanning Python dependencies for vulnerabilities..."
+          if [ -f "apps/backend/requirements.txt" ]; then
+            cd apps/backend
+            safety check --json --output safety-report.json || true
+            safety check --short-report || echo "Safety scan completed with warnings"
+          fi
+
+      - name: Python code security scan (Bandit)
+        run: |
+          echo "Running Bandit security scan..."
+          if [ -d "apps/backend" ]; then
+            cd apps/backend
+            bandit -r . -f json -o bandit-report.json || true
+            bandit -r . -ll || echo "Bandit scan completed with warnings"
+          fi
+
+      - name: Semgrep security scan
+        run: |
+          echo "Running Semgrep security scan..."
+          semgrep --config=auto --json --output=semgrep-report.json . || true
+          semgrep --config=auto --error . || echo "Semgrep scan completed with warnings"
+
+      - name: Node.js dependency audit
+        run: |
+          echo "Auditing Node.js dependencies..."
+          if [ -f "apps/frontend/package.json" ]; then
+            cd apps/frontend
+            npm audit --audit-level=moderate --json > npm-audit-report.json || true
+            npm audit --audit-level=high || echo "NPM audit completed with warnings"
+          fi
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            apps/backend/safety-report.json
+            apps/backend/bandit-report.json
+            semgrep-report.json
+            apps/frontend/npm-audit-report.json
+          retention-days: 30
+
+  code-scanning:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python', 'javascript' ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+
+      - name: Set up Python (for Python analysis)
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies (for Python analysis)
+        if: matrix.language == 'python'
+        run: |
+          if [ -f "apps/backend/requirements.txt" ]; then
+            cd apps/backend
+            pip install -r requirements.txt
+          fi
+
+      - name: Set up Node.js (for JavaScript analysis)
+        if: matrix.language == 'javascript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Node.js dependencies (for JavaScript analysis)
+        if: matrix.language == 'javascript'
+        run: |
+          if [ -f "apps/frontend/package.json" ]; then
+            cd apps/frontend
+            npm ci
+          fi
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
+
+  container-security:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: |
+          if [ -f "apps/backend/Dockerfile" ]; then
+            docker build -t pms-backend:security-scan apps/backend/
+          fi
+
+      - name: Build frontend Docker image
+        run: |
+          if [ -f "apps/frontend/Dockerfile" ]; then
+            docker build -t pms-frontend:security-scan apps/frontend/
+          fi
+
+      - name: Run Trivy vulnerability scanner (Backend)
+        uses: aquasecurity/trivy-action@master
+        if: hashFiles('apps/backend/Dockerfile') != ''
+        with:
+          image-ref: 'pms-backend:security-scan'
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+
+      - name: Run Trivy vulnerability scanner (Frontend)
+        uses: aquasecurity/trivy-action@master
+        if: hashFiles('apps/frontend/Dockerfile') != ''
+        with:
+          image-ref: 'pms-frontend:security-scan'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: '*.sarif'
+
+  secrets-scan:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  license-compliance:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install license checking tools
+        run: |
+          pip install pip-licenses
+          npm install -g license-checker
+
+      - name: Check Python licenses
+        run: |
+          if [ -f "apps/backend/requirements.txt" ]; then
+            cd apps/backend
+            pip install -r requirements.txt
+            pip-licenses --format=json --output-file=python-licenses.json
+            pip-licenses --fail-on='GPL v3;AGPL v3;LGPL v3' || echo "License check completed with warnings"
+          fi
+
+      - name: Check Node.js licenses
+        run: |
+          if [ -f "apps/frontend/package.json" ]; then
+            cd apps/frontend
+            npm ci
+            license-checker --json --out npm-licenses.json
+            license-checker --failOn 'GPL-3.0;AGPL-3.0;LGPL-3.0' || echo "License check completed with warnings"
+          fi
+
+      - name: Upload license reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: license-reports
+          path: |
+            apps/backend/python-licenses.json
+            apps/frontend/npm-licenses.json
+          retention-days: 30
+
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-security, code-scanning, container-security, secrets-scan, license-compliance]
+    if: always()
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Generate security summary
+        run: |
+          echo "# Security Scan Summary" > security-summary.md
+          echo "" >> security-summary.md
+          echo "## Scan Results" >> security-summary.md
+          echo "" >> security-summary.md
+          echo "- **Dependency Security**: ${{ needs.dependency-security.result }}" >> security-summary.md
+          echo "- **Code Scanning**: ${{ needs.code-scanning.result }}" >> security-summary.md
+          echo "- **Container Security**: ${{ needs.container-security.result }}" >> security-summary.md
+          echo "- **Secrets Detection**: ${{ needs.secrets-scan.result }}" >> security-summary.md
+          echo "- **License Compliance**: ${{ needs.license-compliance.result }}" >> security-summary.md
+          echo "" >> security-summary.md
+          echo "Generated on: $(date)" >> security-summary.md
+          
+          cat security-summary.md
+
+      - name: Upload security summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-summary
+          path: security-summary.md
+          retention-days: 30

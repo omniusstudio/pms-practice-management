@@ -1,3 +1,10 @@
+## [1.0.14](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.13...v1.0.14) (2025-08-05)
+
+
+### Bug Fixes
+
+* resolve Pydantic JSON schema error and clean up code issues ([d3e1457](https://github.com/omniusstudio/pms-practice-management/commit/d3e14570d8e335c09aba698cd9835b686e28ad7f))
+
 ## [1.0.13](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.12...v1.0.13) (2025-08-05)
 
 

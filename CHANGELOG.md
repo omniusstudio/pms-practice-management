@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.2...v1.0.3) (2025-08-05)
+
+
+### Bug Fixes
+
+* Add actions write permission to enable CD pipeline triggering ([284504d](https://github.com/omniusstudio/pms-practice-management/commit/284504da2b7af3467b7705e54a0e5e6524b1c19c))
+
 ## [1.0.2](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.1...v1.0.2) (2025-08-05)
 
 

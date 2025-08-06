@@ -1,3 +1,11 @@
+## [1.1.0](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.15...v1.1.0) (2025-08-06)
+
+
+### Features
+
+* implement HIPAA-compliant backup and restore system ([05997f0](https://github.com/omniusstudio/pms-practice-management/commit/05997f021986d99435a20004064d7247ac0a4026))
+* update Kubernetes infrastructure and backup scripts ([8f30e31](https://github.com/omniusstudio/pms-practice-management/commit/8f30e318515c52a7f8da3674efe289eadbaeec38))
+
 ## [1.0.15](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.14...v1.0.15) (2025-08-05)
 
 

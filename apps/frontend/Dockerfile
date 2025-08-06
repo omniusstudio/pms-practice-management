@@ -26,6 +26,10 @@ RUN npm run build
 # Production stage with Nginx
 FROM nginx:alpine AS production
 
+# Build arguments (redeclared for production stage)
+ARG VERSION=unknown
+ARG GIT_SHA=unknown
+
 # Install curl for health checks
 RUN apk add --no-cache curl
 

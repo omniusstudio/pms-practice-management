@@ -3,7 +3,7 @@
 import asyncio
 import random
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any, Dict, cast
 from uuid import uuid4
 
 import structlog
@@ -19,9 +19,7 @@ class EDIMockService:
         self.processed_claims: Dict[str, Dict] = {}
         self.remittance_data: Dict[str, Dict] = {}
 
-    async def submit_837_claim(
-        self, claim_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def submit_837_claim(self, claim_data: Dict[str, Any]) -> Dict[str, Any]:
         """Simulate EDI 837 claim submission.
 
         Args:
@@ -42,8 +40,9 @@ class EDIMockService:
             {"status": "pending", "ack_code": "AR", "weight": 0.05},
         ]
 
-        weights = [float(s["weight"]) for s in scenarios]
-        scenario = random.choices(scenarios, weights=weights)[0]
+        weights = [float(cast(Dict[str, Any], s)["weight"]) for s in scenarios]
+        selected_scenarios = random.choices(scenarios, weights=weights)
+        scenario = cast(Dict[str, Any], selected_scenarios[0])
 
         response = {
             "transaction_id": transaction_id,
@@ -59,9 +58,7 @@ class EDIMockService:
         # Add error details for rejected claims
         if scenario["status"] == "rejected":
             response["error_codes"] = ["INV001", "DUP002"]
-            response["error_description"] = (
-                "Invalid patient ID or duplicate claim"
-            )
+            response["error_description"] = "Invalid patient ID or duplicate claim"
 
         # Store for later remittance processing (always store for testing)
         # In production, only accepted claims would be stored
@@ -103,17 +100,16 @@ class EDIMockService:
             {"status": "denied", "adjustment_reason": "CO-97", "weight": 0.10},
         ]
 
-        weights = [float(s["weight"]) for s in payment_scenarios]
-        scenario = random.choices(payment_scenarios, weights=weights)[0]
+        weights = [float(cast(Dict[str, Any], s)["weight"]) for s in payment_scenarios]
+        selected_scenarios = random.choices(payment_scenarios, weights=weights)
+        scenario = cast(Dict[str, Any], selected_scenarios[0])
 
-        original_amount = remittance_data.get("claim_amount", 100.0)
+        original_amount = float(remittance_data.get("claim_amount", 100.0))
 
         if scenario["status"] == "paid_full":
             paid_amount = original_amount
         elif scenario["status"] == "paid_partial":
-            paid_amount = round(
-                original_amount * random.uniform(0.6, 0.9), 2
-            )
+            paid_amount = round(original_amount * random.uniform(0.6, 0.9), 2)
         else:
             paid_amount = 0.0
 
@@ -128,17 +124,14 @@ class EDIMockService:
             "paid_amount": paid_amount,
             "adjustment_amount": original_amount - paid_amount,
             "check_number": f"CHK{random.randint(100000, 999999)}",
-            "payment_date": (
-                datetime.utcnow() + timedelta(days=1)
-            ).isoformat(),
+            "payment_date": (datetime.utcnow() + timedelta(days=1)).isoformat(),
         }
 
-        if scenario["adjustment_reason"]:
-            response["adjustment_reason"] = scenario["adjustment_reason"]
-            response["adjustment_description"] = (
-                self._get_adjustment_description(
-                    scenario["adjustment_reason"]
-                )
+        adjustment_reason = scenario.get("adjustment_reason")
+        if adjustment_reason:
+            response["adjustment_reason"] = adjustment_reason
+            response["adjustment_description"] = self._get_adjustment_description(
+                adjustment_reason
             )
 
         # Store remittance data
@@ -181,9 +174,7 @@ class EDIMockService:
                 "timestamp": datetime.utcnow().isoformat(),
             }
 
-    async def get_remittance_details(
-        self, remittance_id: str
-    ) -> Dict[str, Any]:
+    async def get_remittance_details(self, remittance_id: str) -> Dict[str, Any]:
         """Get details of a payment remittance.
 
         Args:

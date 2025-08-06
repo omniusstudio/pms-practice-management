@@ -261,12 +261,13 @@ jobs:
           fetch-depth: 0
 
       - name: Run GitLeaks
-        uses: gitleaks/gitleaks-action@v2
+        run: |
+          # Install gitleaks
+          curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/scripts/install.sh | sh -s -- -b /usr/local/bin
+          # Run gitleaks on current files only, respecting .gitleaksignore
+          gitleaks detect --source . --report-format sarif --report-path gitleaks-results.sarif --no-git
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
-        with:
-          args: '--no-git'
 
       - name: Run TruffleHog
         uses: trufflesecurity/trufflehog@main

@@ -373,5 +373,253 @@ class TestDataIntegrity(TestDatabaseInfrastructure):
             test_session.flush()
 
 
+class TestDatabaseModule(TestDatabaseInfrastructure):
+    """Test functions from database.py module."""
+
+    def test_get_db_dependency(self):
+        """Test get_db dependency function."""
+        from database import get_db
+
+        # Test that get_db returns a database session generator
+        db_gen = get_db()
+        db_session = next(db_gen)
+
+        # Should return a database session object
+        assert db_session is not None
+
+        # Clean up
+        try:
+            next(db_gen)
+        except StopIteration:
+            pass  # Expected behavior
+
+    @pytest.mark.asyncio
+    async def test_get_async_db_dependency(self):
+        """Test get_async_db dependency function."""
+        from database import get_async_db
+
+        # Test that get_async_db returns an async database session
+        async_gen = get_async_db()
+        try:
+            db_session = await async_gen.__anext__()
+            # Should return an async database session object
+            assert db_session is not None
+        except StopAsyncIteration:
+            pass  # Expected in some test environments
+        finally:
+            try:
+                await async_gen.aclose()
+            except Exception:
+                pass
+
+    @patch("database.Base")
+    @patch("database.engine")
+    def test_create_tables_sync(self, mock_engine, mock_base):
+        """Test synchronous table creation."""
+        from database import create_tables_sync
+
+        create_tables_sync()
+
+        # Verify that metadata.create_all was called
+        mock_base.metadata.create_all.assert_called_once_with(bind=mock_engine)
+
+    @patch("database.Base")
+    @patch("database.engine")
+    def test_drop_tables_sync(self, mock_engine, mock_base):
+        """Test synchronous table dropping."""
+        from database import drop_tables_sync
+
+        drop_tables_sync()
+
+        # Verify that metadata.drop_all was called
+        mock_base.metadata.drop_all.assert_called_once_with(bind=mock_engine)
+
+    @pytest.mark.asyncio
+    @patch("database.async_engine")
+    async def test_create_tables_async(self, mock_async_engine):
+        """Test async table creation."""
+        from database import create_tables
+
+        mock_conn = MagicMock()
+        mock_async_engine.begin.return_value.__aenter__.return_value = mock_conn
+
+        await create_tables()
+
+        # Verify that the connection was used
+        mock_async_engine.begin.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch("database.async_engine")
+    async def test_drop_tables_async(self, mock_async_engine):
+        """Test async table dropping."""
+        from database import drop_tables
+
+        mock_conn = MagicMock()
+        mock_async_engine.begin.return_value.__aenter__.return_value = mock_conn
+
+        await drop_tables()
+
+        # Verify that the connection was used
+        mock_async_engine.begin.assert_called_once()
+
+    def test_receive_before_cursor_execute_dml(self):
+        """Test SQL audit logging for DML operations."""
+        from database import receive_before_cursor_execute
+
+        # Test with INSERT statement
+        conn = MagicMock()
+        cursor = MagicMock()
+        statement = "INSERT INTO users (name) VALUES ('test')"
+        parameters = {}
+        context = MagicMock()
+        executemany = False
+
+        # Should not raise any exceptions
+        receive_before_cursor_execute(
+            conn, cursor, statement, parameters, context, executemany
+        )
+
+    def test_receive_before_cursor_execute_select(self):
+        """Test SQL audit logging for SELECT operations."""
+        from database import receive_before_cursor_execute
+
+        # Test with SELECT statement (should not be logged)
+        conn = MagicMock()
+        cursor = MagicMock()
+        statement = "SELECT * FROM users"
+        parameters = {}
+        context = MagicMock()
+        executemany = False
+
+        # Should not raise any exceptions
+        receive_before_cursor_execute(
+            conn, cursor, statement, parameters, context, executemany
+        )
+
+    def test_receive_before_cursor_execute_update(self):
+        """Test SQL audit logging for UPDATE operations."""
+        from database import receive_before_cursor_execute
+
+        # Test with UPDATE statement
+        conn = MagicMock()
+        cursor = MagicMock()
+        statement = "UPDATE users SET name = 'updated' WHERE id = 1"
+        parameters = {}
+        context = MagicMock()
+        executemany = False
+
+        # Should not raise any exceptions
+        receive_before_cursor_execute(
+            conn, cursor, statement, parameters, context, executemany
+        )
+
+    def test_receive_before_cursor_execute_delete(self):
+        """Test SQL audit logging for DELETE operations."""
+        from database import receive_before_cursor_execute
+
+        # Test with DELETE statement
+        conn = MagicMock()
+        cursor = MagicMock()
+        statement = "DELETE FROM users WHERE id = 1"
+        parameters = {}
+        context = MagicMock()
+        executemany = False
+
+        # Should not raise any exceptions
+        receive_before_cursor_execute(
+            conn, cursor, statement, parameters, context, executemany
+        )
+
+    def test_database_url_configuration(self):
+        """Test DATABASE_URL configuration."""
+        from database import DATABASE_URL
+
+        # Test that DATABASE_URL is properly configured
+        assert DATABASE_URL is not None
+        assert isinstance(DATABASE_URL, str)
+        assert len(DATABASE_URL) > 0
+
+    def test_async_database_url_configuration(self):
+        """Test ASYNC_DATABASE_URL configuration."""
+        from database import ASYNC_DATABASE_URL
+
+        # Test that ASYNC_DATABASE_URL is properly configured
+        assert ASYNC_DATABASE_URL is not None
+        assert isinstance(ASYNC_DATABASE_URL, str)
+        assert len(ASYNC_DATABASE_URL) > 0
+
+    def test_engine_configuration(self):
+        """Test that engines are properly configured."""
+        from database import AsyncSessionLocal, SessionLocal, async_engine, engine
+
+        assert engine is not None
+        assert async_engine is not None
+        assert SessionLocal is not None
+        assert AsyncSessionLocal is not None
+
+
+class TestDatabaseHealthChecksExtended(TestDatabaseInfrastructure):
+    """Extended tests for database health check functions."""
+
+    @patch("database.engine")
+    def test_check_database_health_success(self, mock_engine):
+        """Test successful database health check."""
+        from database import check_database_health
+
+        mock_conn = MagicMock()
+        mock_engine.connect.return_value.__enter__.return_value = mock_conn
+
+        result = check_database_health()
+
+        assert result is True
+        mock_engine.connect.assert_called_once()
+
+    @patch("database.engine")
+    def test_check_database_health_failure(self, mock_engine):
+        """Test failed database health check."""
+        from database import check_database_health
+
+        mock_engine.connect.side_effect = Exception("Connection failed")
+
+        result = check_database_health()
+
+        assert result is False
+        mock_engine.connect.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch("database.async_engine")
+    async def test_check_database_health_async_success(self, mock_async_engine):
+        """Test successful async database health check."""
+        from database import check_database_health_async
+
+        mock_conn = MagicMock()
+        mock_async_engine.begin.return_value.__aenter__.return_value = mock_conn
+
+        result = await check_database_health_async()
+
+        assert result is True
+        mock_async_engine.begin.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch("database.async_engine")
+    async def test_check_database_health_async_failure(self, mock_async_engine):
+        """Test failed async database health check."""
+        from database import check_database_health_async
+
+        mock_async_engine.begin.side_effect = Exception("Connection failed")
+
+        result = await check_database_health_async()
+
+        assert result is False
+        mock_async_engine.begin.assert_called_once()
+
+    def test_check_async_database_health_alias(self):
+        """Test that check_async_database_health is an alias."""
+        from database import check_async_database_health, check_database_health_async
+
+        # Should be the same function
+        assert check_async_database_health is check_database_health_async
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

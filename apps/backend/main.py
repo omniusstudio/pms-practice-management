@@ -14,6 +14,7 @@ from api.auth import router as auth_api_router
 from api.clients import router as clients_router
 from api.events import router as events_router
 from api.ledger import router as ledger_router
+from api.mock_services import router as mock_services_router
 from api.notes import router as notes_router
 from api.patients import router as patients_router
 from api.providers import router as providers_router
@@ -278,6 +279,7 @@ app.include_router(notes_router, prefix="/api")
 app.include_router(ledger_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(auth_api_router, prefix="/api")
+app.include_router(mock_services_router, prefix="/api")
 app.include_router(oidc_router, prefix="/oidc")
 app.include_router(auth_router, prefix="/api")
 

@@ -100,6 +100,22 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     log_format: Optional[str] = Field(None, alias="LOG_FORMAT")
 
+    # Integration Service Configuration
+    enable_mock_edi: bool = Field(default=True, alias="ENABLE_MOCK_EDI")
+    enable_mock_payments: bool = Field(default=True, alias="ENABLE_MOCK_PAYMENTS")
+    enable_mock_video: bool = Field(default=True, alias="ENABLE_MOCK_VIDEO")
+
+    # External Service URLs
+    edi_service_url: str = Field(
+        default="http://localhost:8000/mock/edi", alias="EDI_SERVICE_URL"
+    )
+    stripe_api_key: Optional[str] = Field(None, alias="STRIPE_API_KEY")
+    stripe_webhook_secret: Optional[str] = Field(None, alias="STRIPE_WEBHOOK_SECRET")
+    video_service_url: str = Field(
+        default="http://localhost:8000/mock/video", alias="VIDEO_SERVICE_URL"
+    )
+    video_api_key: Optional[str] = Field(None, alias="VIDEO_API_KEY")
+
     # Additional Configuration
     allowed_origins: Optional[str] = Field(None, alias="ALLOWED_ORIGINS")
     trusted_hosts: Optional[str] = Field(None, alias="TRUSTED_HOSTS")

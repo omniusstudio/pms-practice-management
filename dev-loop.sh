@@ -15,10 +15,10 @@ echo "================================================"
 build_backend() {
     echo "📦 Building backend image..."
     docker build -t pms-backend:latest ./apps/backend
-    
+
     echo "🔄 Restarting backend deployment..."
     kubectl rollout restart deployment/pms-backend -n $NAMESPACE
-    
+
     echo "⏳ Waiting for backend rollout to complete..."
     kubectl rollout status deployment/pms-backend -n $NAMESPACE --timeout=120s
 }
@@ -27,10 +27,10 @@ build_backend() {
 build_frontend() {
     echo "📦 Building frontend image..."
     docker build -t pms-frontend:latest ./apps/frontend
-    
+
     echo "🔄 Restarting frontend deployment..."
     kubectl rollout restart deployment/pms-frontend -n $NAMESPACE
-    
+
     echo "⏳ Waiting for frontend rollout to complete..."
     kubectl rollout status deployment/pms-frontend -n $NAMESPACE --timeout=120s
 }
@@ -39,10 +39,10 @@ build_frontend() {
 check_status() {
     echo "\n📊 Current Deployment Status:"
     kubectl get pods -n $NAMESPACE -o wide
-    
+
     echo "\n🌐 Services:"
     kubectl get services -n $NAMESPACE
-    
+
     echo "\n✅ Application URLs:"
     echo "   Frontend: http://localhost:80"
     echo "   Backend API: kubectl port-forward -n pms service/pms-backend 8000:8000"
@@ -51,7 +51,7 @@ check_status() {
 # Function to run quick tests
 run_tests() {
     echo "\n🧪 Running quick health checks..."
-    
+
     # Test frontend
     echo "Testing frontend..."
     if curl -s -f http://localhost:80 > /dev/null; then
@@ -59,19 +59,19 @@ run_tests() {
     else
         echo "❌ Frontend is not responding"
     fi
-    
+
     # Test backend via port-forward (non-blocking)
     echo "Testing backend (via port-forward)..."
     kubectl port-forward -n $NAMESPACE service/pms-backend 8001:8000 &
     PF_PID=$!
     sleep 3
-    
+
     if curl -s -f http://localhost:8001/health > /dev/null 2>&1; then
         echo "✅ Backend API is responding"
     else
         echo "❌ Backend API is not responding"
     fi
-    
+
     # Clean up port-forward
     kill $PF_PID 2>/dev/null || true
 }

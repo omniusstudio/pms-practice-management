@@ -10,16 +10,16 @@ data:
   # S3 Configuration
   s3-bucket: "pms-production-backups"
   aws-region: "us-east-1"
-  
+
   # Backup Configuration
   retention-days: "30"
   max-backup-age-hours: "26"
   min-backup-size-mb: "100"
-  
+
   # Monitoring Configuration
   slack-channel: "#alerts"
   prometheus-pushgateway: "http://prometheus-pushgateway:9091"
-  
+
   # Backup Schedule
   backup-schedule: "0 2 * * *"  # Daily at 2 AM UTC
   monitor-schedule: "0 * * * *"  # Hourly
@@ -42,7 +42,7 @@ data:
     # For now, this is a placeholder that will be updated during deployment
     echo "Backup script placeholder - update during deployment"
     exit 1
-  
+
   restore.sh: |
     #!/bin/bash
     # This will be populated from the actual restore script
@@ -50,7 +50,7 @@ data:
     # For now, this is a placeholder that will be updated during deployment
     echo "Restore script placeholder - update during deployment"
     exit 1
-  
+
   verify_backup.sh: |
     #!/bin/bash
     # This will be populated from the actual verification script
@@ -58,7 +58,7 @@ data:
     # For now, this is a placeholder that will be updated during deployment
     echo "Verification script placeholder - update during deployment"
     exit 1
-  
+
   monitor_backups.sh: |
     #!/bin/bash
     # This will be populated from the actual monitoring script
@@ -82,10 +82,10 @@ data:
   # These should be set during deployment with actual values
   aws-access-key-id: "QUFBQUFBQUFBQUFBQUFBQUE="  # Placeholder: AAAAAAAAAAAAAAA
   aws-secret-access-key: "QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQg=="  # Placeholder: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
-  
+
   # GPG Encryption Key ID
   encryption-key-id: "cG1zLWJhY2t1cC1rZXk="  # Placeholder: pms-backup-key
-  
+
   # Alert Webhooks (optional)
   alert-webhook-url: ""  # Empty - to be set if needed
   slack-webhook-url: ""   # Empty - to be set if needed
@@ -106,7 +106,7 @@ data:
   # The key should be base64 encoded
   private.key: ""  # To be populated during deployment
   public.key: ""   # To be populated during deployment
-  
+
   # GPG trust database
   trustdb.gpg: ""  # To be populated during deployment
 

@@ -41,14 +41,14 @@ spec:
             - -c
             - |
               set -euo pipefail
-              
+
               # Install required tools
               apk add --no-cache aws-cli gnupg curl
-              
+
               # Copy backup script
               cp /scripts/pg_backup.sh /tmp/pg_backup.sh
               chmod +x /tmp/pg_backup.sh
-              
+
               # Run backup
               /tmp/pg_backup.sh
             env:
@@ -185,14 +185,14 @@ spec:
             - -c
             - |
               set -euo pipefail
-              
+
               # Install required tools
               apk add --no-cache aws-cli curl bc
-              
+
               # Copy monitoring script
               cp /scripts/monitor_backups.sh /tmp/monitor_backups.sh
               chmod +x /tmp/monitor_backups.sh
-              
+
               # Run monitoring
               /tmp/monitor_backups.sh
             env:
@@ -320,14 +320,14 @@ spec:
             - -c
             - |
               set -euo pipefail
-              
+
               # Install required tools
               apk add --no-cache aws-cli gnupg curl
-              
+
               # Copy verification script
               cp /scripts/verify_backup.sh /tmp/verify_backup.sh
               chmod +x /tmp/verify_backup.sh
-              
+
               # Run verification on latest backup
               /tmp/verify_backup.sh latest
             env:

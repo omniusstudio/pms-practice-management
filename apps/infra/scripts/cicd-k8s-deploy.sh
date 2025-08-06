@@ -69,10 +69,10 @@ OPTIONS:
 EXAMPLES:
     # Deploy to staging using Helm
     $0 --environment staging --method helm --version v1.2.3
-    
+
     # Deploy to production using kubectl with dry run
     $0 -e production -m kubectl -v v1.2.3 --dry-run
-    
+
     # Force deploy to staging without validation
     $0 -e staging --force --skip-validation
 
@@ -142,7 +142,7 @@ parse_args() {
 # Validate environment
 validate_environment() {
     log_info "Validating environment: $ENVIRONMENT"
-    
+
     case $ENVIRONMENT in
         staging|production)
             ;;
@@ -151,7 +151,7 @@ validate_environment() {
             exit 1
             ;;
     esac
-    
+
     case $DEPLOYMENT_METHOD in
         helm|kubectl)
             ;;
@@ -165,30 +165,30 @@ validate_environment() {
 # Check prerequisites
 check_prerequisites() {
     log_info "Checking prerequisites..."
-    
+
     # Check kubectl
     if ! command -v kubectl &> /dev/null; then
         log_error "kubectl is not installed or not in PATH"
         exit 1
     fi
-    
+
     # Check Helm if using Helm deployment
     if [[ "$DEPLOYMENT_METHOD" == "helm" ]] && ! command -v helm &> /dev/null; then
         log_error "helm is not installed or not in PATH"
         exit 1
     fi
-    
+
     # Check kubeconfig
     if [[ -z "${KUBECONFIG:-}" ]]; then
         log_warning "KUBECONFIG not set, using default kubectl configuration"
     fi
-    
+
     # Test kubectl connectivity
     if ! kubectl cluster-info &> /dev/null; then
         log_error "Cannot connect to Kubernetes cluster"
         exit 1
     fi
-    
+
     log_success "Prerequisites check passed"
 }
 
@@ -198,11 +198,11 @@ validate_k8s_configs() {
         log_warning "Skipping Kubernetes configuration validation"
         return 0
     fi
-    
+
     log_info "Validating Kubernetes configurations..."
-    
+
     local validation_failed=false
-    
+
     if [[ "$DEPLOYMENT_METHOD" == "helm" ]]; then
         # Validate Helm chart
         if [[ -d "$HELM_CHART_DIR" ]]; then
@@ -211,7 +211,7 @@ validate_k8s_configs() {
                 log_error "Helm chart validation failed"
                 validation_failed=true
             fi
-            
+
             # Template and validate
             log_info "Templating Helm chart for validation..."
             if ! helm template pms "$HELM_CHART_DIR" \
@@ -244,7 +244,7 @@ validate_k8s_configs() {
             validation_failed=true
         fi
     fi
-    
+
     if [[ "$validation_failed" == "true" ]]; then
         if [[ "$FORCE_DEPLOY" == "true" ]]; then
             log_warning "Validation failed but continuing due to --force flag"
@@ -260,7 +260,7 @@ validate_k8s_configs() {
 # Deploy using Helm
 deploy_with_helm() {
     log_info "Deploying with Helm to $ENVIRONMENT environment..."
-    
+
     local helm_args=(
         "pms"
         "$HELM_CHART_DIR"
@@ -273,16 +273,16 @@ deploy_with_helm() {
         "--wait"
         "--timeout" "$WAIT_TIMEOUT"
     )
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         helm_args+=("--dry-run")
         log_info "Performing Helm dry run..."
     fi
-    
+
     if [[ "$VERBOSE" == "true" ]]; then
         helm_args+=("--debug")
     fi
-    
+
     # Check if release exists
     if helm list -n "pms-$ENVIRONMENT" | grep -q "pms"; then
         log_info "Upgrading existing Helm release..."
@@ -310,20 +310,20 @@ deploy_with_helm() {
 # Deploy using kubectl
 deploy_with_kubectl() {
     log_info "Deploying with kubectl to $ENVIRONMENT environment..."
-    
+
     # Create namespace if it doesn't exist
     kubectl create namespace "pms-$ENVIRONMENT" --dry-run=client -o yaml | kubectl apply -f -
-    
+
     local kubectl_args=("apply" "-f" "$K8S_MANIFESTS_DIR" "--namespace" "pms-$ENVIRONMENT")
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         kubectl_args+=("--dry-run=client")
         log_info "Performing kubectl dry run..."
     fi
-    
+
     if kubectl "${kubectl_args[@]}"; then
         log_success "kubectl deployment completed successfully"
-        
+
         if [[ "$DRY_RUN" == "false" ]]; then
             # Wait for deployments to be ready
             log_info "Waiting for deployments to be ready..."
@@ -342,24 +342,24 @@ perform_health_checks() {
         log_info "Skipping health checks for dry run"
         return 0
     fi
-    
+
     log_info "Performing health checks..."
-    
+
     # Check pod status
     log_info "Checking pod status..."
     kubectl get pods -n "pms-$ENVIRONMENT" -l app.kubernetes.io/name=pms
-    
+
     # Check service endpoints
     log_info "Checking service endpoints..."
     kubectl get endpoints -n "pms-$ENVIRONMENT"
-    
+
     # Perform application health checks
     log_info "Performing application health checks..."
-    
+
     # Get service IPs for health checks
     local backend_service=$(kubectl get svc pms-backend -n "pms-$ENVIRONMENT" -o jsonpath='{.spec.clusterIP}')
     local frontend_service=$(kubectl get svc pms-frontend -n "pms-$ENVIRONMENT" -o jsonpath='{.spec.clusterIP}')
-    
+
     # Health check backend
     if kubectl run health-check-backend --rm -i --restart=Never --image=curlimages/curl:latest \
         -- curl -f "http://$backend_service/health" --max-time 30; then
@@ -368,7 +368,7 @@ perform_health_checks() {
         log_error "Backend health check failed"
         return 1
     fi
-    
+
     # Health check frontend
     if kubectl run health-check-frontend --rm -i --restart=Never --image=curlimages/curl:latest \
         -- curl -f "http://$frontend_service/" --max-time 30; then
@@ -377,16 +377,16 @@ perform_health_checks() {
         log_error "Frontend health check failed"
         return 1
     fi
-    
+
     log_success "All health checks passed"
 }
 
 # Generate deployment report
 generate_deployment_report() {
     log_info "Generating deployment report..."
-    
+
     local report_file="/tmp/deployment-report-$ENVIRONMENT-$(date +%Y%m%d-%H%M%S).json"
-    
+
     cat > "$report_file" << EOF
 {
   "deployment": {
@@ -406,9 +406,9 @@ generate_deployment_report() {
   "status": "success"
 }
 EOF
-    
+
     log_success "Deployment report generated: $report_file"
-    
+
     # Output report content for CI/CD systems
     if [[ "${CI:-false}" == "true" ]]; then
         echo "::set-output name=deployment-report::$report_file"
@@ -423,11 +423,11 @@ main() {
     log_info "Method: $DEPLOYMENT_METHOD"
     log_info "Version: $VERSION"
     log_info "Dry Run: $DRY_RUN"
-    
+
     validate_environment
     check_prerequisites
     validate_k8s_configs
-    
+
     case $DEPLOYMENT_METHOD in
         helm)
             deploy_with_helm
@@ -436,10 +436,10 @@ main() {
             deploy_with_kubectl
             ;;
     esac
-    
+
     perform_health_checks
     generate_deployment_report
-    
+
     log_success "CI/CD Kubernetes deployment completed successfully!"
 }
 

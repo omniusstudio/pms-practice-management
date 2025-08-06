@@ -24,14 +24,14 @@ backend:
     repository: pms-backend
     tag: "latest"
     pullPolicy: IfNotPresent
-  
+
   replicaCount: 3
-  
+
   service:
     type: ClusterIP
     port: 80
     targetPort: 8000
-  
+
   resources:
     requests:
       memory: "512Mi"
@@ -39,14 +39,14 @@ backend:
     limits:
       memory: "1Gi"
       cpu: "500m"
-  
+
   autoscaling:
     enabled: true
     minReplicas: 2
     maxReplicas: 10
     targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 80
-  
+
   livenessProbe:
     httpGet:
       path: /health
@@ -55,7 +55,7 @@ backend:
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 3
-  
+
   readinessProbe:
     httpGet:
       path: /health
@@ -64,11 +64,11 @@ backend:
     periodSeconds: 5
     timeoutSeconds: 3
     failureThreshold: 3
-  
+
   podDisruptionBudget:
     enabled: true
     minAvailable: 2
-  
+
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -82,14 +82,14 @@ frontend:
     repository: pms-frontend
     tag: "local-test"
     pullPolicy: IfNotPresent
-  
+
   replicaCount: 2
-  
+
   service:
     type: ClusterIP
     port: 80
     targetPort: 80
-  
+
   resources:
     requests:
       memory: "256Mi"
@@ -97,14 +97,14 @@ frontend:
     limits:
       memory: "512Mi"
       cpu: "200m"
-  
+
   autoscaling:
     enabled: true
     minReplicas: 2
     maxReplicas: 5
     targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 80
-  
+
   livenessProbe:
     httpGet:
       path: /
@@ -113,7 +113,7 @@ frontend:
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 3
-  
+
   readinessProbe:
     httpGet:
       path: /
@@ -122,11 +122,11 @@ frontend:
     periodSeconds: 5
     timeoutSeconds: 3
     failureThreshold: 3
-  
+
   podDisruptionBudget:
     enabled: true
     minAvailable: 1
-  
+
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -155,7 +155,7 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
     cert-manager.io/cluster-issuer: letsencrypt-prod
-  
+
   hosts:
     - host: pms.example.com
       paths:
@@ -171,7 +171,7 @@ ingress:
           service:
             name: pms-backend-service
             port: 80
-  
+
   tls:
     - secretName: pms-tls-secret
       hosts:
@@ -185,31 +185,31 @@ configMap:
     AUTH0_DOMAIN: "your-tenant.auth0.com"
     AUTH0_AUDIENCE: "https://pms-api"
     AUTH0_ISSUER: "https://your-tenant.auth0.com/"
-    
+
     # API Configuration
     API_V1_STR: "/api/v1"
     PROJECT_NAME: "Mental Health PMS"
-    
+
     # CORS Configuration
     BACKEND_CORS_ORIGINS: '["http://localhost:3000", "https://pms.example.com"]'
-    
+
     # Logging Configuration
     LOG_LEVEL: "INFO"
     LOG_FORMAT: "json"
-    
+
     # Debug Configuration
     DEBUG: "false"
-    
+
     # Database Configuration (non-sensitive)
     DATABASE_HOST: "postgresql"
     DATABASE_PORT: "5432"
     DATABASE_NAME: "pms_db"
-    
+
     # Redis Configuration (non-sensitive)
     REDIS_HOST: "redis-master"
     REDIS_PORT: "6379"
     REDIS_DB: "0"
-    
+
     # AWS Configuration (non-sensitive)
     AWS_REGION: "us-west-2"
     AWS_S3_BUCKET: "pms-documents"
@@ -220,23 +220,23 @@ secrets:
     # Database credentials (base64 encoded)
     DATABASE_USER: "cG1zX3VzZXI="  # pms_user
     DATABASE_PASSWORD: "cGFzc3dvcmQ="  # password
-    
+
     # Redis credentials (base64 encoded)
     REDIS_PASSWORD: "cmVkaXNwYXNz"  # redispass
-    
+
     # Application secrets (base64 encoded)
     SECRET_KEY: "c3VwZXJzZWNyZXRrZXk="  # supersecretkey
     ALGORITHM: "SFMyNTY="  # HS256
     ACCESS_TOKEN_EXPIRE_MINUTES: "MzA="  # 30
-    
+
     # AWS credentials (base64 encoded)
     AWS_ACCESS_KEY_ID: "QUtJQUlPU0ZPRE5ON0VYQU1QTEU="  # AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: "d0phbHJYVXRuRkVNSS9LN01ERU5HL2JQeFJmaUNZRVhBTVBMRUtFWQ=="  # wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-    
+
     # Auth0 secrets (base64 encoded)
     AUTH0_CLIENT_ID: "eW91cl9jbGllbnRfaWQ="  # your_client_id
     AUTH0_CLIENT_SECRET: "eW91cl9jbGllbnRfc2VjcmV0"  # your_client_secret
-    
+
     # OIDC Configuration (base64 encoded)
     OIDC_CLIENT_ID: "b2lkY19jbGllbnRfaWQ="  # oidc_client_id
     OIDC_CLIENT_SECRET: "b2lkY19jbGllbnRfc2VjcmV0"  # oidc_client_secret
@@ -256,7 +256,7 @@ networkPolicy:
   policyTypes:
     - Ingress
     - Egress
-  
+
   ingress:
     - from:
         - namespaceSelector:
@@ -270,7 +270,7 @@ networkPolicy:
           port: 8000
         - protocol: TCP
           port: 80
-  
+
   egress:
     - to: []
       ports:

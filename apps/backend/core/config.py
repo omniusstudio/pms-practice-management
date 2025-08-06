@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", case_sensitive=False, env_prefix=""
     )
-    
+
     def __init__(self, **kwargs):
         """Initialize settings with environment-specific configuration."""
         # Load environment-specific .env file before initializing
@@ -50,23 +50,15 @@ class Settings(BaseSettings):
     redis_url: str = Field(alias="REDIS_URL")
 
     # AWS Configuration
-    aws_access_key_id: Optional[str] = Field(
-        None, alias="AWS_ACCESS_KEY_ID"
-    )
-    aws_secret_access_key: Optional[str] = Field(
-        None, alias="AWS_SECRET_ACCESS_KEY"
-    )
+    aws_access_key_id: Optional[str] = Field(None, alias="AWS_ACCESS_KEY_ID")
+    aws_secret_access_key: Optional[str] = Field(None, alias="AWS_SECRET_ACCESS_KEY")
     aws_region: Optional[str] = Field(None, alias="AWS_REGION")
 
     # CORS
-    cors_origins: str = Field(
-        default="http://localhost:3000", alias="CORS_ORIGINS"
-    )
+    cors_origins: str = Field(default="http://localhost:3000", alias="CORS_ORIGINS")
 
     # Frontend Configuration
-    frontend_url: str = Field(
-        default="http://localhost:3000", alias="FRONTEND_URL"
-    )
+    frontend_url: str = Field(default="http://localhost:3000", alias="FRONTEND_URL")
 
     # Session Configuration
     session_secret_key: str = Field(
@@ -75,9 +67,7 @@ class Settings(BaseSettings):
     session_max_age: int = Field(default=3600, alias="SESSION_MAX_AGE")
 
     # Audit Configuration
-    enable_audit_logging: bool = Field(
-        default=True, alias="ENABLE_AUDIT_LOGGING"
-    )
+    enable_audit_logging: bool = Field(default=True, alias="ENABLE_AUDIT_LOGGING")
     audit_log_retention_days: int = Field(
         default=2555, alias="AUDIT_LOG_RETENTION_DAYS"
     )
@@ -85,19 +75,13 @@ class Settings(BaseSettings):
     # Auth0 Configuration
     auth0_domain: Optional[str] = Field(None, alias="AUTH0_DOMAIN")
     auth0_client_id: Optional[str] = Field(None, alias="AUTH0_CLIENT_ID")
-    auth0_client_secret: Optional[str] = Field(
-        None, alias="AUTH0_CLIENT_SECRET"
-    )
+    auth0_client_secret: Optional[str] = Field(None, alias="AUTH0_CLIENT_SECRET")
     auth0_audience: Optional[str] = Field(None, alias="AUTH0_AUDIENCE")
     redirect_uri: Optional[str] = Field(None, alias="REDIRECT_URI")
-    logout_redirect_uri: Optional[str] = Field(
-        None, alias="LOGOUT_REDIRECT_URI"
-    )
+    logout_redirect_uri: Optional[str] = Field(None, alias="LOGOUT_REDIRECT_URI")
 
     # OIDC Configuration
-    oidc_google_client_id: Optional[str] = Field(
-        None, alias="OIDC_GOOGLE_CLIENT_ID"
-    )
+    oidc_google_client_id: Optional[str] = Field(None, alias="OIDC_GOOGLE_CLIENT_ID")
     oidc_google_client_secret: Optional[str] = Field(
         None, alias="OIDC_GOOGLE_CLIENT_SECRET"
     )
@@ -132,7 +116,7 @@ class Settings(BaseSettings):
 
     def get_cors_origins_list(self):
         """Get CORS origins as a list."""
-        origins = self.__dict__.get('cors_origins', '')
+        origins = self.__dict__.get("cors_origins", "")
         if isinstance(origins, str) and origins:
             return [origin.strip() for origin in origins.split(",")]
         return []

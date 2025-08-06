@@ -52,25 +52,25 @@ fi
 # Check prerequisites
 check_prerequisites() {
     log "Checking prerequisites..."
-    
+
     # Check kubectl
     if ! command -v kubectl &> /dev/null; then
         log_error "kubectl is not installed"
         exit 1
     fi
-    
+
     # Check cluster connectivity
     if ! kubectl cluster-info &> /dev/null; then
         log_error "Cannot connect to Kubernetes cluster"
         exit 1
     fi
-    
+
     # Check namespace exists
     if ! kubectl get namespace "$NAMESPACE" &> /dev/null; then
         log_error "Namespace ${NAMESPACE} does not exist"
         exit 1
     fi
-    
+
     log_success "Prerequisites check passed"
 }
 
@@ -93,7 +93,7 @@ confirm_rollback() {
     else
         log_warning "Rolling back to previous revision"
     fi
-    
+
     read -p "Are you sure you want to proceed with the rollback? (y/N): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -105,18 +105,18 @@ confirm_rollback() {
 # Perform rollback
 perform_rollback() {
     log "Performing rollback..."
-    
+
     local deployments=("pms-backend" "pms-frontend")
-    
+
     for deployment in "${deployments[@]}"; do
         log "Rolling back deployment ${deployment}..."
-        
+
         if [[ -n "$REVISION" ]]; then
             kubectl rollout undo deployment/${deployment} --to-revision=${REVISION} -n ${NAMESPACE}
         else
             kubectl rollout undo deployment/${deployment} -n ${NAMESPACE}
         fi
-        
+
         log_success "Initiated rollback for ${deployment}"
     done
 }
@@ -124,12 +124,12 @@ perform_rollback() {
 # Wait for rollback to complete
 wait_for_rollback() {
     log "Waiting for rollback to complete..."
-    
+
     local deployments=("pms-backend" "pms-frontend")
-    
+
     for deployment in "${deployments[@]}"; do
         log "Waiting for deployment ${deployment} rollback..."
-        
+
         if kubectl rollout status deployment/${deployment} -n ${NAMESPACE} --timeout=600s; then
             log_success "Rollback completed for ${deployment}"
         else
@@ -144,10 +144,10 @@ wait_for_rollback() {
 # Health check after rollback
 health_check() {
     log "Performing health checks after rollback..."
-    
+
     # Wait a bit for pods to be ready
     sleep 30
-    
+
     # Check backend health
     local backend_pod=$(kubectl get pods -l app=pms-backend -n ${NAMESPACE} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
     if [[ -n "$backend_pod" ]]; then
@@ -159,7 +159,7 @@ health_check() {
     else
         log_warning "No backend pods found for health check"
     fi
-    
+
     # Check frontend health
     local frontend_pod=$(kubectl get pods -l app=pms-frontend -n ${NAMESPACE} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
     if [[ -n "$frontend_pod" ]]; then
@@ -187,7 +187,7 @@ show_status() {
 # Create rollback report
 create_report() {
     local report_file="rollback_report_$(date +%Y%m%d_%H%M%S).txt"
-    
+
     {
         echo "Kubernetes Rollback Report"
         echo "========================="
@@ -205,14 +205,14 @@ create_report() {
         echo "Recent Events:"
         kubectl get events -n ${NAMESPACE} --sort-by='.lastTimestamp' | tail -20
     } > "$report_file"
-    
+
     log_success "Rollback report saved to ${report_file}"
 }
 
 # Main execution
 main() {
     log "Starting Kubernetes rollback for ${ENVIRONMENT} environment"
-    
+
     check_prerequisites
     show_history
     confirm_rollback
@@ -221,7 +221,7 @@ main() {
     health_check
     show_status
     create_report
-    
+
     log_success "Rollback completed successfully!"
 }
 

@@ -21,18 +21,18 @@ backend:
   enabled: true
   name: pms-backend
   replicaCount: 1
-  
+
   image:
     registry: "localhost:30500"
     repository: pms-backend
     tag: "latest"
     pullPolicy: IfNotPresent
-  
+
   service:
     type: ClusterIP
     port: 80
     targetPort: 8000
-  
+
   resources:
     limits:
       cpu: 500m
@@ -40,10 +40,10 @@ backend:
     requests:
       cpu: 250m
       memory: 256Mi
-  
+
   autoscaling:
     enabled: false
-  
+
   livenessProbe:
     httpGet:
       path: /health
@@ -52,7 +52,7 @@ backend:
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 3
-  
+
   readinessProbe:
     httpGet:
       path: /health
@@ -61,7 +61,7 @@ backend:
     periodSeconds: 5
     timeoutSeconds: 3
     failureThreshold: 3
-  
+
   podDisruptionBudget:
     enabled: false
 
@@ -70,18 +70,18 @@ frontend:
   enabled: true
   name: pms-frontend
   replicaCount: 1
-  
+
   image:
     registry: "localhost:30500"
     repository: pms-frontend
     tag: "latest"
     pullPolicy: IfNotPresent
-  
+
   service:
     type: ClusterIP
     port: 80
     targetPort: 80
-  
+
   resources:
     limits:
       cpu: 200m
@@ -89,10 +89,10 @@ frontend:
     requests:
       cpu: 100m
       memory: 128Mi
-  
+
   autoscaling:
     enabled: false
-  
+
   livenessProbe:
     httpGet:
       path: /
@@ -101,7 +101,7 @@ frontend:
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 3
-  
+
   readinessProbe:
     httpGet:
       path: /
@@ -110,7 +110,7 @@ frontend:
     periodSeconds: 5
     timeoutSeconds: 3
     failureThreshold: 3
-  
+
   podDisruptionBudget:
     enabled: false
 

@@ -9,10 +9,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
-from middleware.auth_middleware import (
-    AuthenticatedUser,
-    require_auth_dependency,
-)
+from middleware.auth_middleware import AuthenticatedUser, require_auth_dependency
 from middleware.correlation import get_correlation_id
 from services.database_service import DatabaseService
 from utils.response_models import APIResponse
@@ -96,9 +93,7 @@ async def get_providers(
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(50, ge=1, le=100, description="Items per page"),
     specialty: Optional[str] = Query(None, description="Filter by specialty"),
-    is_active: Optional[bool] = Query(
-        None, description="Filter by active status"
-    ),
+    is_active: Optional[bool] = Query(None, description="Filter by active status"),
     accepts_new_patients: Optional[bool] = Query(
         None, description="Filter by accepting new patients"
     ),
@@ -120,13 +115,10 @@ async def get_providers(
 
         db_service = DatabaseService(db)
         providers = await db_service.list_providers()
-        
+
         return APIResponse(
             success=True,
-            data=[
-                ProviderResponse.model_validate(provider)
-                for provider in providers
-            ],
+            data=[ProviderResponse.model_validate(provider) for provider in providers],
             message="Providers retrieved successfully",
             total=len(providers),
             page=page,
@@ -169,7 +161,7 @@ async def get_provider(
 
         db_service = DatabaseService(db)
         provider = await db_service.get_provider(provider_id)
-        
+
         if not provider:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -243,9 +235,7 @@ async def create_provider(
             office_zip_code=provider_data.office_zip_code,
             npi_number=provider_data.npi_number,
             tax_id=provider_data.tax_id,
-            default_appointment_duration=(
-                provider_data.default_appointment_duration
-            ),
+            default_appointment_duration=(provider_data.default_appointment_duration),
             accepts_new_patients=provider_data.accepts_new_patients,
             bio=provider_data.bio,
             administrative_notes=provider_data.administrative_notes,
@@ -293,11 +283,9 @@ async def update_provider(
         )
 
         db_service = DatabaseService(db)
-        
+
         # Check if provider exists
-        existing_provider = await db_service.get_provider(
-            provider_id
-        )
+        existing_provider = await db_service.get_provider(provider_id)
         if not existing_provider:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -308,9 +296,7 @@ async def update_provider(
         # For now, return the existing provider
         return APIResponse(
             success=True,
-            data=ProviderResponse.model_validate(
-                existing_provider
-            ),
+            data=ProviderResponse.model_validate(existing_provider),
             message="Provider updated successfully",
         )
 
@@ -355,7 +341,7 @@ async def delete_provider(
         )
 
         db_service = DatabaseService(db)
-        
+
         # Check if provider exists
         existing_provider = await db_service.get_provider(provider_id)
         if not existing_provider:

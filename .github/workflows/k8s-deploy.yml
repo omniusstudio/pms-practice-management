@@ -132,19 +132,19 @@ jobs:
         if: ${{ inputs.deployment_method == 'helm' && !inputs.rollback }}
         run: |
           cd apps/infra/kubernetes/helm/pms
-          
+
           # Set environment-specific values
           VALUES_FILE="values-${{ inputs.environment }}.yaml"
           if [ ! -f "$VALUES_FILE" ]; then
             VALUES_FILE="values.yaml"
           fi
-          
+
           HELM_ARGS="--namespace pms --create-namespace --wait --timeout 10m"
-          
+
           if [ "${{ inputs.dry_run }}" == "true" ]; then
             HELM_ARGS="$HELM_ARGS --dry-run"
           fi
-          
+
           # Deploy or upgrade
           helm upgrade --install pms . \
             --values $VALUES_FILE \
@@ -159,11 +159,11 @@ jobs:
         run: |
           cd apps/infra/scripts
           chmod +x deploy-k8s.sh
-          
+
           if [ "${{ inputs.dry_run }}" == "true" ]; then
             export DRY_RUN=true
           fi
-          
+
           ./deploy-k8s.sh ${{ inputs.environment }} ${{ inputs.version }}
 
       - name: Rollback deployment
@@ -171,7 +171,7 @@ jobs:
         run: |
           cd apps/infra/scripts
           chmod +x rollback-k8s.sh
-          
+
           if [ "${{ inputs.deployment_method }}" == "helm" ]; then
             # Helm rollback
             helm rollback pms --namespace pms
@@ -186,7 +186,7 @@ jobs:
           echo "Waiting for deployments to be ready..."
           kubectl wait --for=condition=available --timeout=600s deployment/pms-backend -n pms
           kubectl wait --for=condition=available --timeout=600s deployment/pms-frontend -n pms
-          
+
           echo "Checking pod status..."
           kubectl get pods -n pms -l app.kubernetes.io/name=pms
 
@@ -195,17 +195,17 @@ jobs:
         run: |
           # Get the ingress URL
           INGRESS_URL="${{ inputs.environment == 'production' && 'https://pms.example.com' || 'https://staging.pms.example.com' }}"
-          
+
           echo "Running health checks against $INGRESS_URL"
-          
+
           # Wait for ingress to be ready
           sleep 30
-          
+
           # Health check endpoints
           curl -f $INGRESS_URL/health || exit 1
           curl -f $INGRESS_URL/healthz || exit 1
           curl -f $INGRESS_URL/api/docs || exit 1
-          
+
           # Verify version
           VERSION_RESPONSE=$(curl -s $INGRESS_URL/healthz)
           echo "Deployed version: $VERSION_RESPONSE"
@@ -215,22 +215,22 @@ jobs:
         run: |
           echo "=== Deployment Status ==="
           kubectl get deployments -n pms
-          
+
           echo "=== Pod Status ==="
           kubectl get pods -n pms
-          
+
           echo "=== Service Status ==="
           kubectl get services -n pms
-          
+
           echo "=== Ingress Status ==="
           kubectl get ingress -n pms
-          
+
           echo "=== HPA Status ==="
           kubectl get hpa -n pms
-          
+
           echo "=== PDB Status ==="
           kubectl get pdb -n pms
-          
+
           echo "=== Events ==="
           kubectl get events -n pms --sort-by='.lastTimestamp' | tail -20
 
@@ -239,30 +239,30 @@ jobs:
         run: |
           cat > deployment-report.md << EOF
           # Kubernetes Deployment Report
-          
+
           **Environment:** ${{ inputs.environment }}
           **Version:** ${{ inputs.version }}
           **Method:** ${{ inputs.deployment_method }}
           **Rollback:** ${{ inputs.rollback }}
           **Timestamp:** $(date -u +%Y-%m-%dT%H:%M:%SZ)
           **Deployed by:** ${{ github.actor }}
-          
+
           ## Deployment Status
           \`\`\`
           $(kubectl get deployments -n pms)
           \`\`\`
-          
+
           ## Pod Status
           \`\`\`
           $(kubectl get pods -n pms)
           \`\`\`
-          
+
           ## Service Endpoints
           \`\`\`
           $(kubectl get ingress -n pms)
           \`\`\`
           EOF
-          
+
           echo "Deployment report generated:"
           cat deployment-report.md
 

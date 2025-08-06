@@ -25,15 +25,15 @@ spec:
           mkdir -p /host/etc/containerd/certs.d/10.96.234.11:5000
           cat > /host/etc/containerd/certs.d/10.96.234.11:5000/hosts.toml << EOF
           server = "http://10.96.234.11:5000"
-          
+
           [host."http://10.96.234.11:5000"]
             capabilities = ["pull", "resolve"]
             skip_verify = true
           EOF
-          
+
           # Restart containerd to pick up the new configuration
           nsenter -t 1 -m -u -i -n -p -- systemctl restart containerd
-          
+
           # Keep the container running
           sleep infinity
         securityContext:

@@ -59,7 +59,7 @@ shell() {
 forward() {
     local component=${1:-backend}
     local port=${2:-8000}
-    
+
     case $component in
         "backend")
             print_header "Port-forwarding backend to localhost:$port"
@@ -87,7 +87,7 @@ forward() {
 # Function to restart deployments
 restart() {
     local component=${1:-all}
-    
+
     case $component in
         "backend")
             print_header "Restarting backend"
@@ -132,19 +132,19 @@ clean() {
 # Function to run development tests
 test() {
     print_header "Running Development Tests"
-    
+
     echo "Testing frontend accessibility..."
     if curl -s -f http://localhost:80 > /dev/null; then
         print_success "Frontend is accessible"
     else
         print_error "Frontend is not accessible"
     fi
-    
+
     echo "\nTesting backend via port-forward..."
     kubectl port-forward -n $NAMESPACE service/pms-backend 8001:8000 &
     PF_PID=$!
     sleep 3
-    
+
     if curl -s -f http://localhost:8001/health > /dev/null 2>&1; then
         print_success "Backend API is responding"
     elif curl -s -f http://localhost:8001/ > /dev/null 2>&1; then
@@ -152,9 +152,9 @@ test() {
     else
         print_error "Backend is not responding"
     fi
-    
+
     kill $PF_PID 2>/dev/null || true
-    
+
     echo "\nChecking pod health..."
     kubectl get pods -n $NAMESPACE | grep -E "(Running|Ready)" && print_success "All pods are healthy" || print_error "Some pods are not healthy"
 }

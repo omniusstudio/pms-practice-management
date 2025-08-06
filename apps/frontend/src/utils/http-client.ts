@@ -24,7 +24,7 @@ function generateCorrelationId(): string {
 export function createHttpClient(baseURL?: string): AxiosInstance {
   // Use environment variable if available, otherwise fall back to provided baseURL or default
   const apiUrl = import.meta.env.VITE_API_URL || baseURL || "/api";
-  
+
   const client = axios.create({
     baseURL: apiUrl,
     timeout: 30000,

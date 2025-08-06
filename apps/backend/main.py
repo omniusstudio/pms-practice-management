@@ -7,7 +7,6 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-# TrustedHostMiddleware removed - not needed for Kubernetes deployment
 
 from api.admin import router as admin_router
 from api.appointments import router as appointments_router
@@ -27,13 +26,14 @@ from services.etl_pipeline import initialize_etl_pipeline
 from services.event_bus import initialize_event_bus
 from utils.logging_config import configure_structured_logging
 
+# TrustedHostMiddleware removed - not needed for Kubernetes deployment
+
+
 # Configure structured logging with PHI scrubbing
 configure_structured_logging(
     environment=os.getenv("ENVIRONMENT", "development"),
     log_level=os.getenv("LOG_LEVEL", "INFO"),
-    enable_json_output=(
-        os.getenv("ENVIRONMENT", "development") == "production"
-    ),
+    enable_json_output=(os.getenv("ENVIRONMENT", "development") == "production"),
 )
 
 logger = structlog.get_logger()
@@ -53,9 +53,7 @@ async def lifespan(app: FastAPI):
 
     try:
         # Initialize event bus
-        event_bus = initialize_event_bus(
-            redis_url=redis_url, environment=environment
-        )
+        event_bus = initialize_event_bus(redis_url=redis_url, environment=environment)
         await event_bus.connect()
 
         # Initialize ETL pipeline
@@ -108,9 +106,7 @@ async def lifespan(app: FastAPI):
         logger.info("Event system shutdown complete")
 
     except Exception as e:
-        logger.error(
-            "Error during shutdown", extra={"error": str(e)}
-        )
+        logger.error("Error during shutdown", extra={"error": str(e)})
 
 
 # Create FastAPI app with lifespan manager
@@ -168,9 +164,7 @@ app.add_middleware(PrometheusMetricsMiddleware, environment=environment)
 # CORS middleware (configure for production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000"
-    ],  # Frontend dev
+    allow_origins=["http://localhost:3000"],  # Frontend dev
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
@@ -238,9 +232,7 @@ async def readiness_check():
             "database": "connected",
         }
     except Exception as e:
-        logger.error(
-            "Database connectivity check failed", error=str(e)
-        )
+        logger.error("Database connectivity check failed", error=str(e))
         return {
             "status": "not ready",
             "service": "pms-backend",

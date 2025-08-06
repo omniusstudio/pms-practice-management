@@ -20,17 +20,17 @@ backend:
   enabled: true
   name: pms-backend
   replicaCount: 3
-  
+
   image:
     repository: "${ECR_REGISTRY}/pms-backend"
     tag: "latest"
     pullPolicy: Always
-  
+
   service:
     type: ClusterIP
     port: 80
     targetPort: 8000
-  
+
   resources:
     limits:
       cpu: 2000m
@@ -38,14 +38,14 @@ backend:
     requests:
       cpu: 1000m
       memory: 1Gi
-  
+
   autoscaling:
     enabled: true
     minReplicas: 3
     maxReplicas: 10
     targetCPUUtilizationPercentage: 60
     targetMemoryUtilizationPercentage: 70
-  
+
   livenessProbe:
     httpGet:
       path: /health
@@ -54,7 +54,7 @@ backend:
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 3
-  
+
   readinessProbe:
     httpGet:
       path: /health
@@ -63,7 +63,7 @@ backend:
     periodSeconds: 5
     timeoutSeconds: 3
     failureThreshold: 3
-  
+
   podDisruptionBudget:
     enabled: true
     minAvailable: 2
@@ -73,17 +73,17 @@ frontend:
   enabled: true
   name: pms-frontend
   replicaCount: 3
-  
+
   image:
     repository: "${ECR_REGISTRY}/pms-frontend"
     tag: "latest"
     pullPolicy: Always
-  
+
   service:
     type: ClusterIP
     port: 80
     targetPort: 80
-  
+
   resources:
     limits:
       cpu: 1000m
@@ -91,14 +91,14 @@ frontend:
     requests:
       cpu: 500m
       memory: 512Mi
-  
+
   autoscaling:
     enabled: true
     minReplicas: 3
     maxReplicas: 8
     targetCPUUtilizationPercentage: 60
     targetMemoryUtilizationPercentage: 70
-  
+
   livenessProbe:
     httpGet:
       path: /
@@ -107,7 +107,7 @@ frontend:
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 3
-  
+
   readinessProbe:
     httpGet:
       path: /
@@ -116,7 +116,7 @@ frontend:
     periodSeconds: 5
     timeoutSeconds: 3
     failureThreshold: 3
-  
+
   podDisruptionBudget:
     enabled: true
     minAvailable: 2
@@ -142,7 +142,7 @@ ingress:
       add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'self';" always;
       add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  
+
   hosts:
     - host: pms.example.com
       paths:
@@ -166,7 +166,7 @@ ingress:
           service:
             name: pms-backend
             port: 80
-  
+
   tls:
     - secretName: pms-production-tls
       hosts:
@@ -178,29 +178,29 @@ configMap:
   AUTH0_DOMAIN: "pms-prod.us.auth0.com"
   AUTH0_AUDIENCE: "https://api.pms.example.com"
   AUTH0_ISSUER: "https://pms-prod.us.auth0.com/"
-  
+
   # API Configuration
   API_V1_STR: "/api/v1"
   PROJECT_NAME: "Mental Health PMS"
-  
+
   # CORS Configuration
   BACKEND_CORS_ORIGINS: '["https://pms.example.com"]'
-  
+
   # Logging Configuration
   LOG_LEVEL: "INFO"
   LOG_FORMAT: "json"
   DEBUG: "false"
-  
+
   # Database Configuration (non-sensitive)
   DATABASE_HOST: "pms-production-postgres.rds.amazonaws.com"
   DATABASE_PORT: "5432"
   DATABASE_NAME: "pms_production"
-  
+
   # Redis Configuration (non-sensitive)
   REDIS_HOST: "pms-production-redis.cache.amazonaws.com"
   REDIS_PORT: "6379"
   REDIS_DB: "0"
-  
+
   # AWS Configuration
   AWS_REGION: "us-east-1"
   AWS_S3_BUCKET: "pms-production-uploads"
@@ -210,23 +210,23 @@ secrets:
   # Database credentials
   DATABASE_USER: "cG1zX3Byb2RfdXNlcg=="  # pms_prod_user
   DATABASE_PASSWORD: "cHJvZF9wYXNzd29yZF8xMjM="  # prod_password_123
-  
+
   # Redis credentials
   REDIS_PASSWORD: "cHJvZF9yZWRpc19wYXNzXzQ1Ng=="  # prod_redis_pass_456
-  
+
   # Application secrets
   SECRET_KEY: "cHJvZF9zZWNyZXRfa2V5XzEyMzQ1Ng=="  # prod_secret_key_123456
   ALGORITHM: "SFMyNTY="  # HS256
   ACCESS_TOKEN_EXPIRE_MINUTES: "NjA="  # 60
-  
+
   # AWS credentials
   AWS_ACCESS_KEY_ID: "QUtJQVBST0RVQ1RJT05LRVk="  # AKIAPRODUCTIONKEY
   AWS_SECRET_ACCESS_KEY: "cHJvZF9hd3Nfc2VjcmV0X2tleV8xMjM="  # prod_aws_secret_key_123
-  
+
   # Auth0 credentials
   AUTH0_CLIENT_ID: "cHJvZF9hdXRoMF9jbGllbnRfaWRfMTIz"  # prod_auth0_client_id_123
   AUTH0_CLIENT_SECRET: "cHJvZF9hdXRoMF9jbGllbnRfc2VjcmV0XzQ1Ng=="  # prod_auth0_client_secret_456
-  
+
   # OIDC credentials
   OIDC_CLIENT_ID: "cHJvZF9vaWRjX2NsaWVudF9pZF8xMjM="  # prod_oidc_client_id_123
   OIDC_CLIENT_SECRET: "cHJvZF9vaWRjX2NsaWVudF9zZWNyZXRfNDU2"  # prod_oidc_client_secret_456

@@ -9,10 +9,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_async_db
-from middleware.auth_middleware import (
-    AuthenticatedUser,
-    require_auth_dependency,
-)
+from middleware.auth_middleware import AuthenticatedUser, require_auth_dependency
 from middleware.correlation import get_correlation_id
 from models.note import NoteType
 from services.database_service import DatabaseService
@@ -81,15 +78,9 @@ async def get_notes(
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(50, ge=1, le=100, description="Items per page"),
     client_id: Optional[UUID] = Query(None, description="Filter by client"),
-    provider_id: Optional[UUID] = Query(
-        None, description="Filter by provider"
-    ),
-    note_type: Optional[NoteType] = Query(
-        None, description="Filter by note type"
-    ),
-    is_signed: Optional[bool] = Query(
-        None, description="Filter by signed status"
-    ),
+    provider_id: Optional[UUID] = Query(None, description="Filter by provider"),
+    note_type: Optional[NoteType] = Query(None, description="Filter by note type"),
+    is_signed: Optional[bool] = Query(None, description="Filter by signed status"),
 ):
     """Get all notes with pagination and filtering."""
     try:

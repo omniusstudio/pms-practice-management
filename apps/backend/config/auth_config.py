@@ -43,12 +43,9 @@ class AuthConfig:
 
         # Security Configuration
         cors_origins_str = os.getenv(
-            "CORS_ORIGINS",
-            "http://localhost:3000,http://localhost:8000"
+            "CORS_ORIGINS", "http://localhost:3000,http://localhost:8000"
         )
-        self.cors_origins = [
-            origin.strip() for origin in cors_origins_str.split(",")
-        ]
+        self.cors_origins = [origin.strip() for origin in cors_origins_str.split(",")]
 
         # HIPAA Compliance
         self.enable_audit_logging = (
@@ -111,19 +108,13 @@ class AuthConfig:
     def _validate_required_settings(self) -> None:
         """Validate required Auth0 settings."""
         if not self.auth0_domain:
-            raise ValueError(
-                "AUTH0_DOMAIN environment variable is required"
-            )
+            raise ValueError("AUTH0_DOMAIN environment variable is required")
 
         if not self.auth0_client_id:
-            raise ValueError(
-                "AUTH0_CLIENT_ID environment variable is required"
-            )
+            raise ValueError("AUTH0_CLIENT_ID environment variable is required")
 
         if not self.auth0_client_secret:
-            raise ValueError(
-                "AUTH0_CLIENT_SECRET environment variable is required"
-            )
+            raise ValueError("AUTH0_CLIENT_SECRET environment variable is required")
 
 
 # Global instance will be created when needed

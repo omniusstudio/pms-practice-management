@@ -56,38 +56,38 @@ fi
 # Check prerequisites
 check_prerequisites() {
     log "Checking prerequisites..."
-    
+
     # Check kubectl
     if ! command -v kubectl &> /dev/null; then
         log_error "kubectl is not installed"
         exit 1
     fi
-    
+
     # Check AWS CLI
     if ! command -v aws &> /dev/null; then
         log_error "AWS CLI is not installed"
         exit 1
     fi
-    
+
     # Check envsubst
     if ! command -v envsubst &> /dev/null; then
         log_error "envsubst is not installed (part of gettext package)"
         exit 1
     fi
-    
+
     # Check cluster connectivity
     if ! kubectl cluster-info &> /dev/null; then
         log_error "Cannot connect to Kubernetes cluster"
         exit 1
     fi
-    
+
     log_success "Prerequisites check passed"
 }
 
 # Load environment variables
 load_environment_config() {
     log "Loading environment configuration for ${ENVIRONMENT}..."
-    
+
     # Load environment-specific configuration
     local env_file="${ROOT_DIR}/.env.${ENVIRONMENT}"
     if [[ -f "$env_file" ]]; then
@@ -98,13 +98,13 @@ load_environment_config() {
     else
         log_warning "Environment file $env_file not found, using defaults"
     fi
-    
+
     # Set required variables
     export ENVIRONMENT
     export VERSION
     export ECR_REGISTRY
     export AWS_REGION
-    
+
     # Validate required variables
     local required_vars=("ECR_REGISTRY" "DOMAIN_NAME" "AUTH0_DOMAIN" "AUTH0_CLIENT_ID")
     for var in "${required_vars[@]}"; do
@@ -118,7 +118,7 @@ load_environment_config() {
 # Create namespace if it doesn't exist
 ensure_namespace() {
     log "Ensuring namespace ${NAMESPACE} exists..."
-    
+
     if ! kubectl get namespace "$NAMESPACE" &> /dev/null; then
         envsubst < "${K8S_DIR}/namespace.yaml" | kubectl apply -f -
         log_success "Created namespace ${NAMESPACE}"
@@ -130,7 +130,7 @@ ensure_namespace() {
 # Apply ConfigMap and Secrets
 apply_config() {
     log "Applying ConfigMap and Secrets..."
-    
+
     # Base64 encode secrets
     export DATABASE_URL_B64=$(echo -n "$DATABASE_URL" | base64)
     export REDIS_URL_B64=$(echo -n "$REDIS_URL" | base64)
@@ -144,7 +144,7 @@ apply_config() {
     export OIDC_MICROSOFT_CLIENT_SECRET_B64=$(echo -n "$OIDC_MICROSOFT_CLIENT_SECRET" | base64)
     export DB_PASSWORD_B64=$(echo -n "$DB_PASSWORD" | base64)
     export REDIS_PASSWORD_B64=$(echo -n "$REDIS_PASSWORD" | base64)
-    
+
     envsubst < "${K8S_DIR}/configmap.yaml" | kubectl apply -f -
     log_success "Applied ConfigMap and Secrets"
 }
@@ -152,27 +152,27 @@ apply_config() {
 # Deploy applications
 deploy_applications() {
     log "Deploying applications..."
-    
+
     # Apply network policies first
     envsubst < "${K8S_DIR}/network-policy.yaml" | kubectl apply -f -
     log_success "Applied network policies"
-    
+
     # Deploy backend
     envsubst < "${K8S_DIR}/backend-deployment.yaml" | kubectl apply -f -
     log_success "Applied backend deployment"
-    
+
     # Deploy frontend
     envsubst < "${K8S_DIR}/frontend-deployment.yaml" | kubectl apply -f -
     log_success "Applied frontend deployment"
-    
+
     # Apply HPA
     envsubst < "${K8S_DIR}/hpa.yaml" | kubectl apply -f -
     log_success "Applied Horizontal Pod Autoscalers"
-    
+
     # Apply PDB
     envsubst < "${K8S_DIR}/pdb.yaml" | kubectl apply -f -
     log_success "Applied Pod Disruption Budgets"
-    
+
     # Apply Ingress
     envsubst < "${K8S_DIR}/ingress.yaml" | kubectl apply -f -
     log_success "Applied Ingress configuration"
@@ -181,12 +181,12 @@ deploy_applications() {
 # Wait for deployments to be ready
 wait_for_deployments() {
     log "Waiting for deployments to be ready..."
-    
+
     local deployments=("pms-backend" "pms-frontend")
-    
+
     for deployment in "${deployments[@]}"; do
         log "Waiting for deployment ${deployment}..."
-        
+
         if kubectl wait --for=condition=available --timeout=600s deployment/${deployment} -n ${NAMESPACE}; then
             log_success "Deployment ${deployment} is ready"
         else
@@ -201,7 +201,7 @@ wait_for_deployments() {
 # Health check
 health_check() {
     log "Performing health checks..."
-    
+
     # Check backend health
     local backend_pod=$(kubectl get pods -l app=pms-backend -n ${NAMESPACE} -o jsonpath='{.items[0].metadata.name}')
     if kubectl exec ${backend_pod} -n ${NAMESPACE} -- curl -f http://localhost:8000/health; then
@@ -210,7 +210,7 @@ health_check() {
         log_error "Backend health check failed"
         exit 1
     fi
-    
+
     # Check frontend health
     local frontend_pod=$(kubectl get pods -l app=pms-frontend -n ${NAMESPACE} -o jsonpath='{.items[0].metadata.name}')
     if kubectl exec ${frontend_pod} -n ${NAMESPACE} -- curl -f http://localhost:80/; then
@@ -237,10 +237,10 @@ show_status() {
 # Rollback function
 rollback() {
     log_warning "Rolling back deployment..."
-    
+
     kubectl rollout undo deployment/pms-backend -n ${NAMESPACE}
     kubectl rollout undo deployment/pms-frontend -n ${NAMESPACE}
-    
+
     log_success "Rollback completed"
 }
 
@@ -259,9 +259,9 @@ cleanup() {
 # Main execution
 main() {
     log "Starting Kubernetes deployment for ${ENVIRONMENT} environment with version ${VERSION}"
-    
+
     trap cleanup EXIT
-    
+
     check_prerequisites
     load_environment_config
     ensure_namespace
@@ -270,7 +270,7 @@ main() {
     wait_for_deployments
     health_check
     show_status
-    
+
     log_success "Deployment completed successfully!"
 }
 

@@ -7,7 +7,7 @@ global:
 app:
   environment: local
   domain: pms.local
-  
+
 backend:
   image:
     repository: localhost:30500/pms-backend
@@ -21,7 +21,7 @@ backend:
     limits:
       cpu: 500m
       memory: 512Mi
-  
+
 frontend:
   image:
     repository: localhost:30500/pms-frontend

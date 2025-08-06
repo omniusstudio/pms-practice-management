@@ -192,15 +192,11 @@ class DatabaseService:
 
     async def delete_provider(self, provider_id: UUID) -> bool:
         """Soft delete provider."""
-        result = await self.update_provider(
-            provider_id, {"is_active": False}
-        )
+        result = await self.update_provider(provider_id, {"is_active": False})
         return result is not None
 
     # Appointment operations
-    async def create_appointment(
-        self, appointment_data: Dict[str, Any]
-    ) -> Appointment:
+    async def create_appointment(self, appointment_data: Dict[str, Any]) -> Appointment:
         """Create a new appointment."""
         session = self._ensure_session()
         appointment = Appointment(**appointment_data)
@@ -216,9 +212,7 @@ class DatabaseService:
 
         return appointment
 
-    async def get_appointment(
-        self, appointment_id: UUID
-    ) -> Optional[Appointment]:
+    async def get_appointment(self, appointment_id: UUID) -> Optional[Appointment]:
         """Get appointment by ID with related data."""
         result = await self.session.execute(
             select(Appointment)
@@ -322,9 +316,7 @@ class DatabaseService:
 
     async def get_note(self, note_id: UUID) -> Optional[Note]:
         """Get note by ID."""
-        result = await self.session.execute(
-            select(Note).where(Note.id == note_id)
-        )
+        result = await self.session.execute(select(Note).where(Note.id == note_id))
         return result.scalar_one_or_none()
 
     async def update_note(
@@ -373,9 +365,7 @@ class DatabaseService:
         return True
 
     # Ledger operations
-    async def create_ledger_entry(
-        self, entry_data: Dict[str, Any]
-    ) -> LedgerEntry:
+    async def create_ledger_entry(self, entry_data: Dict[str, Any]) -> LedgerEntry:
         """Create a ledger entry for billing."""
         session = self._ensure_session()
         entry = LedgerEntry(**entry_data)

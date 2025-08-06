@@ -2,7 +2,7 @@
 <testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="chromium" tests="6" failures="6" skipped="0" time="158.785" errors="0">
 <testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.672">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
-<![CDATA[  [chromium] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+<![CDATA[  [chromium] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users
 
     Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
 
@@ -46,7 +46,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.574">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
-<![CDATA[  [chromium] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+<![CDATA[  [chromium] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login
 
     Test timeout of 30000ms exceeded.
 
@@ -87,7 +87,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.67">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
-<![CDATA[  [chromium] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+<![CDATA[  [chromium] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -128,7 +128,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.604">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
-<![CDATA[  [chromium] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+<![CDATA[  [chromium] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -169,7 +169,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.656">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
-<![CDATA[  [chromium] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+<![CDATA[  [chromium] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully
 
     Test timeout of 30000ms exceeded.
 
@@ -253,7 +253,7 @@
 <testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="firefox" tests="6" failures="6" skipped="0" time="156.092" errors="0">
 <testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.674">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
-<![CDATA[  [firefox] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+<![CDATA[  [firefox] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users
 
     Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
 
@@ -297,7 +297,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.087">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
-<![CDATA[  [firefox] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+<![CDATA[  [firefox] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login
 
     Test timeout of 30000ms exceeded.
 
@@ -338,7 +338,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.079">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
-<![CDATA[  [firefox] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+<![CDATA[  [firefox] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -379,7 +379,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.106">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
-<![CDATA[  [firefox] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+<![CDATA[  [firefox] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -420,7 +420,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.08">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
-<![CDATA[  [firefox] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+<![CDATA[  [firefox] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully
 
     Test timeout of 30000ms exceeded.
 
@@ -504,7 +504,7 @@
 <testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="webkit" tests="6" failures="6" skipped="0" time="156.166" errors="0">
 <testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.859">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
-<![CDATA[  [webkit] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+<![CDATA[  [webkit] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users
 
     Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
 
@@ -548,7 +548,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.07">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
-<![CDATA[  [webkit] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+<![CDATA[  [webkit] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login
 
     Test timeout of 30000ms exceeded.
 
@@ -589,7 +589,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.062">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
-<![CDATA[  [webkit] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+<![CDATA[  [webkit] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -630,7 +630,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.059">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
-<![CDATA[  [webkit] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+<![CDATA[  [webkit] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -671,7 +671,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.054">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
-<![CDATA[  [webkit] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+<![CDATA[  [webkit] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully
 
     Test timeout of 30000ms exceeded.
 
@@ -755,7 +755,7 @@
 <testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="Mobile Chrome" tests="6" failures="6" skipped="0" time="158.168" errors="0">
 <testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.404">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users
 
     Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
 
@@ -799,7 +799,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.577">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login
 
     Test timeout of 30000ms exceeded.
 
@@ -840,7 +840,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.549">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -881,7 +881,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.538">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -922,7 +922,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.555">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully
 
     Test timeout of 30000ms exceeded.
 
@@ -963,7 +963,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.545">
 <failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully 
+<![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully
 
     Test timeout of 30000ms exceeded.
 
@@ -1006,7 +1006,7 @@
 <testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="Mobile Safari" tests="6" failures="6" skipped="0" time="155.611" errors="0">
 <testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.323">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
-<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users
 
     Error: Timed out 5000ms waiting for expect(locator).toContainText(expected)
 
@@ -1050,7 +1050,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.061">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
-<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login
 
     Test timeout of 30000ms exceeded.
 
@@ -1091,7 +1091,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.058">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
-<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -1132,7 +1132,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.056">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
-<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials
 
     Test timeout of 30000ms exceeded.
 
@@ -1173,7 +1173,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.045">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
-<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully
 
     Test timeout of 30000ms exceeded.
 
@@ -1214,7 +1214,7 @@
 </testcase>
 <testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.068">
 <failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
-<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully 
+<![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully
 
     Test timeout of 30000ms exceeded.
 

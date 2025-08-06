@@ -113,28 +113,28 @@ log_info "Project root: $PROJECT_ROOT"
 # Cleanup function
 cleanup_resources() {
     log_info "Cleaning up existing resources..."
-    
+
     # Remove Helm release if exists
     if helm list -n "$NAMESPACE" | grep -q pms-local; then
         log_info "Removing Helm release..."
         helm uninstall pms-local -n "$NAMESPACE" || true
     fi
-    
+
     # Remove namespace
     if kubectl get namespace "$NAMESPACE" &> /dev/null; then
         log_info "Removing namespace $NAMESPACE..."
         kubectl delete namespace "$NAMESPACE" --timeout=60s || true
     fi
-    
+
     # Remove from /etc/hosts
     if grep -q "pms.local" /etc/hosts; then
         log_info "Removing pms.local from /etc/hosts..."
         sudo sed -i '' '/pms.local/d' /etc/hosts || true
     fi
-    
+
     # Stop port-forwards
     pkill -f "kubectl port-forward" || true
-    
+
     log_success "Cleanup completed"
 }
 
@@ -143,14 +143,14 @@ select_cluster_type() {
     if [[ -n "$CLUSTER_TYPE" ]]; then
         return
     fi
-    
+
     echo
     log_info "Select your preferred local Kubernetes option:"
     echo "1) Docker Desktop Kubernetes (recommended for macOS)"
     echo "2) Minikube (lightweight, multiple drivers)"
     echo "3) Kind (Kubernetes in Docker, great for CI/CD)"
     echo
-    
+
     while true; do
         read -p "Enter your choice (1-3): " choice
         case $choice in
@@ -176,37 +176,37 @@ select_cluster_type() {
 # Check prerequisites
 check_prerequisites() {
     log_info "Checking prerequisites..."
-    
+
     # Check kubectl
     if ! command -v kubectl &> /dev/null; then
         log_error "kubectl is not installed. Please install kubectl first."
         exit 1
     fi
-    
+
     # Check Helm
     if ! command -v helm &> /dev/null; then
         log_error "Helm is not installed. Please install Helm first."
         exit 1
     fi
-    
+
     # Check Docker
     if ! command -v docker &> /dev/null; then
         log_error "Docker is not installed. Please install Docker first."
         exit 1
     fi
-    
+
     if ! docker info &> /dev/null; then
         log_error "Docker daemon is not running. Please start Docker."
         exit 1
     fi
-    
+
     log_success "Prerequisites check passed"
 }
 
 # Setup Docker Desktop Kubernetes
 setup_docker_desktop() {
     log_info "Setting up Docker Desktop Kubernetes..."
-    
+
     # Check if Kubernetes is enabled
     if ! kubectl cluster-info &> /dev/null; then
         log_error "Kubernetes is not enabled in Docker Desktop."
@@ -217,33 +217,33 @@ setup_docker_desktop() {
         log_info "4. Click 'Apply & Restart'"
         exit 1
     fi
-    
+
     # Install NGINX Ingress Controller
     log_info "Installing NGINX Ingress Controller..."
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
-    
+
     # Wait for ingress controller
     log_info "Waiting for ingress controller to be ready..."
     kubectl wait --namespace ingress-nginx \
         --for=condition=ready pod \
         --selector=app.kubernetes.io/component=controller \
         --timeout=120s
-    
+
     # Install metrics server
     log_info "Installing metrics server..."
     kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-    
+
     # Patch metrics server for local development
     kubectl patch deployment metrics-server -n kube-system --type='json' \
         -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--kubelet-insecure-tls"}]'
-    
+
     log_success "Docker Desktop Kubernetes setup completed"
 }
 
 # Setup Minikube
 setup_minikube() {
     log_info "Setting up Minikube..."
-    
+
     # Check if minikube is installed
     if ! command -v minikube &> /dev/null; then
         log_error "Minikube is not installed. Installing..."
@@ -254,7 +254,7 @@ setup_minikube() {
             exit 1
         fi
     fi
-    
+
     # Start minikube if not running
     if ! minikube status &> /dev/null; then
         log_info "Starting Minikube..."
@@ -262,22 +262,22 @@ setup_minikube() {
     else
         log_info "Minikube is already running"
     fi
-    
+
     # Set kubectl context
     kubectl config use-context "$CLUSTER_NAME"
-    
+
     # Enable add-ons
     log_info "Enabling Minikube add-ons..."
     minikube addons enable ingress --profile="$CLUSTER_NAME"
     minikube addons enable metrics-server --profile="$CLUSTER_NAME"
-    
+
     log_success "Minikube setup completed"
 }
 
 # Setup Kind
 setup_kind() {
     log_info "Setting up Kind..."
-    
+
     # Check if kind is installed
     if ! command -v kind &> /dev/null; then
         log_error "Kind is not installed. Installing..."
@@ -288,7 +288,7 @@ setup_kind() {
             exit 1
         fi
     fi
-    
+
     # Create cluster configuration
     local kind_config="/tmp/kind-config-$CLUSTER_NAME.yaml"
     cat > "$kind_config" << EOF
@@ -312,7 +312,7 @@ nodes:
 - role: worker
 - role: worker
 EOF
-    
+
     # Create cluster if it doesn't exist
     if ! kind get clusters | grep -q "$CLUSTER_NAME"; then
         log_info "Creating Kind cluster..."
@@ -320,23 +320,23 @@ EOF
     else
         log_info "Kind cluster already exists"
     fi
-    
+
     # Set kubectl context
     kubectl config use-context "kind-$CLUSTER_NAME"
-    
+
     # Install ingress controller
     log_info "Installing NGINX Ingress Controller..."
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-    
+
     # Wait for ingress controller
     kubectl wait --namespace ingress-nginx \
         --for=condition=ready pod \
         --selector=app.kubernetes.io/component=controller \
         --timeout=90s
-    
+
     # Clean up config file
     rm -f "$kind_config"
-    
+
     log_success "Kind setup completed"
 }
 
@@ -346,19 +346,19 @@ build_images() {
         log_info "Skipping Docker image build"
         return
     fi
-    
+
     log_info "Building Docker images..."
-    
+
     cd "$PROJECT_ROOT"
-    
+
     # Build backend image
     log_info "Building backend image..."
     docker build -t pms-backend:local-test ./apps/backend
-    
+
     # Build frontend image
     log_info "Building frontend image..."
     docker build -t pms-frontend:local-test ./apps/frontend
-    
+
     # Load images into cluster
     case $CLUSTER_TYPE in
         minikube)
@@ -375,16 +375,16 @@ build_images() {
             log_info "Images available in Docker Desktop"
             ;;
     esac
-    
+
     log_success "Docker images built and loaded"
 }
 
 # Create local values file
 create_local_values() {
     local values_file="$PROJECT_ROOT/apps/infra/kubernetes/helm/pms/values-local.yaml"
-    
+
     log_info "Creating local Helm values file..."
-    
+
     cat > "$values_file" << 'EOF'
 global:
   environment: local
@@ -395,7 +395,7 @@ global:
 app:
   environment: local
   domain: pms.local
-  
+
 backend:
   image:
     repository: pms-backend
@@ -408,7 +408,7 @@ backend:
     limits:
       cpu: 500m
       memory: 512Mi
-  
+
 frontend:
   image:
     repository: pms-frontend
@@ -464,7 +464,7 @@ backup:
 certManager:
   enabled: false
 EOF
-    
+
     log_success "Local values file created: $values_file"
 }
 
@@ -474,34 +474,34 @@ deploy_application() {
         log_info "Skipping application deployment"
         return
     fi
-    
+
     log_info "Deploying application to local cluster..."
-    
+
     # Create namespace
     kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
-    
+
     # Deploy with Helm
     cd "$PROJECT_ROOT/apps/infra/kubernetes/helm"
-    
+
     helm upgrade --install pms-local pms/ \
         --namespace "$NAMESPACE" \
         --values pms/values-local.yaml \
         --wait \
         --timeout=10m
-    
+
     log_success "Application deployed successfully"
 }
 
 # Configure local access
 configure_access() {
     log_info "Configuring local access..."
-    
+
     # Add to /etc/hosts
     if ! grep -q "pms.local" /etc/hosts; then
         echo "127.0.0.1 pms.local" | sudo tee -a /etc/hosts
         log_success "Added pms.local to /etc/hosts"
     fi
-    
+
     # For minikube, update with minikube IP
     if [[ "$CLUSTER_TYPE" == "minikube" ]]; then
         local minikube_ip
@@ -517,24 +517,24 @@ configure_access() {
 # Run health checks
 run_health_checks() {
     log_info "Running health checks..."
-    
+
     # Wait for pods to be ready
     log_info "Waiting for pods to be ready..."
     kubectl wait --for=condition=ready pod -l app=pms-backend -n "$NAMESPACE" --timeout=300s
     kubectl wait --for=condition=ready pod -l app=pms-frontend -n "$NAMESPACE" --timeout=300s
-    
+
     # Check pod status
     log_info "Pod status:"
     kubectl get pods -n "$NAMESPACE"
-    
+
     # Check services
     log_info "Service status:"
     kubectl get services -n "$NAMESPACE"
-    
+
     # Check ingress
     log_info "Ingress status:"
     kubectl get ingress -n "$NAMESPACE"
-    
+
     log_success "Health checks completed"
 }
 
@@ -567,21 +567,21 @@ main() {
     echo "    LOCAL KUBERNETES SETUP"
     echo "========================================"
     echo
-    
+
     # Handle cleanup
     if [[ "$CLEANUP" == "true" ]]; then
         cleanup_resources
         exit 0
     fi
-    
+
     # Check prerequisites
     check_prerequisites
-    
+
     # Select cluster type if not provided
     select_cluster_type
-    
+
     log_info "Setting up local Kubernetes with: $CLUSTER_TYPE"
-    
+
     # Setup cluster based on type
     case $CLUSTER_TYPE in
         docker-desktop)
@@ -598,22 +598,22 @@ main() {
             exit 1
             ;;
     esac
-    
+
     # Build images
     build_images
-    
+
     # Create local values
     create_local_values
-    
+
     # Deploy application
     deploy_application
-    
+
     # Configure access
     configure_access
-    
+
     # Run health checks
     run_health_checks
-    
+
     # Show access information
     show_access_info
 }

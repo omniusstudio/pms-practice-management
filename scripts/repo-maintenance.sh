@@ -20,7 +20,7 @@ print_section() {
 check_cleanup_impact() {
     local description="$1"
     local find_pattern="$2"
-    
+
     local count=$(find . $find_pattern 2>/dev/null | wc -l | tr -d ' ')
     if [ "$count" -gt 0 ]; then
         echo "⚠️  Found $count $description files"

@@ -94,9 +94,7 @@ async def get_ledger_entries(
     transaction_type: Optional[TransactionType] = Query(
         None, description="Filter by transaction type"
     ),
-    is_posted: Optional[bool] = Query(
-        None, description="Filter by posted status"
-    ),
+    is_posted: Optional[bool] = Query(None, description="Filter by posted status"),
     is_reconciled: Optional[bool] = Query(
         None, description="Filter by reconciled status"
     ),
@@ -107,9 +105,7 @@ async def get_ledger_entries(
         None, description="Filter by service date to"
     ),
     skip: int = Query(0, ge=0, description="Number of entries to skip"),
-    limit: int = Query(
-        100, ge=1, le=1000, description="Number of entries to return"
-    ),
+    limit: int = Query(100, ge=1, le=1000, description="Number of entries to return"),
     db: AsyncSession = Depends(get_async_db),
 ) -> List[LedgerEntryResponse]:
     """Get ledger entries with optional filtering."""
@@ -193,9 +189,7 @@ async def delete_ledger_entry(
     await db_service.delete_ledger_entry(entry_id)
 
 
-@router.post(
-    "/ledger/{entry_id}/reconcile", response_model=LedgerEntryResponse
-)
+@router.post("/ledger/{entry_id}/reconcile", response_model=LedgerEntryResponse)
 async def reconcile_ledger_entry(
     entry_id: UUID,
     reconcile_data: ReconcileRequest,
@@ -209,16 +203,12 @@ async def reconcile_ledger_entry(
         raise HTTPException(status_code=404, detail="Ledger entry not found")
 
     if existing_entry.is_reconciled:
-        raise HTTPException(
-            status_code=400, detail="Entry is already reconciled"
-        )
+        raise HTTPException(status_code=400, detail="Entry is already reconciled")
 
     # Update reconciliation status
     update_data = {
         "is_reconciled": True,
-        "reconciliation_date": (
-            reconcile_data.reconciliation_date or date.today()
-        ),
+        "reconciliation_date": (reconcile_data.reconciliation_date or date.today()),
     }
     updated_entry = await db_service.update_ledger_entry(entry_id, update_data)
     return LedgerEntryResponse.model_validate(updated_entry)

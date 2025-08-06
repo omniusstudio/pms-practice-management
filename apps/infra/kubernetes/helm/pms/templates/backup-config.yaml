@@ -33,19 +33,19 @@ data:
     # This is a placeholder - actual script content should be mounted from external source
     echo "Backup script placeholder - mount actual script from /scripts/backup/pg_backup.sh"
     exit 1
-  
+
   restore.sh: |
     #!/bin/bash
     # This is a placeholder - actual script content should be mounted from external source
     echo "Restore script placeholder - mount actual script from /scripts/backup/restore.sh"
     exit 1
-  
+
   verify_backup.sh: |
     #!/bin/bash
     # This is a placeholder - actual script content should be mounted from external source
     echo "Verify backup script placeholder - mount actual script from /scripts/backup/verify_backup.sh"
     exit 1
-  
+
   monitor_backups.sh: |
     #!/bin/bash
     # This is a placeholder - actual script content should be mounted from external source

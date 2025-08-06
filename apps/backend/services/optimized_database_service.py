@@ -227,7 +227,7 @@ class OptimizedDatabaseService:
                         LedgerEntry.transaction_type == TransactionType.CHARGE,
                         LedgerEntry.amount,
                     ),
-                    else_=0,
+                    0,
                 )
             ).label("total_charges"),
             func.sum(
@@ -236,7 +236,7 @@ class OptimizedDatabaseService:
                         LedgerEntry.transaction_type == TransactionType.PAYMENT,
                         LedgerEntry.amount,
                     ),
-                    else_=0,
+                    0,
                 )
             ).label("total_payments"),
             func.count(LedgerEntry.id).label("entry_count"),
@@ -303,7 +303,7 @@ class OptimizedDatabaseService:
                             LedgerEntry.transaction_type == TransactionType.CHARGE,
                             LedgerEntry.amount,
                         ),
-                        else_=-LedgerEntry.amount,
+                        -LedgerEntry.amount,
                     )
                 ).label("balance"),
             )
@@ -317,7 +317,7 @@ class OptimizedDatabaseService:
                             LedgerEntry.transaction_type == TransactionType.CHARGE,
                             LedgerEntry.amount,
                         ),
-                        else_=-LedgerEntry.amount,
+                        -LedgerEntry.amount,
                     )
                 )
                 > 0
@@ -329,7 +329,7 @@ class OptimizedDatabaseService:
                             LedgerEntry.transaction_type == TransactionType.CHARGE,
                             LedgerEntry.amount,
                         ),
-                        else_=-LedgerEntry.amount,
+                        -LedgerEntry.amount,
                     )
                 ).desc()
             )

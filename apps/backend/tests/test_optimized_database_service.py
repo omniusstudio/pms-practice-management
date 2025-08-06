@@ -215,7 +215,9 @@ class TestOptimizedDatabaseService:
         assert "total_charges" in result
         assert "total_payments" in result
         assert "balance" in result
-        assert "appointment_stats" in result
+        assert "client_id" in result
+        assert "entry_count" in result
+        assert "last_service_date" in result
 
     @pytest.mark.asyncio
     async def test_get_financial_dashboard_data(self, service, mock_session):
@@ -249,24 +251,45 @@ class TestOptimizedDatabaseService:
 
         result = await service.get_financial_dashboard_data("2024-01-01", "2024-12-31")
 
-        assert "revenue_summary" in result
-        assert "appointment_summary" in result
+        assert "daily_revenue" in result
         assert "outstanding_balances" in result
+        assert isinstance(result["daily_revenue"], list)
+        assert isinstance(result["outstanding_balances"], list)
 
     @pytest.mark.asyncio
     async def test_get_database_performance_stats(self, service, mock_session):
         """Test get_database_performance_stats."""
-        # Mock table stats queries
-        mock_session.execute.return_value.scalar.return_value = 100
+        # Mock scalar queries for table counts
+        mock_scalar_result = MagicMock()
+        mock_scalar_result.scalar.return_value = 100
+
+        # Mock activity query result
+        mock_activity_result = MagicMock()
+        mock_activity_row = MagicMock()
+        mock_activity_row.recent_appointments = 5
+        mock_activity_row.recent_notes = 3
+        mock_activity_result.first.return_value = mock_activity_row
+
+        # Set up side_effect for multiple execute calls
+        mock_session.execute.side_effect = [
+            mock_scalar_result,  # clients count
+            mock_scalar_result,  # providers count
+            mock_scalar_result,  # appointments count
+            mock_scalar_result,  # notes count
+            mock_scalar_result,  # ledger_entries count
+            mock_activity_result,  # activity query
+        ]
 
         result = await service.get_database_performance_stats()
 
-        assert "table_stats" in result
-        assert "clients" in result["table_stats"]
-        assert "appointments" in result["table_stats"]
-        assert "providers" in result["table_stats"]
-        assert "ledger_entries" in result["table_stats"]
-        assert "notes" in result["table_stats"]
+        assert "clients_count" in result
+        assert "providers_count" in result
+        assert "appointments_count" in result
+        assert "notes_count" in result
+        assert "ledger_entries_count" in result
+        assert "recent_appointments" in result
+        assert "recent_notes" in result
+        assert "timestamp" in result
 
 
 def test_get_optimized_sync_session():

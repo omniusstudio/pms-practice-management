@@ -9,8 +9,7 @@ from unittest.mock import MagicMock, mock_open, patch
 os.environ.setdefault("DB_PASSWORD", "test_password")
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Import the module under test
-import setup_database
+import setup_database  # noqa: E402
 
 
 class TestSetupDatabase:

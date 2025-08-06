@@ -74,7 +74,10 @@ class TestCorrelationIDMiddleware:
         # Setup
         existing_id = "existing-correlation-id"
         mock_request.headers = Headers(
-            {"X-Correlation-ID": existing_id, "user-agent": "test-agent"}
+            {
+                "X-Correlation-ID": existing_id,
+                "user-agent": "test-agent",
+            }
         )
         call_next = AsyncMock(return_value=mock_response)
 
@@ -169,7 +172,10 @@ class TestCorrelationIDMiddleware:
             mock_logger.bind.return_value = mock_logger_with_context
 
             # Mock time to simulate 250ms request
-            with patch("middleware.logging.time.time", side_effect=[1000.0, 1000.25]):
+            with patch(
+                "middleware.logging.time.time",
+                side_effect=[1000.0, 1000.25],
+            ):
                 await middleware.dispatch(mock_request, call_next)
 
                 # Verify duration calculation
@@ -189,7 +195,8 @@ class TestCorrelationIDMiddleware:
         ):
             with patch("middleware.logging.logger"):
                 with patch(
-                    "middleware.logging.time.time", side_effect=[1000.0, 1001.0]
+                    "middleware.logging.time.time",
+                    side_effect=[1000.0, 1001.0],
                 ):
                     result = await middleware.dispatch(mock_request, call_next)
 

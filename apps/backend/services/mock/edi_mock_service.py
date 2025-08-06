@@ -19,7 +19,9 @@ class EDIMockService:
         self.processed_claims: Dict[str, Dict] = {}
         self.remittance_data: Dict[str, Dict] = {}
 
-    async def submit_837_claim(self, claim_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def submit_837_claim(
+        self, claim_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Simulate EDI 837 claim submission.
 
         Args:
@@ -57,11 +59,13 @@ class EDIMockService:
         # Add error details for rejected claims
         if scenario["status"] == "rejected":
             response["error_codes"] = ["INV001", "DUP002"]
-            response["error_description"] = "Invalid patient ID or duplicate claim"
+            response["error_description"] = (
+                "Invalid patient ID or duplicate claim"
+            )
 
-        # Store for later remittance processing
-        if scenario["status"] == "accepted":
-            self.processed_claims[transaction_id] = response
+        # Store for later remittance processing (always store for testing)
+        # In production, only accepted claims would be stored
+        self.processed_claims[transaction_id] = response
 
         logger.info(
             "EDI 837 claim processed",
@@ -91,7 +95,11 @@ class EDIMockService:
         # Generate realistic payment scenarios
         payment_scenarios = [
             {"status": "paid_full", "adjustment_reason": None, "weight": 0.70},
-            {"status": "paid_partial", "adjustment_reason": "CO-45", "weight": 0.20},
+            {
+                "status": "paid_partial",
+                "adjustment_reason": "CO-45",
+                "weight": 0.20,
+            },
             {"status": "denied", "adjustment_reason": "CO-97", "weight": 0.10},
         ]
 
@@ -103,7 +111,9 @@ class EDIMockService:
         if scenario["status"] == "paid_full":
             paid_amount = original_amount
         elif scenario["status"] == "paid_partial":
-            paid_amount = round(original_amount * random.uniform(0.6, 0.9), 2)
+            paid_amount = round(
+                original_amount * random.uniform(0.6, 0.9), 2
+            )
         else:
             paid_amount = 0.0
 
@@ -118,13 +128,17 @@ class EDIMockService:
             "paid_amount": paid_amount,
             "adjustment_amount": original_amount - paid_amount,
             "check_number": f"CHK{random.randint(100000, 999999)}",
-            "payment_date": (datetime.utcnow() + timedelta(days=1)).isoformat(),
+            "payment_date": (
+                datetime.utcnow() + timedelta(days=1)
+            ).isoformat(),
         }
 
         if scenario["adjustment_reason"]:
             response["adjustment_reason"] = scenario["adjustment_reason"]
-            response["adjustment_description"] = self._get_adjustment_description(
-                scenario["adjustment_reason"]
+            response["adjustment_description"] = (
+                self._get_adjustment_description(
+                    scenario["adjustment_reason"]
+                )
             )
 
         # Store remittance data
@@ -167,7 +181,9 @@ class EDIMockService:
                 "timestamp": datetime.utcnow().isoformat(),
             }
 
-    async def get_remittance_details(self, remittance_id: str) -> Dict[str, Any]:
+    async def get_remittance_details(
+        self, remittance_id: str
+    ) -> Dict[str, Any]:
         """Get details of a payment remittance.
 
         Args:

@@ -1,3 +1,10 @@
+## [1.2.0](https://github.com/omniusstudio/pms-practice-management/compare/v1.1.0...v1.2.0) (2025-08-06)
+
+
+### Features
+
+* implement mock services with comprehensive testing ([9a2696c](https://github.com/omniusstudio/pms-practice-management/commit/9a2696cef235977ebecd9011e8420e23a1c19444))
+
 ## [1.1.0](https://github.com/omniusstudio/pms-practice-management/compare/v1.0.15...v1.1.0) (2025-08-06)
 
 

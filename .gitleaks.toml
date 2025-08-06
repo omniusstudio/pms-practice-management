@@ -1,0 +1,28 @@
+# GitLeaks configuration file
+
+[extend]
+# Extend default rules
+path = "https://raw.githubusercontent.com/gitleaks/gitleaks/master/config/gitleaks.toml"
+
+# Files to ignore
+[allowlist]
+paths = [
+    "keys.txt",
+    ".env.test",
+    ".env.example", 
+    ".env.dev",
+    ".env.docker",
+    ".env.k8s",
+    "apps/backend/tests/conftest.py",
+    "apps/backend/tests/test_*.py",
+    "tests/backup/test_backup_restore.py",
+    "apps/infra/kubernetes/helm/pms/values.yaml"
+]
+
+# Specific secrets to ignore (if needed)
+regexes = [
+    # Ignore test JWT tokens
+    "JWT_SECRET_KEY=.*",
+    # Ignore test API keys in keys.txt
+    "API_KEY=.*"
+]

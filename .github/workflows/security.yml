@@ -266,8 +266,11 @@ jobs:
           wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz
           tar -xzf gitleaks_8.18.4_linux_x64.tar.gz
           chmod +x gitleaks
+          # Show .gitleaksignore content for debugging
+          echo "Contents of .gitleaksignore:"
+          cat .gitleaksignore
           # Run gitleaks on current files only, respecting .gitleaksignore
-          ./gitleaks detect --source . --report-format sarif --report-path gitleaks-results.sarif --no-git
+          ./gitleaks detect --source . --report-format sarif --report-path gitleaks-results.sarif --no-git --verbose
         env:
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 

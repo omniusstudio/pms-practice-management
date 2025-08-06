@@ -1,0 +1,29 @@
+# GitLeaks ignore file - exclude legitimate test files and examples
+
+# Configuration files with environment-specific keys
+keys.txt
+
+# Test environment files with dummy secrets
+.env.test
+.env.example
+.env.dev
+.env.docker
+.env.k8s
+
+# Test files with dummy keys/secrets
+apps/backend/tests/conftest.py
+apps/backend/tests/test_*.py
+tests/backup/test_backup_restore.py
+
+# Kubernetes example values with base64 encoded dummy secrets
+apps/infra/kubernetes/helm/pms/values.yaml
+
+# Documentation files with example keys
+docs/operations/backup-deployment-guide.md
+
+# Package lock files (contain no real secrets)
+package-lock.json
+**/package-lock.json
+
+# Any file containing "test-" or "example-" in the secret value
+# (This is handled by GitLeaks rules, but adding for clarity)

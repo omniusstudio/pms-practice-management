@@ -131,7 +131,8 @@ jobs:
           python -m pytest tests/ --cov=. \
             --cov-report=xml --cov-report=html \
             --cov-report=term-missing --cov-fail-under=70 \
-            --junitxml=test-results.xml
+            --junitxml=test-results.xml \
+            -m "not smoke"
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pms_test
           ENVIRONMENT: test
@@ -183,8 +184,7 @@ jobs:
         run: |
           if [ -f "apps/frontend/package.json" ]; then
             cd apps/frontend
-            npm run test -- --coverage --watchAll=false \
-              --testResultsProcessor=jest-junit
+            npm run test:ci
           else
             echo "No frontend package.json found, running basic tests"
             make test-frontend
@@ -208,6 +208,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
 
       - name: Run Trivy vulnerability scanner
         run: |

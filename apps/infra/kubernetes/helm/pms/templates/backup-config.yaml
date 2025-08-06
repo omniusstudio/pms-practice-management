@@ -1,0 +1,136 @@
+{{- if .Values.backup.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pms.fullname" . }}-backup-config
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup
+data:
+  s3-bucket: {{ .Values.backup.s3.bucket | quote }}
+  aws-region: {{ .Values.backup.s3.region | quote }}
+  retention-days: {{ .Values.backup.retention.days | quote }}
+  backup-schedule: {{ .Values.backup.schedule | quote }}
+  {{- if .Values.backup.monitoring.enabled }}
+  monitoring-schedule: {{ .Values.backup.monitoring.schedule | quote }}
+  alert-webhook-url: {{ .Values.backup.monitoring.alerting.webhook | quote }}
+  {{- end }}
+  {{- if .Values.backup.verification.enabled }}
+  verification-schedule: {{ .Values.backup.verification.schedule | quote }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pms.fullname" . }}-backup-scripts
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup
+data:
+  pg_backup.sh: |
+    #!/bin/bash
+    # This is a placeholder - actual script content should be mounted from external source
+    echo "Backup script placeholder - mount actual script from /scripts/backup/pg_backup.sh"
+    exit 1
+  
+  restore.sh: |
+    #!/bin/bash
+    # This is a placeholder - actual script content should be mounted from external source
+    echo "Restore script placeholder - mount actual script from /scripts/backup/restore.sh"
+    exit 1
+  
+  verify_backup.sh: |
+    #!/bin/bash
+    # This is a placeholder - actual script content should be mounted from external source
+    echo "Verify backup script placeholder - mount actual script from /scripts/backup/verify_backup.sh"
+    exit 1
+  
+  monitor_backups.sh: |
+    #!/bin/bash
+    # This is a placeholder - actual script content should be mounted from external source
+    echo "Monitor backups script placeholder - mount actual script from /scripts/backup/monitor_backups.sh"
+    exit 1
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "pms.fullname" . }}-backup-secrets
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup
+type: Opaque
+data:
+  # These values should be set during deployment
+  postgres-user: {{ .Values.postgresql.auth.username | b64enc | quote }}
+  postgres-password: {{ .Values.postgresql.auth.password | b64enc | quote }}
+  aws-access-key-id: "" # Set during deployment
+  aws-secret-access-key: "" # Set during deployment
+  gpg-key-id: "" # Set during deployment
+  gpg-private-key: "" # Set during deployment
+  gpg-public-key: "" # Set during deployment
+  {{- if .Values.backup.monitoring.alerting.slack }}
+  slack-webhook-url: {{ .Values.backup.monitoring.alerting.slack | b64enc | quote }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "pms.fullname" . }}-backup-logs
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  {{- if .Values.persistence.storageClass }}
+  storageClassName: {{ .Values.persistence.storageClass }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "pms.fullname" . }}-backup
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "pms.fullname" . }}-backup
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "pms.fullname" . }}-backup
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup
+subjects:
+- kind: ServiceAccount
+  name: {{ include "pms.fullname" . }}-backup
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ include "pms.fullname" . }}-backup
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

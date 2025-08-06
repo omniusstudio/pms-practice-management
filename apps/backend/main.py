@@ -7,14 +7,17 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
+# TrustedHostMiddleware removed - not needed for Kubernetes deployment
 
 from api.admin import router as admin_router
 from api.appointments import router as appointments_router
 from api.auth import router as auth_api_router
 from api.clients import router as clients_router
 from api.events import router as events_router
+from api.ledger import router as ledger_router
+from api.notes import router as notes_router
 from api.patients import router as patients_router
+from api.providers import router as providers_router
 from middleware.correlation import CorrelationIDMiddleware, get_correlation_id
 from middleware.metrics import PrometheusMetricsMiddleware, metrics_endpoint
 from middleware.session_middleware import add_session_middleware
@@ -28,7 +31,9 @@ from utils.logging_config import configure_structured_logging
 configure_structured_logging(
     environment=os.getenv("ENVIRONMENT", "development"),
     log_level=os.getenv("LOG_LEVEL", "INFO"),
-    enable_json_output=(os.getenv("ENVIRONMENT", "development") == "production"),
+    enable_json_output=(
+        os.getenv("ENVIRONMENT", "development") == "production"
+    ),
 )
 
 logger = structlog.get_logger()
@@ -48,12 +53,16 @@ async def lifespan(app: FastAPI):
 
     try:
         # Initialize event bus
-        event_bus = initialize_event_bus(redis_url=redis_url, environment=environment)
+        event_bus = initialize_event_bus(
+            redis_url=redis_url, environment=environment
+        )
         await event_bus.connect()
 
         # Initialize ETL pipeline
         etl_pipeline = initialize_etl_pipeline(
-            environment=environment, s3_bucket=s3_bucket, aws_region=aws_region
+            environment=environment,
+            s3_bucket=s3_bucket,
+            aws_region=aws_region,
         )
 
         # Start ETL pipeline in background
@@ -69,7 +78,10 @@ async def lifespan(app: FastAPI):
         )
 
     except Exception as e:
-        logger.error("Failed to initialize event system", extra={"error": str(e)})
+        logger.error(
+            "Failed to initialize event system",
+            extra={"error": str(e)},
+        )
         # Continue without event system for now
 
     yield
@@ -96,7 +108,9 @@ async def lifespan(app: FastAPI):
         logger.info("Event system shutdown complete")
 
     except Exception as e:
-        logger.error("Error during shutdown", extra={"error": str(e)})
+        logger.error(
+            "Error during shutdown", extra={"error": str(e)}
+        )
 
 
 # Create FastAPI app with lifespan manager
@@ -148,16 +162,15 @@ app.add_middleware(CorrelationIDMiddleware)
 # Add metrics middleware
 app.add_middleware(PrometheusMetricsMiddleware, environment=environment)
 
-# Security middleware
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.example.com", "testserver"],
-)
+# TrustedHost middleware disabled for Kubernetes internal networking
+# Kubernetes handles host validation at the ingress level
 
 # CORS middleware (configure for production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend dev server
+    allow_origins=[
+        "http://localhost:3000"
+    ],  # Frontend dev
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
@@ -169,7 +182,9 @@ async def root(request: Request):
     """Root endpoint for health check."""
     correlation_id = get_correlation_id()
     logger.info(
-        "Health check requested", correlation_id=correlation_id, endpoint="root"
+        "Health check requested",
+        correlation_id=correlation_id,
+        endpoint="root",
     )
     return {
         "message": "Mental Health PMS API",
@@ -217,9 +232,15 @@ async def readiness_check():
             await db.execute(text("SELECT 1"))
             break
 
-        return {"status": "ready", "service": "pms-backend", "database": "connected"}
+        return {
+            "status": "ready",
+            "service": "pms-backend",
+            "database": "connected",
+        }
     except Exception as e:
-        logger.error("Database connectivity check failed", error=str(e))
+        logger.error(
+            "Database connectivity check failed", error=str(e)
+        )
         return {
             "status": "not ready",
             "service": "pms-backend",
@@ -260,6 +281,9 @@ app.include_router(events_router, prefix="/api")
 app.include_router(clients_router, prefix="/api")
 app.include_router(patients_router, prefix="/api")
 app.include_router(appointments_router, prefix="/api")
+app.include_router(providers_router, prefix="/api")
+app.include_router(notes_router, prefix="/api")
+app.include_router(ledger_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(auth_api_router, prefix="/api")
 app.include_router(oidc_router, prefix="/oidc")

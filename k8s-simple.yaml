@@ -1,0 +1,149 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pms-backend
+  namespace: pms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pms-backend
+  template:
+    metadata:
+      labels:
+        app: pms-backend
+    spec:
+      containers:
+      - name: backend
+        image: pms-backend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://postgres:password@postgres:5432/pms"
+        - name: REDIS_URL
+          value: "redis://redis:6379"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pms-backend
+  namespace: pms
+spec:
+  selector:
+    app: pms-backend
+  ports:
+  - port: 8000
+    targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pms-frontend
+  namespace: pms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pms-frontend
+  template:
+    metadata:
+      labels:
+        app: pms-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: pms-frontend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        env:
+        - name: BACKEND_URL
+          value: "http://pms-backend:8000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pms-frontend
+  namespace: pms
+spec:
+  type: LoadBalancer
+  selector:
+    app: pms-frontend
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: pms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "pms"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "password"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: pms
+spec:
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: pms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:6
+        ports:
+        - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: pms
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379

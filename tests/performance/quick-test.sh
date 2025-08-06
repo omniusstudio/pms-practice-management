@@ -16,7 +16,8 @@ node -e "require('./performance-budgets.json')" 2>/dev/null && echo "   ✅ perf
 
 # Test 3: Backend Health
 echo "3. Backend Status:"
-curl -s http://localhost:8000/healthz > /dev/null 2>&1 && echo "   ✅ Backend responding" || echo "   ⚠️  Backend not responding"
+BACKEND_URL=${API_BASE_URL:-http://localhost:8000}
+curl -s "$BACKEND_URL/healthz" > /dev/null 2>&1 && echo "   ✅ Backend responding" || echo "   ⚠️  Backend not responding"
 
 # Test 4: Dependencies
 echo "4. Dependencies:"

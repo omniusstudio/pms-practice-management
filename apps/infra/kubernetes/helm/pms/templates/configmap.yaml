@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pms-local-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: config
+data:
+{{- if .Values.configMap.data }}
+{{- range $key, $value := .Values.configMap.data }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}
+{{- else }}
+  # Default configuration
+  AUTH0_DOMAIN: "your-tenant.auth0.com"
+  AUTH0_AUDIENCE: "https://pms-api"
+  AUTH0_ISSUER: "https://your-tenant.auth0.com/"
+  API_V1_STR: "/api/v1"
+  PROJECT_NAME: "Mental Health PMS"
+  BACKEND_CORS_ORIGINS: '["http://localhost:3000", "https://pms.example.com"]'
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+  DEBUG: "false"
+  DATABASE_HOST: "postgresql"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "pms_db"
+  REDIS_HOST: "redis-master"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  AWS_REGION: "us-west-2"
+  AWS_S3_BUCKET: "pms-documents"
+  ENVIRONMENT: "local"
+  VITE_API_BASE_URL: "http://localhost:8081/api"
+{{- end }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pms-local-secrets
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: secrets
+type: Opaque
+data:
+  DATABASE_USER: "cG1zX3VzZXI="
+  DATABASE_PASSWORD: "cGFzc3dvcmQ="
+  REDIS_PASSWORD: "cmVkaXNwYXNz"
+  SECRET_KEY: "c3VwZXJzZWNyZXRrZXk="
+  ALGORITHM: "SFMyNTY="
+  ACCESS_TOKEN_EXPIRE_MINUTES: "MzA="
+  AWS_ACCESS_KEY_ID: "QUtJQUlPU0ZPRE5ON0VYQU1QTEU="
+  AWS_SECRET_ACCESS_KEY: "d0phbHJYVXRuRkVNSS9LN01ERU5HL2JQeFJmaUNZRVhBTVBMRUtFWQ=="
+  AUTH0_CLIENT_ID: "eW91cl9jbGllbnRfaWQ="
+  AUTH0_CLIENT_SECRET: "eW91cl9jbGllbnRfc2VjcmV0"
+  OIDC_CLIENT_ID: "b2lkY19jbGllbnRfaWQ="
+  OIDC_CLIENT_SECRET: "b2lkY19jbGllbnRfc2VjcmV0"
+  OIDC_DISCOVERY_URL: "aHR0cHM6Ly95b3VyLXRlbmFudC5hdXRoMC5jb20vLndlbGwta25vd24vb3BlbmlkX2NvbmZpZ3VyYXRpb24="

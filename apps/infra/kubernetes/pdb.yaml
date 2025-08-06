@@ -1,0 +1,25 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pms-backend-pdb
+  namespace: pms
+  labels:
+    app: pms-backend
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: pms-backend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pms-frontend-pdb
+  namespace: pms
+  labels:
+    app: pms-frontend
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: pms-frontend

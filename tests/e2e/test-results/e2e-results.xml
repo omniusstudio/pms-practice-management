@@ -1,6 +1,6 @@
-<testsuites id="" name="" tests="30" failures="30" skipped="0" errors="0" time="157.906305">
-<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="chromium" tests="6" failures="6" skipped="0" time="158.787" errors="0">
-<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.815">
+<testsuites id="" name="" tests="30" failures="30" skipped="0" errors="0" time="158.820233">
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="chromium" tests="6" failures="6" skipped="0" time="158.785" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.672">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
 <![CDATA[  [chromium] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
 
@@ -44,7 +44,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.577">
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.574">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
 <![CDATA[  [chromium] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
 
@@ -59,7 +59,7 @@
       18 |     // Try to submit empty form
     > 19 |     await page.click('button[type="submit"]');
          |                ^
-      20 |     
+      20 |
       21 |     // Check for validation messages
       22 |     await expect(page.locator('text=Email is required')).toBeVisible();
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
@@ -85,7 +85,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.61">
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.67">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
 <![CDATA[  [chromium] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
 
@@ -102,7 +102,7 @@
          |                ^
       29 |     await page.fill('input[type="password"]', 'wrongpassword');
       30 |     await page.click('button[type="submit"]');
-      31 |     
+      31 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -126,7 +126,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.609">
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.604">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
 <![CDATA[  [chromium] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
 
@@ -143,7 +143,7 @@
          |                ^
       43 |     await page.fill('input[type="password"]', 'testpassword123');
       44 |     await page.click('button[type="submit"]');
-      45 |     
+      45 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -167,7 +167,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.602">
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.656">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
 <![CDATA[  [chromium] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
 
@@ -184,7 +184,7 @@
          |                ^
       54 |     await page.fill('input[type="password"]', 'testpassword123');
       55 |     await page.click('button[type="submit"]');
-      56 |     
+      56 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -208,7 +208,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.574">
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.609">
 <failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
 <![CDATA[  [chromium] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully ───
 
@@ -225,7 +225,7 @@
          |                ^
       77 |     await page.fill('input[type="password"]', 'testpassword123');
       78 |     await page.click('button[type="submit"]');
-      79 |     
+      79 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -250,8 +250,8 @@
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="firefox" tests="6" failures="6" skipped="0" time="155.972" errors="0">
-<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.607">
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="firefox" tests="6" failures="6" skipped="0" time="156.092" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.674">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
 <![CDATA[  [firefox] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
 
@@ -295,7 +295,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.093">
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.087">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
 <![CDATA[  [firefox] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
 
@@ -310,7 +310,7 @@
       18 |     // Try to submit empty form
     > 19 |     await page.click('button[type="submit"]');
          |                ^
-      20 |     
+      20 |
       21 |     // Check for validation messages
       22 |     await expect(page.locator('text=Email is required')).toBeVisible();
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
@@ -336,7 +336,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.059">
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.079">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
 <![CDATA[  [firefox] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
 
@@ -353,7 +353,7 @@
          |                ^
       29 |     await page.fill('input[type="password"]', 'wrongpassword');
       30 |     await page.click('button[type="submit"]');
-      31 |     
+      31 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -377,7 +377,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.084">
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.106">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
 <![CDATA[  [firefox] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
 
@@ -394,7 +394,7 @@
          |                ^
       43 |     await page.fill('input[type="password"]', 'testpassword123');
       44 |     await page.click('button[type="submit"]');
-      45 |     
+      45 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -418,7 +418,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.069">
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.08">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
 <![CDATA[  [firefox] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
 
@@ -435,7 +435,7 @@
          |                ^
       54 |     await page.fill('input[type="password"]', 'testpassword123');
       55 |     await page.click('button[type="submit"]');
-      56 |     
+      56 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -459,7 +459,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.06">
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.066">
 <failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
 <![CDATA[  [firefox] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully ────
 
@@ -476,7 +476,7 @@
          |                ^
       77 |     await page.fill('input[type="password"]', 'testpassword123');
       78 |     await page.click('button[type="submit"]');
-      79 |     
+      79 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -501,8 +501,8 @@
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="webkit" tests="6" failures="6" skipped="0" time="156.097" errors="0">
-<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.807">
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="webkit" tests="6" failures="6" skipped="0" time="156.166" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.859">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
 <![CDATA[  [webkit] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
 
@@ -546,7 +546,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.055">
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.07">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
 <![CDATA[  [webkit] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
 
@@ -561,7 +561,7 @@
       18 |     // Try to submit empty form
     > 19 |     await page.click('button[type="submit"]');
          |                ^
-      20 |     
+      20 |
       21 |     // Check for validation messages
       22 |     await expect(page.locator('text=Email is required')).toBeVisible();
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
@@ -587,7 +587,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.061">
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.062">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
 <![CDATA[  [webkit] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
 
@@ -604,7 +604,7 @@
          |                ^
       29 |     await page.fill('input[type="password"]', 'wrongpassword');
       30 |     await page.click('button[type="submit"]');
-      31 |     
+      31 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -628,7 +628,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.057">
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.059">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
 <![CDATA[  [webkit] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
 
@@ -645,7 +645,7 @@
          |                ^
       43 |     await page.fill('input[type="password"]', 'testpassword123');
       44 |     await page.click('button[type="submit"]');
-      45 |     
+      45 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -669,7 +669,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.06">
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.054">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
 <![CDATA[  [webkit] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
 
@@ -686,7 +686,7 @@
          |                ^
       54 |     await page.fill('input[type="password"]', 'testpassword123');
       55 |     await page.click('button[type="submit"]');
-      56 |     
+      56 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -710,7 +710,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.057">
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.062">
 <failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
 <![CDATA[  [webkit] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully ─────
 
@@ -727,7 +727,7 @@
          |                ^
       77 |     await page.fill('input[type="password"]', 'testpassword123');
       78 |     await page.click('button[type="submit"]');
-      79 |     
+      79 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -752,8 +752,8 @@
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="Mobile Chrome" tests="6" failures="6" skipped="0" time="158.003" errors="0">
-<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.381">
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="Mobile Chrome" tests="6" failures="6" skipped="0" time="158.168" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.404">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
 <![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
 
@@ -797,7 +797,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.516">
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.577">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
 <![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
 
@@ -812,7 +812,7 @@
       18 |     // Try to submit empty form
     > 19 |     await page.click('button[type="submit"]');
          |                ^
-      20 |     
+      20 |
       21 |     // Check for validation messages
       22 |     await expect(page.locator('text=Email is required')).toBeVisible();
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
@@ -838,7 +838,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.539">
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.549">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
 <![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
 
@@ -855,7 +855,7 @@
          |                ^
       29 |     await page.fill('input[type="password"]', 'wrongpassword');
       30 |     await page.click('button[type="submit"]');
-      31 |     
+      31 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -879,7 +879,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.539">
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.538">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
 <![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
 
@@ -896,7 +896,7 @@
          |                ^
       43 |     await page.fill('input[type="password"]', 'testpassword123');
       44 |     await page.click('button[type="submit"]');
-      45 |     
+      45 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -920,7 +920,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.515">
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.555">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
 <![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
 
@@ -937,7 +937,7 @@
          |                ^
       54 |     await page.fill('input[type="password"]', 'testpassword123');
       55 |     await page.click('button[type="submit"]');
-      56 |     
+      56 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -961,7 +961,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.513">
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.545">
 <failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
 <![CDATA[  [Mobile Chrome] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully 
 
@@ -978,7 +978,7 @@
          |                ^
       77 |     await page.fill('input[type="password"]', 'testpassword123');
       78 |     await page.click('button[type="submit"]');
-      79 |     
+      79 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -1003,8 +1003,8 @@
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-05T04:03:55.734Z" hostname="Mobile Safari" tests="6" failures="6" skipped="0" time="155.613" errors="0">
-<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.329">
+<testsuite name="auth-workflow.spec.ts" timestamp="2025-08-06T02:21:22.932Z" hostname="Mobile Safari" tests="6" failures="6" skipped="0" time="155.611" errors="0">
+<testcase name="Authentication Workflow › should display login page for unauthenticated users" classname="auth-workflow.spec.ts" time="5.323">
 <failure message="auth-workflow.spec.ts:9:7 should display login page for unauthenticated users" type="FAILURE">
 <![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:9:7 › Authentication Workflow › should display login page for unauthenticated users 
 
@@ -1048,7 +1048,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.066">
+<testcase name="Authentication Workflow › should show validation errors for invalid login" classname="auth-workflow.spec.ts" time="30.061">
 <failure message="auth-workflow.spec.ts:17:7 should show validation errors for invalid login" type="FAILURE">
 <![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:17:7 › Authentication Workflow › should show validation errors for invalid login 
 
@@ -1063,7 +1063,7 @@
       18 |     // Try to submit empty form
     > 19 |     await page.click('button[type="submit"]');
          |                ^
-      20 |     
+      20 |
       21 |     // Check for validation messages
       22 |     await expect(page.locator('text=Email is required')).toBeVisible();
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16
@@ -1089,7 +1089,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.055">
+<testcase name="Authentication Workflow › should show error for invalid credentials" classname="auth-workflow.spec.ts" time="30.058">
 <failure message="auth-workflow.spec.ts:26:7 should show error for invalid credentials" type="FAILURE">
 <![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:26:7 › Authentication Workflow › should show error for invalid credentials 
 
@@ -1106,7 +1106,7 @@
          |                ^
       29 |     await page.fill('input[type="password"]', 'wrongpassword');
       30 |     await page.click('button[type="submit"]');
-      31 |     
+      31 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -1130,7 +1130,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.055">
+<testcase name="Authentication Workflow › should successfully login with valid credentials" classname="auth-workflow.spec.ts" time="30.056">
 <failure message="auth-workflow.spec.ts:40:7 should successfully login with valid credentials" type="FAILURE">
 <![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:40:7 › Authentication Workflow › should successfully login with valid credentials 
 
@@ -1147,7 +1147,7 @@
          |                ^
       43 |     await page.fill('input[type="password"]', 'testpassword123');
       44 |     await page.click('button[type="submit"]');
-      45 |     
+      45 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -1171,7 +1171,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.05">
+<testcase name="Authentication Workflow › should handle session timeout gracefully" classname="auth-workflow.spec.ts" time="30.045">
 <failure message="auth-workflow.spec.ts:51:7 should handle session timeout gracefully" type="FAILURE">
 <![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:51:7 › Authentication Workflow › should handle session timeout gracefully 
 
@@ -1188,7 +1188,7 @@
          |                ^
       54 |     await page.fill('input[type="password"]', 'testpassword123');
       55 |     await page.click('button[type="submit"]');
-      56 |     
+      56 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
@@ -1212,7 +1212,7 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.058">
+<testcase name="Authentication Workflow › should logout successfully" classname="auth-workflow.spec.ts" time="30.068">
 <failure message="auth-workflow.spec.ts:74:7 should logout successfully" type="FAILURE">
 <![CDATA[  [Mobile Safari] › auth-workflow.spec.ts:74:7 › Authentication Workflow › should logout successfully 
 
@@ -1229,7 +1229,7 @@
          |                ^
       77 |     await page.fill('input[type="password"]', 'testpassword123');
       78 |     await page.click('button[type="submit"]');
-      79 |     
+      79 |
         at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────

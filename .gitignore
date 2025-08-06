@@ -206,6 +206,16 @@ apps/frontend/public/uploads/
 static/uploads/
 media/
 
+# Generated reports and test artifacts
+test_pyramid_report.json
+test_integration.db
+eslint-report.json
+**/eslint-report.json
+
+# Performance test artifacts
+tests/performance/reports/
+tests/performance/node_modules/
+
 # Monitoring and observability
 *.trace
 *.prof

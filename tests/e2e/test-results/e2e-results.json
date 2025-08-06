@@ -161,7 +161,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 5815,
+                      "duration": 5672,
                       "error": {
                         "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n",
                         "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\n    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38",
@@ -185,7 +185,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:03:56.539Z",
+                      "startTime": "2025-08-06T02:21:23.863Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -235,7 +235,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 30577,
+                      "duration": 30574,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -250,13 +250,13 @@
                             "column": 16,
                             "line": 19
                           },
-                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
+                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m\n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:03:56.551Z",
+                      "startTime": "2025-08-06T02:21:23.891Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -301,7 +301,7 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 30610,
+                      "duration": 30670,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -316,13 +316,13 @@
                             "column": 16,
                             "line": 28
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:03:56.545Z",
+                      "startTime": "2025-08-06T02:21:23.848Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -367,7 +367,7 @@
                       "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "timedOut",
-                      "duration": 30609,
+                      "duration": 30604,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -382,13 +382,13 @@
                             "column": 16,
                             "line": 42
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:03:56.561Z",
+                      "startTime": "2025-08-06T02:21:23.853Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -433,7 +433,7 @@
                       "workerIndex": 4,
                       "parallelIndex": 4,
                       "status": "timedOut",
-                      "duration": 30602,
+                      "duration": 30656,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -448,13 +448,13 @@
                             "column": 16,
                             "line": 53
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:03:56.552Z",
+                      "startTime": "2025-08-06T02:21:23.874Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -499,7 +499,7 @@
                       "workerIndex": 5,
                       "parallelIndex": 5,
                       "status": "timedOut",
-                      "duration": 30574,
+                      "duration": 30609,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -514,13 +514,13 @@
                             "column": 16,
                             "line": 76
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:03:56.560Z",
+                      "startTime": "2025-08-06T02:21:23.827Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -565,7 +565,7 @@
                       "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 5607,
+                      "duration": 5674,
                       "error": {
                         "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n",
                         "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\n    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38",
@@ -589,7 +589,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:04:04.515Z",
+                      "startTime": "2025-08-06T02:21:30.611Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -639,7 +639,7 @@
                       "workerIndex": 7,
                       "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 30093,
+                      "duration": 30087,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -654,13 +654,13 @@
                             "column": 16,
                             "line": 19
                           },
-                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
+                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m\n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:04:13.263Z",
+                      "startTime": "2025-08-06T02:21:38.127Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -705,7 +705,7 @@
                       "workerIndex": 8,
                       "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 30059,
+                      "duration": 30079,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -720,13 +720,13 @@
                             "column": 16,
                             "line": 28
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:04:29.416Z",
+                      "startTime": "2025-08-06T02:21:55.717Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -768,10 +768,10 @@
                   "projectName": "firefox",
                   "results": [
                     {
-                      "workerIndex": 9,
-                      "parallelIndex": 5,
+                      "workerIndex": 10,
+                      "parallelIndex": 3,
                       "status": "timedOut",
-                      "duration": 30084,
+                      "duration": 30106,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -786,13 +786,13 @@
                             "column": 16,
                             "line": 42
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:04:29.414Z",
+                      "startTime": "2025-08-06T02:21:55.723Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -834,10 +834,10 @@
                   "projectName": "firefox",
                   "results": [
                     {
-                      "workerIndex": 10,
-                      "parallelIndex": 4,
+                      "workerIndex": 9,
+                      "parallelIndex": 5,
                       "status": "timedOut",
-                      "duration": 30069,
+                      "duration": 30080,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -852,13 +852,13 @@
                             "column": 16,
                             "line": 53
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:04:29.426Z",
+                      "startTime": "2025-08-06T02:21:55.721Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -901,9 +901,9 @@
                   "results": [
                     {
                       "workerIndex": 11,
-                      "parallelIndex": 3,
+                      "parallelIndex": 4,
                       "status": "timedOut",
-                      "duration": 30060,
+                      "duration": 30066,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -918,13 +918,13 @@
                             "column": 16,
                             "line": 76
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:04:29.448Z",
+                      "startTime": "2025-08-06T02:21:55.736Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -969,7 +969,7 @@
                       "workerIndex": 12,
                       "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 5807,
+                      "duration": 5859,
                       "error": {
                         "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n",
                         "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\n    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38",
@@ -993,7 +993,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:04:29.449Z",
+                      "startTime": "2025-08-06T02:21:55.730Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1043,7 +1043,7 @@
                       "workerIndex": 13,
                       "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 30055,
+                      "duration": 30070,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1058,13 +1058,13 @@
                             "column": 16,
                             "line": 19
                           },
-                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
+                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m\n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:04:39.433Z",
+                      "startTime": "2025-08-06T02:22:02.968Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1109,7 +1109,7 @@
                       "workerIndex": 14,
                       "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 30061,
+                      "duration": 30062,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1124,13 +1124,13 @@
                             "column": 16,
                             "line": 28
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:04:44.674Z",
+                      "startTime": "2025-08-06T02:22:09.562Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1173,9 +1173,9 @@
                   "results": [
                     {
                       "workerIndex": 15,
-                      "parallelIndex": 4,
+                      "parallelIndex": 5,
                       "status": "timedOut",
-                      "duration": 30057,
+                      "duration": 30059,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1190,13 +1190,13 @@
                             "column": 16,
                             "line": 42
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:00.875Z",
+                      "startTime": "2025-08-06T02:22:27.319Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1241,7 +1241,7 @@
                       "workerIndex": 16,
                       "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 30060,
+                      "duration": 30054,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1256,13 +1256,13 @@
                             "column": 16,
                             "line": 53
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:01.308Z",
+                      "startTime": "2025-08-06T02:22:27.658Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1305,9 +1305,9 @@
                   "results": [
                     {
                       "workerIndex": 17,
-                      "parallelIndex": 3,
+                      "parallelIndex": 4,
                       "status": "timedOut",
-                      "duration": 30057,
+                      "duration": 30062,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1322,13 +1322,13 @@
                             "column": 16,
                             "line": 76
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:01.757Z",
+                      "startTime": "2025-08-06T02:22:28.169Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1371,9 +1371,9 @@
                   "results": [
                     {
                       "workerIndex": 18,
-                      "parallelIndex": 5,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 5381,
+                      "duration": 5404,
                       "error": {
                         "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n",
                         "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\n    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38",
@@ -1397,7 +1397,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:02.193Z",
+                      "startTime": "2025-08-06T02:22:28.710Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1445,9 +1445,9 @@
                   "results": [
                     {
                       "workerIndex": 19,
-                      "parallelIndex": 5,
+                      "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 30516,
+                      "duration": 30577,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1462,13 +1462,13 @@
                             "column": 16,
                             "line": 19
                           },
-                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
+                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m\n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:08.417Z",
+                      "startTime": "2025-08-06T02:22:33.888Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1511,9 +1511,9 @@
                   "results": [
                     {
                       "workerIndex": 20,
-                      "parallelIndex": 2,
+                      "parallelIndex": 3,
                       "status": "timedOut",
-                      "duration": 30539,
+                      "duration": 30549,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1528,13 +1528,13 @@
                             "column": 16,
                             "line": 28
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:10.348Z",
+                      "startTime": "2025-08-06T02:22:34.958Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1579,7 +1579,7 @@
                       "workerIndex": 21,
                       "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 30539,
+                      "duration": 30538,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1594,13 +1594,13 @@
                             "column": 16,
                             "line": 42
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:15.558Z",
+                      "startTime": "2025-08-06T02:22:40.456Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1643,9 +1643,9 @@
                   "results": [
                     {
                       "workerIndex": 22,
-                      "parallelIndex": 4,
+                      "parallelIndex": 5,
                       "status": "timedOut",
-                      "duration": 30515,
+                      "duration": 30555,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1660,13 +1660,13 @@
                             "column": 16,
                             "line": 53
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:31.779Z",
+                      "startTime": "2025-08-06T02:22:58.276Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1711,7 +1711,7 @@
                       "workerIndex": 23,
                       "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 30513,
+                      "duration": 30545,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1726,13 +1726,13 @@
                             "column": 16,
                             "line": 76
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:32.223Z",
+                      "startTime": "2025-08-06T02:22:58.585Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1775,9 +1775,9 @@
                   "results": [
                     {
                       "workerIndex": 24,
-                      "parallelIndex": 3,
+                      "parallelIndex": 4,
                       "status": "failed",
-                      "duration": 5329,
+                      "duration": 5323,
                       "error": {
                         "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n",
                         "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign In\"\u001b[39m\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\n    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:11:38",
@@ -1801,7 +1801,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:32.642Z",
+                      "startTime": "2025-08-06T02:22:59.056Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1849,9 +1849,9 @@
                   "results": [
                     {
                       "workerIndex": 25,
-                      "parallelIndex": 3,
+                      "parallelIndex": 4,
                       "status": "timedOut",
-                      "duration": 30066,
+                      "duration": 30061,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1866,13 +1866,13 @@
                             "column": 16,
                             "line": 19
                           },
-                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
+                          "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m   test(\u001b[32m'should show validation errors for invalid login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Try to submit empty form\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m\n \u001b[90m 21 |\u001b[39m     \u001b[90m// Check for validation messages\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Email is required'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:19:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:38.781Z",
+                      "startTime": "2025-08-06T02:23:05.202Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1915,9 +1915,9 @@
                   "results": [
                     {
                       "workerIndex": 26,
-                      "parallelIndex": 5,
+                      "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 30055,
+                      "duration": 30058,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1932,13 +1932,13 @@
                             "column": 16,
                             "line": 28
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 26 |\u001b[39m   test(\u001b[32m'should show error for invalid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 27 |\u001b[39m     \u001b[90m// Fill in invalid credentials\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'invalid@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'wrongpassword'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:28:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:39.663Z",
+                      "startTime": "2025-08-06T02:23:05.248Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1981,9 +1981,9 @@
                   "results": [
                     {
                       "workerIndex": 27,
-                      "parallelIndex": 2,
+                      "parallelIndex": 3,
                       "status": "timedOut",
-                      "duration": 30055,
+                      "duration": 30056,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1998,13 +1998,13 @@
                             "column": 16,
                             "line": 42
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   test(\u001b[32m'should successfully login with valid credentials'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 41 |\u001b[39m     \u001b[90m// Use test credentials (these should be configured in test environment)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:42:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:41.594Z",
+                      "startTime": "2025-08-06T02:23:06.286Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2049,7 +2049,7 @@
                       "workerIndex": 28,
                       "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 30050,
+                      "duration": 30045,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2064,13 +2064,13 @@
                             "column": 16,
                             "line": 53
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   test(\u001b[32m'should handle session timeout gracefully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 52 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:53:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:05:46.811Z",
+                      "startTime": "2025-08-06T02:23:11.717Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2113,9 +2113,9 @@
                   "results": [
                     {
                       "workerIndex": 29,
-                      "parallelIndex": 4,
+                      "parallelIndex": 5,
                       "status": "timedOut",
-                      "duration": 30058,
+                      "duration": 30068,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2130,13 +2130,13 @@
                             "column": 16,
                             "line": 76
                           },
-                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m     \u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
+                          "message": "Error: page.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"email\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 74 |\u001b[39m   test(\u001b[32m'should logout successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 75 |\u001b[39m     \u001b[90m// Login first\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 76 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'test@example.com'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 77 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[type=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'testpassword123'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 79 |\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/external storage /PMS/tests/e2e/specs/auth-workflow.spec.ts:76:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-05T04:06:03.078Z",
+                      "startTime": "2025-08-06T02:23:29.624Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2172,8 +2172,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-08-05T04:03:55.469Z",
-    "duration": 157906.305,
+    "startTime": "2025-08-06T02:21:21.131Z",
+    "duration": 158820.233,
     "expected": 0,
     "skipped": 0,
     "unexpected": 30,

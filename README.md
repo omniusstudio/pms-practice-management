@@ -15,7 +15,7 @@ This is a mono-repository containing multiple applications and packages:
 │   ├── shared-types/       # TypeScript type definitions
 │   ├── shared-utils/       # Common utilities
 │   └── shared-config/      # Shared configuration
-├── docs/                   # Documentation
+├── docs/                   # Comprehensive documentation (see [Documentation Index](docs/README.md))
 ├── scripts/                # Build and deployment scripts
 └── tools/                  # Development tools
 ```
@@ -26,6 +26,25 @@ This is a mono-repository containing multiple applications and packages:
 - Python 3.11 or higher
 - Docker and Docker Compose
 - Make
+
+For detailed setup instructions, see [SETUP.md](docs/SETUP.md).
+
+## Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+- **[Documentation Index](docs/README.md)** - Complete guide to all documentation
+- **[Setup Guide](docs/SETUP.md)** - Detailed installation and configuration
+- **[Local Development](docs/local-dev-workflow.md)** - Development workflow and best practices
+- **[Testing Guide](docs/testing-guide.md)** - Testing strategies and implementation
+- **[CI/CD Pipeline](docs/ci-pipeline.md)** - Continuous integration and deployment
+
+For specific topics, see the organized documentation in:
+- `docs/implementation/` - Implementation guides and phase documentation
+- `docs/technical/` - Technical specifications and architecture
+- `docs/project/` - Project management and enhancement tracking
+- `docs/maintenance/` - Repository maintenance and housekeeping
+- `docs/troubleshooting/` - Common issues and solutions
 
 ## Local Development Setup
 

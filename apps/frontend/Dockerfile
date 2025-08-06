@@ -32,6 +32,9 @@ RUN apk add --no-cache curl
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
+# Remove default nginx configuration to avoid conflicts
+RUN rm -f /etc/nginx/conf.d/default.conf
+
 # Copy built application from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 

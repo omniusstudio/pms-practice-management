@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pms-config
+  namespace: pms
+  labels:
+    app: pms
+data:
+  # Auth0 Configuration
+  auth0-domain: "${AUTH0_DOMAIN}"
+  auth0-client-id: "${AUTH0_CLIENT_ID}"
+  
+  # API Configuration
+  api-base-url: "${API_BASE_URL}"
+  
+  # CORS Configuration
+  cors-origins: "${CORS_ORIGINS}"
+  
+  # Logging Configuration
+  log-level: "${LOG_LEVEL}"
+  
+  # Application Configuration
+  debug: "${DEBUG}"
+  
+  # Database Configuration (non-sensitive)
+  db-host: "${DB_HOST}"
+  db-port: "${DB_PORT}"
+  db-name: "${DB_NAME}"
+  db-user: "${DB_USER}"
+  
+  # Redis Configuration (non-sensitive)
+  redis-host: "${REDIS_HOST}"
+  redis-port: "${REDIS_PORT}"
+  
+  # AWS Configuration (non-sensitive)
+  aws-region: "${AWS_REGION}"
+  aws-s3-bucket: "${AWS_S3_BUCKET}"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pms-secrets
+  namespace: pms
+  labels:
+    app: pms
+type: Opaque
+data:
+  # Database credentials (base64 encoded)
+  database-url: "${DATABASE_URL_B64}"
+  db-password: "${DB_PASSWORD_B64}"
+  
+  # Redis credentials (base64 encoded)
+  redis-url: "${REDIS_URL_B64}"
+  redis-password: "${REDIS_PASSWORD_B64}"
+  
+  # Application secrets (base64 encoded)
+  secret-key: "${SECRET_KEY_B64}"
+  jwt-secret-key: "${JWT_SECRET_KEY_B64}"
+  session-secret-key: "${SESSION_SECRET_KEY_B64}"
+  
+  # AWS credentials (base64 encoded)
+  aws-access-key-id: "${AWS_ACCESS_KEY_ID_B64}"
+  aws-secret-access-key: "${AWS_SECRET_ACCESS_KEY_B64}"
+  
+  # Auth0 secrets (base64 encoded)
+  auth0-client-secret: "${AUTH0_CLIENT_SECRET_B64}"
+  
+  # OIDC secrets (base64 encoded)
+  oidc-google-client-secret: "${OIDC_GOOGLE_CLIENT_SECRET_B64}"
+  oidc-microsoft-client-secret: "${OIDC_MICROSOFT_CLIENT_SECRET_B64}"

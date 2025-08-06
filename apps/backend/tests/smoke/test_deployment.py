@@ -6,6 +6,11 @@ import pytest
 import requests  # type: ignore[import]
 
 
+def get_api_base_url() -> str:
+    """Get the API base URL from environment or use default."""
+    return os.getenv("API_BASE_URL", "http://localhost:8000")
+
+
 class TestDeploymentSmoke:
     """Smoke tests to validate deployment health."""
 
@@ -27,6 +32,7 @@ class TestDeploymentSmoke:
     @pytest.mark.critical
     def test_health_endpoint(self, base_url: str):
         """Test health endpoint returns expected structure."""
+        base_url = get_api_base_url()
         response = requests.get(f"{base_url}/healthz", timeout=5)
         assert response.status_code == 200
 
@@ -53,11 +59,13 @@ class TestDeploymentSmoke:
     def test_api_documentation_accessible(self, base_url: str):
         """Test that API documentation is accessible."""
         # Test OpenAPI docs
+        base_url = get_api_base_url()
         response = requests.get(f"{base_url}/api/docs", timeout=5)
         assert response.status_code == 200
         assert "text/html" in response.headers.get("content-type", "")
 
         # Test OpenAPI JSON
+        base_url = get_api_base_url()
         response = requests.get(f"{base_url}/openapi.json", timeout=5)
         assert response.status_code == 200
         assert "application/json" in response.headers.get("content-type", "")

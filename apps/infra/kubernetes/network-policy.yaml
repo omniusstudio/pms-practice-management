@@ -1,0 +1,131 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pms-backend-network-policy
+  namespace: pms
+  labels:
+    app: pms-backend
+spec:
+  podSelector:
+    matchLabels:
+      app: pms-backend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow traffic from frontend
+  - from:
+    - podSelector:
+        matchLabels:
+          app: pms-frontend
+    ports:
+    - protocol: TCP
+      port: 8000
+  # Allow traffic from ingress controller
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8000
+  # Allow health checks from kube-system
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 8000
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Allow database connections
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Allow Redis connections
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 6379
+  # Allow HTTPS for external APIs (Auth0, etc.)
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+  # Allow HTTP for health checks and metrics
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pms-frontend-network-policy
+  namespace: pms
+  labels:
+    app: pms-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app: pms-frontend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow traffic from ingress controller
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 80
+  # Allow health checks from kube-system
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 80
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Allow connections to backend
+  - to:
+    - podSelector:
+        matchLabels:
+          app: pms-backend
+    ports:
+    - protocol: TCP
+      port: 8000
+  # Allow HTTPS for CDNs and external resources
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-default
+  namespace: pms
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress

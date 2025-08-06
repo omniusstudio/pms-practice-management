@@ -123,7 +123,8 @@ main() {
     log_info "Testing baseline system with working endpoint..."
 
     # Check if backend is running
-    if curl -s http://localhost:8000/healthz > /dev/null 2>&1; then
+    BACKEND_URL=${API_BASE_URL:-http://localhost:8000}
+if curl -s "$BACKEND_URL/healthz" > /dev/null 2>&1; then
         log_success "Backend server is running"
         run_test "Baseline test execution" "node baseline-test.js simple-test.yml" "success"
 
@@ -154,7 +155,7 @@ main() {
 
     # Test 7: Error Detection
     log_header "7. Error Detection Validation"
-    if curl -s http://localhost:8000/healthz > /dev/null 2>&1; then
+    if curl -s "$BACKEND_URL/healthz" > /dev/null 2>&1; then
         log_info "Testing error detection with problematic endpoint..."
         # This should detect 405 errors from the login endpoint
         run_test "Error detection system" "node baseline-test.js artillery.yml" "success"

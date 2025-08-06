@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pms-backend
+  namespace: pms
+  labels:
+    app: pms-backend
+    component: api
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: pms-backend
+  template:
+    metadata:
+      labels:
+        app: pms-backend
+        component: api
+        version: v1
+    spec:
+      containers:
+      - name: backend
+        #image: ${ECR_REGISTRY}/pms-backend:${VERSION}
+        image: pms-backend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: ENVIRONMENT
+          value: "${ENVIRONMENT}"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: pms-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: pms-secrets
+              key: redis-url
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pms-secrets
+              key: secret-key
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pms-secrets
+              key: jwt-secret-key
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: pms-secrets
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pms-secrets
+              key: aws-secret-access-key
+        - name: AUTH0_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: pms-config
+              key: auth0-domain
+        - name: AUTH0_CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: pms-config
+              key: auth0-client-id
+        - name: AUTH0_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: pms-secrets
+              key: auth0-client-secret
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+      securityContext:
+        fsGroup: 1000
+      serviceAccountName: pms-backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pms-backend-service
+  namespace: pms
+  labels:
+    app: pms-backend
+spec:
+  selector:
+    app: pms-backend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  type: ClusterIP

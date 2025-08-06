@@ -1,0 +1,367 @@
+# Default values for PMS
+# This is a YAML-formatted file.
+
+# Global settings
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# Application settings
+app:
+  name: pms
+  version: "1.0.0"
+  environment: staging
+  domain: pms.example.com
+  apiDomain: api.pms.example.com
+
+# Backend configuration
+backend:
+  enabled: true
+  name: pms-backend
+  image:
+    registry: "10.96.234.11:5000"
+    repository: pms-backend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 3
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Frontend configuration
+frontend:
+  enabled: true
+  name: pms-frontend
+  image:
+    registry: "10.96.234.11:5000"
+    repository: pms-frontend
+    tag: "local-test"
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 2
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'self';" always;
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  
+  hosts:
+    - host: pms.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: pms-frontend-service
+            port: 80
+    - host: api.pms.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: pms-backend-service
+            port: 80
+  
+  tls:
+    - secretName: pms-tls-secret
+      hosts:
+        - pms.example.com
+        - api.pms.example.com
+
+# ConfigMap configuration
+configMap:
+  data:
+    # Auth0 Configuration
+    AUTH0_DOMAIN: "your-tenant.auth0.com"
+    AUTH0_AUDIENCE: "https://pms-api"
+    AUTH0_ISSUER: "https://your-tenant.auth0.com/"
+    
+    # API Configuration
+    API_V1_STR: "/api/v1"
+    PROJECT_NAME: "Mental Health PMS"
+    
+    # CORS Configuration
+    BACKEND_CORS_ORIGINS: '["http://localhost:3000", "https://pms.example.com"]'
+    
+    # Logging Configuration
+    LOG_LEVEL: "INFO"
+    LOG_FORMAT: "json"
+    
+    # Debug Configuration
+    DEBUG: "false"
+    
+    # Database Configuration (non-sensitive)
+    DATABASE_HOST: "postgresql"
+    DATABASE_PORT: "5432"
+    DATABASE_NAME: "pms_db"
+    
+    # Redis Configuration (non-sensitive)
+    REDIS_HOST: "redis-master"
+    REDIS_PORT: "6379"
+    REDIS_DB: "0"
+    
+    # AWS Configuration (non-sensitive)
+    AWS_REGION: "us-west-2"
+    AWS_S3_BUCKET: "pms-documents"
+
+# Secret configuration
+secrets:
+  data:
+    # Database credentials (base64 encoded)
+    DATABASE_USER: "cG1zX3VzZXI="  # pms_user
+    DATABASE_PASSWORD: "cGFzc3dvcmQ="  # password
+    
+    # Redis credentials (base64 encoded)
+    REDIS_PASSWORD: "cmVkaXNwYXNz"  # redispass
+    
+    # Application secrets (base64 encoded)
+    SECRET_KEY: "c3VwZXJzZWNyZXRrZXk="  # supersecretkey
+    ALGORITHM: "SFMyNTY="  # HS256
+    ACCESS_TOKEN_EXPIRE_MINUTES: "MzA="  # 30
+    
+    # AWS credentials (base64 encoded)
+    AWS_ACCESS_KEY_ID: "QUtJQUlPU0ZPRE5ON0VYQU1QTEU="  # AKIAIOSFODNN7EXAMPLE
+    AWS_SECRET_ACCESS_KEY: "d0phbHJYVXRuRkVNSS9LN01ERU5HL2JQeFJmaUNZRVhBTVBMRUtFWQ=="  # wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    
+    # Auth0 secrets (base64 encoded)
+    AUTH0_CLIENT_ID: "eW91cl9jbGllbnRfaWQ="  # your_client_id
+    AUTH0_CLIENT_SECRET: "eW91cl9jbGllbnRfc2VjcmV0"  # your_client_secret
+    
+    # OIDC Configuration (base64 encoded)
+    OIDC_CLIENT_ID: "b2lkY19jbGllbnRfaWQ="  # oidc_client_id
+    OIDC_CLIENT_SECRET: "b2lkY19jbGllbnRfc2VjcmV0"  # oidc_client_secret
+    OIDC_DISCOVERY_URL: "aHR0cHM6Ly95b3VyLXRlbmFudC5hdXRoMC5jb20vLndlbGwta25vd24vb3BlbmlkX2NvbmZpZ3VyYXRpb24="  # https://your-tenant.auth0.com/.well-known/openid_configuration
+
+# RBAC configuration
+rbac:
+  create: true
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: ""
+
+# Network Policy configuration
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 80
+  
+  egress:
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: default
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 6379
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+
+# PostgreSQL configuration (using Bitnami chart)
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres"
+    username: "pms_user"
+    password: "password"
+    database: "pms_db"
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+# Redis configuration (using Bitnami chart)
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: "redispass"
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+# Cert-manager configuration
+certManager:
+  enabled: true
+  installCRDs: true
+
+# Monitoring configuration
+monitoring:
+  enabled: false
+  prometheus:
+    enabled: false
+  grafana:
+    enabled: false
+  alertmanager:
+    enabled: false
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention:
+    days: 30
+  s3:
+    bucket: "pms-backups"
+    region: "us-east-1"
+  encryption:
+    enabled: true
+  monitoring:
+    enabled: true
+    schedule: "0 * * * *"  # Hourly monitoring
+    alerting:
+      webhook: ""
+      slack: ""
+  verification:
+    enabled: true
+    schedule: "0 3 * * 0"  # Weekly on Sunday at 3 AM

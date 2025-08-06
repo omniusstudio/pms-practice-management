@@ -1,0 +1,273 @@
+# Staging Environment Values for PMS Helm Chart
+
+# Global settings
+global:
+  environment: staging
+  domain: staging.pms.example.com
+  imagePullSecrets: []
+
+# Application settings
+app:
+  name: pms
+  version: "1.0.0"
+  environment: staging
+  domain:
+    primary: staging.pms.example.com
+    api: api.staging.pms.example.com
+
+# Backend configuration
+backend:
+  enabled: true
+  name: pms-backend
+  replicaCount: 2
+  
+  image:
+    repository: "${ECR_REGISTRY}/pms-backend"
+    tag: "latest"
+    pullPolicy: Always
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# Frontend configuration
+frontend:
+  enabled: true
+  name: pms-frontend
+  replicaCount: 2
+  
+  image:
+    repository: "${ECR_REGISTRY}/pms-frontend"
+    tag: "latest"
+    pullPolicy: Always
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  
+  hosts:
+    - host: staging.pms.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: pms-frontend
+            port: 80
+        - path: /api
+          pathType: Prefix
+          service:
+            name: pms-backend
+            port: 80
+        - path: /docs
+          pathType: Prefix
+          service:
+            name: pms-backend
+            port: 80
+        - path: /health
+          pathType: Prefix
+          service:
+            name: pms-backend
+            port: 80
+  
+  tls:
+    - secretName: pms-staging-tls
+      hosts:
+        - staging.pms.example.com
+
+# ConfigMap data (non-sensitive)
+configMap:
+  # Auth0 Configuration
+  AUTH0_DOMAIN: "dev-pms.us.auth0.com"
+  AUTH0_AUDIENCE: "https://staging-api.pms.example.com"
+  AUTH0_ISSUER: "https://dev-pms.us.auth0.com/"
+  
+  # API Configuration
+  API_V1_STR: "/api/v1"
+  PROJECT_NAME: "Mental Health PMS - Staging"
+  
+  # CORS Configuration
+  BACKEND_CORS_ORIGINS: '["https://staging.pms.example.com", "http://localhost:3000", "http://localhost:5173"]'
+  
+  # Logging Configuration
+  LOG_LEVEL: "DEBUG"
+  LOG_FORMAT: "json"
+  DEBUG: "true"
+  
+  # Database Configuration (non-sensitive)
+  DATABASE_HOST: "pms-staging-postgres.rds.amazonaws.com"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "pms_staging"
+  
+  # Redis Configuration (non-sensitive)
+  REDIS_HOST: "pms-staging-redis.cache.amazonaws.com"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  
+  # AWS Configuration
+  AWS_REGION: "us-east-1"
+  AWS_S3_BUCKET: "pms-staging-uploads"
+
+# Secret data (base64 encoded)
+secrets:
+  # Database credentials
+  DATABASE_USER: "cG1zX3N0YWdpbmdfdXNlcg=="  # pms_staging_user
+  DATABASE_PASSWORD: "c3RhZ2luZ19wYXNzd29yZA=="  # staging_password
+  
+  # Redis credentials
+  REDIS_PASSWORD: "c3RhZ2luZ19yZWRpc19wYXNz"  # staging_redis_pass
+  
+  # Application secrets
+  SECRET_KEY: "c3RhZ2luZ19zZWNyZXRfa2V5XzEyMw=="  # staging_secret_key_123
+  ALGORITHM: "SFMyNTY="  # HS256
+  ACCESS_TOKEN_EXPIRE_MINUTES: "MzA="  # 30
+  
+  # AWS credentials
+  AWS_ACCESS_KEY_ID: "QUtJQVNUQUdJTkdLRVk="  # AKIASTAGINGKEY
+  AWS_SECRET_ACCESS_KEY: "c3RhZ2luZ19hd3Nfc2VjcmV0X2tleQ=="  # staging_aws_secret_key
+  
+  # Auth0 credentials
+  AUTH0_CLIENT_ID: "c3RhZ2luZ19hdXRoMF9jbGllbnRfaWQ="  # staging_auth0_client_id
+  AUTH0_CLIENT_SECRET: "c3RhZ2luZ19hdXRoMF9jbGllbnRfc2VjcmV0"  # staging_auth0_client_secret
+  
+  # OIDC credentials
+  OIDC_CLIENT_ID: "c3RhZ2luZ19vaWRjX2NsaWVudF9pZA=="  # staging_oidc_client_id
+  OIDC_CLIENT_SECRET: "c3RhZ2luZ19vaWRjX2NsaWVudF9zZWNyZXQ="  # staging_oidc_client_secret
+  OIDC_DISCOVERY_URL: "aHR0cHM6Ly9kZXYtcG1zLnVzLmF1dGgwLmNvbS8ud2VsbC1rbm93bi9vcGVuaWRfY29uZmlndXJhdGlvbg=="  # https://dev-pms.us.auth0.com/.well-known/openid_configuration
+
+# RBAC
+rbac:
+  create: true
+  serviceAccountName: pms-service-account
+
+# Network Policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+
+# Dependencies
+postgresql:
+  enabled: false  # Using external RDS
+
+redis:
+  enabled: false  # Using external ElastiCache
+
+nginx-ingress:
+  enabled: true
+  controller:
+    replicaCount: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+cert-manager:
+  enabled: true
+  installCRDs: true
+
+# Monitoring (placeholder for future implementation)
+monitoring:
+  enabled: false
+  prometheus:
+    enabled: false
+  grafana:
+    enabled: false
+
+# Backup (placeholder for future implementation)
+backup:
+  enabled: false

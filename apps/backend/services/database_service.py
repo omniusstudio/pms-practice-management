@@ -163,8 +163,44 @@ class DatabaseService:
         result = await session.execute(query)
         return list(result.scalars().all())
 
+    async def update_provider(
+        self, provider_id: UUID, update_data: Dict[str, Any]
+    ) -> Optional[Provider]:
+        """Update provider with audit logging."""
+        provider = await self.get_provider(provider_id)
+        if not provider:
+            return None
+
+        session = self._ensure_session()
+        old_values = {}
+        for key, value in update_data.items():
+            if hasattr(provider, key):
+                old_values[key] = getattr(provider, key)
+                setattr(provider, key, value)
+
+        await session.commit()
+
+        self._log_action(
+            action="UPDATE",
+            resource_type="Provider",
+            resource_id=str(provider.id),
+            old_values=old_values,
+            new_values=update_data,
+        )
+
+        return provider
+
+    async def delete_provider(self, provider_id: UUID) -> bool:
+        """Soft delete provider."""
+        result = await self.update_provider(
+            provider_id, {"is_active": False}
+        )
+        return result is not None
+
     # Appointment operations
-    async def create_appointment(self, appointment_data: Dict[str, Any]) -> Appointment:
+    async def create_appointment(
+        self, appointment_data: Dict[str, Any]
+    ) -> Appointment:
         """Create a new appointment."""
         session = self._ensure_session()
         appointment = Appointment(**appointment_data)
@@ -180,12 +216,15 @@ class DatabaseService:
 
         return appointment
 
-    async def get_appointment(self, appointment_id: UUID) -> Optional[Appointment]:
+    async def get_appointment(
+        self, appointment_id: UUID
+    ) -> Optional[Appointment]:
         """Get appointment by ID with related data."""
         result = await self.session.execute(
             select(Appointment)
             .options(
-                selectinload(Appointment.client), selectinload(Appointment.provider)
+                selectinload(Appointment.client),
+                selectinload(Appointment.provider),
             )
             .where(Appointment.id == appointment_id)
         )
@@ -204,6 +243,51 @@ class DatabaseService:
         query = query.order_by(Appointment.scheduled_start.desc())
         result = await session.execute(query)
         return list(result.scalars().all())
+
+    async def update_appointment(
+        self, appointment_id: UUID, update_data: Dict[str, Any]
+    ) -> Optional[Appointment]:
+        """Update appointment with audit logging."""
+        appointment = await self.get_appointment(appointment_id)
+        if not appointment:
+            return None
+
+        session = self._ensure_session()
+        old_values = {}
+        for key, value in update_data.items():
+            if hasattr(appointment, key):
+                old_values[key] = getattr(appointment, key)
+                setattr(appointment, key, value)
+
+        await session.commit()
+
+        self._log_action(
+            action="UPDATE",
+            resource_type="Appointment",
+            resource_id=str(appointment.id),
+            old_values=old_values,
+            new_values=update_data,
+        )
+
+        return appointment
+
+    async def delete_appointment(self, appointment_id: UUID) -> bool:
+        """Delete appointment."""
+        appointment = await self.get_appointment(appointment_id)
+        if not appointment:
+            return False
+
+        session = self._ensure_session()
+        await session.delete(appointment)
+        await session.commit()
+
+        self._log_action(
+            action="DELETE",
+            resource_type="Appointment",
+            resource_id=str(appointment.id),
+        )
+
+        return True
 
     # Note operations
     async def create_note(self, note_data: Dict[str, Any]) -> Note:
@@ -236,8 +320,62 @@ class DatabaseService:
         result = await session.execute(query)
         return list(result.scalars().all())
 
+    async def get_note(self, note_id: UUID) -> Optional[Note]:
+        """Get note by ID."""
+        result = await self.session.execute(
+            select(Note).where(Note.id == note_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def update_note(
+        self, note_id: UUID, update_data: Dict[str, Any]
+    ) -> Optional[Note]:
+        """Update note with audit logging."""
+        note = await self.get_note(note_id)
+        if not note:
+            return None
+
+        session = self._ensure_session()
+        old_values = {}
+        for key, value in update_data.items():
+            if hasattr(note, key):
+                old_values[key] = getattr(note, key)
+                setattr(note, key, value)
+
+        await session.commit()
+
+        self._log_action(
+            action="UPDATE",
+            resource_type="Note",
+            resource_id=str(note.id),
+            old_values=old_values,
+            new_values=update_data,
+        )
+
+        return note
+
+    async def delete_note(self, note_id: UUID) -> bool:
+        """Delete note."""
+        note = await self.get_note(note_id)
+        if not note:
+            return False
+
+        session = self._ensure_session()
+        await session.delete(note)
+        await session.commit()
+
+        self._log_action(
+            action="DELETE",
+            resource_type="Note",
+            resource_id=str(note.id),
+        )
+
+        return True
+
     # Ledger operations
-    async def create_ledger_entry(self, entry_data: Dict[str, Any]) -> LedgerEntry:
+    async def create_ledger_entry(
+        self, entry_data: Dict[str, Any]
+    ) -> LedgerEntry:
         """Create a ledger entry for billing."""
         session = self._ensure_session()
         entry = LedgerEntry(**entry_data)
@@ -252,6 +390,58 @@ class DatabaseService:
         )
 
         return entry
+
+    async def get_ledger_entry(self, entry_id: UUID) -> Optional[LedgerEntry]:
+        """Get ledger entry by ID."""
+        result = await self.session.execute(
+            select(LedgerEntry).where(LedgerEntry.id == entry_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def update_ledger_entry(
+        self, entry_id: UUID, update_data: Dict[str, Any]
+    ) -> Optional[LedgerEntry]:
+        """Update ledger entry with audit logging."""
+        entry = await self.get_ledger_entry(entry_id)
+        if not entry:
+            return None
+
+        session = self._ensure_session()
+        old_values = {}
+        for key, value in update_data.items():
+            if hasattr(entry, key):
+                old_values[key] = getattr(entry, key)
+                setattr(entry, key, value)
+
+        await session.commit()
+
+        self._log_action(
+            action="UPDATE",
+            resource_type="LedgerEntry",
+            resource_id=str(entry.id),
+            old_values=old_values,
+            new_values=update_data,
+        )
+
+        return entry
+
+    async def delete_ledger_entry(self, entry_id: UUID) -> bool:
+        """Delete ledger entry."""
+        entry = await self.get_ledger_entry(entry_id)
+        if not entry:
+            return False
+
+        session = self._ensure_session()
+        await session.delete(entry)
+        await session.commit()
+
+        self._log_action(
+            action="DELETE",
+            resource_type="LedgerEntry",
+            resource_id=str(entry.id),
+        )
+
+        return True
 
     async def get_client_balance(self, client_id: UUID) -> Dict[str, Any]:
         """Calculate client's account balance."""

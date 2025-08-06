@@ -1,0 +1,302 @@
+{{- if .Values.backup.enabled }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "pms.fullname" . }}-backup
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup
+spec:
+  schedule: {{ .Values.backup.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "pms.selectorLabels" . | nindent 12 }}
+            component: backup
+        spec:
+          serviceAccountName: {{ include "pms.fullname" . }}-backup
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+          containers:
+          - name: backup
+            image: postgres:15-alpine
+            imagePullPolicy: IfNotPresent
+            command: ["/scripts/pg_backup.sh"]
+            env:
+            - name: POSTGRES_HOST
+              value: {{ include "pms.fullname" . }}-postgresql
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: {{ .Values.postgresql.auth.database }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: postgres-password
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: aws-secret-access-key
+            - name: S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-config
+                  key: s3-bucket
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-config
+                  key: aws-region
+            - name: BACKUP_RETENTION_DAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-config
+                  key: retention-days
+            - name: BACKUP_GPG_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: gpg-key-id
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "100m"
+              limits:
+                memory: "1Gi"
+                cpu: "500m"
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: gpg-keys
+              mountPath: /root/.gnupg
+              readOnly: true
+            - name: backup-logs
+              mountPath: /var/log/pms
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: {{ include "pms.fullname" . }}-backup-scripts
+              defaultMode: 0755
+          - name: gpg-keys
+            secret:
+              secretName: {{ include "pms.fullname" . }}-backup-secrets
+              items:
+              - key: gpg-private-key
+                path: private.key
+              - key: gpg-public-key
+                path: public.key
+              defaultMode: 0600
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: {{ include "pms.fullname" . }}-backup-logs
+
+{{- if .Values.backup.monitoring.enabled }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "pms.fullname" . }}-backup-monitor
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup-monitor
+spec:
+  schedule: {{ .Values.backup.monitoring.schedule | quote }}
+  concurrencyPolicy: Allow
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "pms.selectorLabels" . | nindent 12 }}
+            component: backup-monitor
+        spec:
+          serviceAccountName: {{ include "pms.fullname" . }}-backup
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+          containers:
+          - name: backup-monitor
+            image: postgres:15-alpine
+            imagePullPolicy: IfNotPresent
+            command: ["/scripts/monitor_backups.sh"]
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: aws-secret-access-key
+            - name: S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-config
+                  key: s3-bucket
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-config
+                  key: aws-region
+            - name: BACKUP_RETENTION_DAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-config
+                  key: retention-days
+            - name: ALERT_WEBHOOK_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-config
+                  key: alert-webhook-url
+                  optional: true
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: slack-webhook-url
+                  optional: true
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "50m"
+              limits:
+                memory: "256Mi"
+                cpu: "100m"
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: backup-logs
+              mountPath: /var/log/pms
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: {{ include "pms.fullname" . }}-backup-scripts
+              defaultMode: 0755
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: {{ include "pms.fullname" . }}-backup-logs
+{{- end }}
+
+{{- if .Values.backup.verification.enabled }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "pms.fullname" . }}-backup-verify
+  labels:
+    {{- include "pms.labels" . | nindent 4 }}
+    component: backup-verify
+spec:
+  schedule: {{ .Values.backup.verification.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "pms.selectorLabels" . | nindent 12 }}
+            component: backup-verify
+        spec:
+          serviceAccountName: {{ include "pms.fullname" . }}-backup
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+          containers:
+          - name: backup-verify
+            image: postgres:15-alpine
+            imagePullPolicy: IfNotPresent
+            command: ["/scripts/verify_backup.sh"]
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: aws-secret-access-key
+            - name: S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-config
+                  key: s3-bucket
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-config
+                  key: aws-region
+            - name: BACKUP_GPG_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pms.fullname" . }}-backup-secrets
+                  key: gpg-key-id
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "100m"
+              limits:
+                memory: "512Mi"
+                cpu: "200m"
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: gpg-keys
+              mountPath: /root/.gnupg
+              readOnly: true
+            - name: backup-logs
+              mountPath: /var/log/pms
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: {{ include "pms.fullname" . }}-backup-scripts
+              defaultMode: 0755
+          - name: gpg-keys
+            secret:
+              secretName: {{ include "pms.fullname" . }}-backup-secrets
+              items:
+              - key: gpg-private-key
+                path: private.key
+              - key: gpg-public-key
+                path: public.key
+              defaultMode: 0600
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: {{ include "pms.fullname" . }}-backup-logs
+{{- end }}
+{{- end }}

@@ -177,7 +177,16 @@ jobs:
           docker load < backend-image.tar.gz
           docker load < frontend-image.tar.gz
 
-      - name: Deploy to staging (Blue/Green)
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubectl for staging
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name pms-staging-cluster
+
+      - name: Deploy to staging (Kubernetes Blue/Green)
         run: |
           # Tag images for ECR
           aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
@@ -188,14 +197,16 @@ jobs:
           docker push ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ needs.build.outputs.version }}
           docker push ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ needs.build.outputs.version }}
 
-          # Deploy using blue/green strategy
+          # Deploy using Kubernetes blue/green strategy
           cd apps/infra/scripts
-          ./deploy-blue-green.sh staging ${{ needs.build.outputs.version }}
+          chmod +x deploy-k8s.sh
+          ./deploy-k8s.sh staging ${{ needs.build.outputs.version }}
 
       - name: Run smoke tests
         run: |
-          # Wait for deployment to be ready
-          sleep 30
+          # Wait for Kubernetes deployment to be ready
+          kubectl wait --for=condition=available --timeout=300s deployment/pms-backend -n pms
+          kubectl wait --for=condition=available --timeout=300s deployment/pms-frontend -n pms
 
           # Test health endpoints
           curl -f https://staging.pms.example.com/health || exit 1
@@ -207,6 +218,10 @@ jobs:
 
           # Basic functionality test
           curl -f https://staging.pms.example.com/api/docs || exit 1
+
+          # Verify Kubernetes deployment status
+          kubectl get pods -n pms -l app=pms-backend
+          kubectl get pods -n pms -l app=pms-frontend
 
       - name: Update deployment status
         run: |
@@ -222,9 +237,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, deploy-staging]
     if: ${{ (github.ref == 'refs/heads/main' && inputs.environment == 'production') || inputs.rollback }}
-    environment:
-      name: production
-      url: https://pms.example.com
+    environment: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -266,7 +279,16 @@ jobs:
             aws ssm put-parameter --name "/pms/production/previous-version" --value "$CURRENT_VERSION" --overwrite
           fi
 
-      - name: Deploy to production (Blue/Green)
+      - name: Set up kubectl for production
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubectl for production
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name pms-production-cluster
+
+      - name: Deploy to production (Kubernetes Blue/Green)
         run: |
           if [ "${{ inputs.rollback }}" != "true" ]; then
             # Load and push new images
@@ -280,16 +302,23 @@ jobs:
 
             docker push ${{ secrets.ECR_REGISTRY }}/pms-backend:${{ steps.deploy-version.outputs.version }}
             docker push ${{ secrets.ECR_REGISTRY }}/pms-frontend:${{ steps.deploy-version.outputs.version }}
-          fi
 
-          # Deploy using blue/green strategy
-          cd apps/infra/scripts
-          ./deploy-blue-green.sh production ${{ steps.deploy-version.outputs.version }}
+            # Deploy using Kubernetes blue/green strategy
+            cd apps/infra/scripts
+            chmod +x deploy-k8s.sh
+            ./deploy-k8s.sh production ${{ steps.deploy-version.outputs.version }}
+          else
+            # Rollback using Kubernetes rollback script
+            cd apps/infra/scripts
+            chmod +x rollback-k8s.sh
+            ./rollback-k8s.sh production ${{ steps.deploy-version.outputs.version }}
+          fi
 
       - name: Run production smoke tests
         run: |
-          # Wait for deployment to be ready
-          sleep 60
+          # Wait for Kubernetes deployment to be ready
+          kubectl wait --for=condition=available --timeout=600s deployment/pms-backend -n pms
+          kubectl wait --for=condition=available --timeout=600s deployment/pms-frontend -n pms
 
           # Test health endpoints
           curl -f https://pms.example.com/health || exit 1
@@ -301,6 +330,11 @@ jobs:
 
           # Basic functionality test
           curl -f https://pms.example.com/api/docs || exit 1
+
+          # Verify Kubernetes deployment status
+          kubectl get pods -n pms -l app=pms-backend
+          kubectl get pods -n pms -l app=pms-frontend
+          kubectl get ingress -n pms
 
       - name: Update production version tracking
         if: ${{ !inputs.rollback }}

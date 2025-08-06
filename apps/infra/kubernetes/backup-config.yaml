@@ -1,0 +1,176 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pms-backup-config
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: configuration
+data:
+  # S3 Configuration
+  s3-bucket: "pms-production-backups"
+  aws-region: "us-east-1"
+  
+  # Backup Configuration
+  retention-days: "30"
+  max-backup-age-hours: "26"
+  min-backup-size-mb: "100"
+  
+  # Monitoring Configuration
+  slack-channel: "#alerts"
+  prometheus-pushgateway: "http://prometheus-pushgateway:9091"
+  
+  # Backup Schedule
+  backup-schedule: "0 2 * * *"  # Daily at 2 AM UTC
+  monitor-schedule: "0 * * * *"  # Hourly
+  verify-schedule: "0 3 * * 0"   # Weekly on Sunday at 3 AM UTC
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pms-backup-scripts
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: scripts
+data:
+  pg_backup.sh: |
+    #!/bin/bash
+    # This will be populated from the actual backup script
+    # The script content should be base64 encoded and stored here
+    # For now, this is a placeholder that will be updated during deployment
+    echo "Backup script placeholder - update during deployment"
+    exit 1
+  
+  restore.sh: |
+    #!/bin/bash
+    # This will be populated from the actual restore script
+    # The script content should be base64 encoded and stored here
+    # For now, this is a placeholder that will be updated during deployment
+    echo "Restore script placeholder - update during deployment"
+    exit 1
+  
+  verify_backup.sh: |
+    #!/bin/bash
+    # This will be populated from the actual verification script
+    # The script content should be base64 encoded and stored here
+    # For now, this is a placeholder that will be updated during deployment
+    echo "Verification script placeholder - update during deployment"
+    exit 1
+  
+  monitor_backups.sh: |
+    #!/bin/bash
+    # This will be populated from the actual monitoring script
+    # The script content should be base64 encoded and stored here
+    # For now, this is a placeholder that will be updated during deployment
+    echo "Monitoring script placeholder - update during deployment"
+    exit 1
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pms-backup-secret
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: secrets
+type: Opaque
+data:
+  # AWS Credentials (base64 encoded)
+  # These should be set during deployment with actual values
+  aws-access-key-id: "QUFBQUFBQUFBQUFBQUFBQUE="  # Placeholder: AAAAAAAAAAAAAAA
+  aws-secret-access-key: "QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQg=="  # Placeholder: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+  
+  # GPG Encryption Key ID
+  encryption-key-id: "cG1zLWJhY2t1cC1rZXk="  # Placeholder: pms-backup-key
+  
+  # Alert Webhooks (optional)
+  alert-webhook-url: ""  # Empty - to be set if needed
+  slack-webhook-url: ""   # Empty - to be set if needed
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pms-backup-gpg-keys
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: encryption
+type: Opaque
+data:
+  # GPG private key for backup encryption/decryption
+  # This should be populated during deployment with the actual GPG private key
+  # The key should be base64 encoded
+  private.key: ""  # To be populated during deployment
+  public.key: ""   # To be populated during deployment
+  
+  # GPG trust database
+  trustdb.gpg: ""  # To be populated during deployment
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pms-backup-logs
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: storage
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pms-backup
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: rbac
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pms-backup
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: rbac
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: ["batch"]
+  resources: ["jobs", "cronjobs"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pms-backup
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: rbac
+subjects:
+- kind: ServiceAccount
+  name: pms-backup
+  namespace: pms
+roleRef:
+  kind: Role
+  name: pms-backup
+  apiGroup: rbac.authorization.k8s.io

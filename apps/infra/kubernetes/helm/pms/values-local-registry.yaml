@@ -1,0 +1,176 @@
+# Local Registry Values for PMS Helm Chart
+# Use this file when deploying with the in-cluster registry
+
+# Global settings
+global:
+  environment: local
+  domain: pms.local
+  imagePullSecrets: []
+
+# Application settings
+app:
+  name: pms
+  version: "1.0.0"
+  environment: local
+  domain:
+    primary: pms.local
+    api: api.pms.local
+
+# Backend configuration
+backend:
+  enabled: true
+  name: pms-backend
+  replicaCount: 1
+  
+  image:
+    registry: "localhost:30500"
+    repository: pms-backend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  
+  autoscaling:
+    enabled: false
+  
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  
+  podDisruptionBudget:
+    enabled: false
+
+# Frontend configuration
+frontend:
+  enabled: true
+  name: pms-frontend
+  replicaCount: 1
+  
+  image:
+    registry: "localhost:30500"
+    repository: pms-frontend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  autoscaling:
+    enabled: false
+  
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  
+  podDisruptionBudget:
+    enabled: false
+
+# Database configuration (for local development)
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres"
+    username: "pms_user"
+    password: "pms_password"
+    database: "pms_db"
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
+
+# Redis configuration (for local development)
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: pms.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: pms-frontend
+            port: 80
+        - path: /api
+          pathType: Prefix
+          service:
+            name: pms-backend
+            port: 80
+  tls: []
+
+# Monitoring (disabled for local)
+monitoring:
+  enabled: false
+
+# Security (relaxed for local development)
+security:
+  networkPolicies:
+    enabled: false
+  podSecurityPolicy:
+    enabled: false
+
+# Persistence
+persistence:
+  enabled: true
+  storageClass: "standard"
+  accessMode: ReadWriteOnce
+  size: 1Gi

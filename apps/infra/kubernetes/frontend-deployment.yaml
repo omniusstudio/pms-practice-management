@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pms-frontend
+  namespace: pms
+  labels:
+    app: pms-frontend
+    component: web
+    version: v1
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: pms-frontend
+  template:
+    metadata:
+      labels:
+        app: pms-frontend
+        component: web
+        version: v1
+    spec:
+      containers:
+      - name: frontend
+        image: pms-frontend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: ENVIRONMENT
+          value: "${ENVIRONMENT}"
+        - name: VITE_API_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: pms-config
+              key: api-base-url
+        - name: VITE_AUTH0_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: pms-config
+              key: auth0-domain
+        - name: VITE_AUTH0_CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: pms-config
+              key: auth0-client-id
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 101
+          capabilities:
+            drop:
+            - ALL
+      securityContext:
+        fsGroup: 101
+      serviceAccountName: pms-frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pms-frontend-service
+  namespace: pms
+  labels:
+    app: pms-frontend
+spec:
+  selector:
+    app: pms-frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  type: ClusterIP

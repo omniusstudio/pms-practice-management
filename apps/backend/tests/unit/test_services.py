@@ -1,10 +1,14 @@
-"""Unit tests for service layer."""
+"""Unit tests for service layer.
+
+NOTE: These tests are placeholders and need proper implementation.
+Each test should be implemented with actual service calls.
+"""
 
 from datetime import datetime
 
 import pytest
 
-# Mock imports for demonstration - adjust based on actual structure
+# TODO: Import actual services when implemented
 # from services.patient_service import PatientService
 # from services.appointment_service import AppointmentService
 # from services.notification_service import NotificationService

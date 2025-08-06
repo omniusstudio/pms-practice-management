@@ -1,0 +1,81 @@
+global:
+  environment: local
+  version: local-test
+  registry: ""
+  pullPolicy: Never  # Force use of local images only
+
+app:
+  environment: local
+  domain: pms.local
+  
+backend:
+  image:
+    repository: localhost:30500/pms-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  
+frontend:
+  image:
+    repository: localhost:30500/pms-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+ingress:
+  enabled: false  # Disable ingress dependency since it's installed by setup script
+  className: nginx
+  host: pms.local
+  tls:
+    enabled: false  # Disable TLS for local testing
+
+# Service Account configuration
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Use local database
+configMap:
+  data:
+    DATABASE_URL: "postgresql://postgres:postgres@pms-local-postgresql:5432/pms_local"
+    REDIS_URL: "redis://:redispass@pms-local-redis-master:6379/0"
+    ENVIRONMENT: "local"
+    DEBUG: "true"
+    VITE_API_BASE_URL: "http://localhost:8081/api"
+    AUTH0_DOMAIN: "your-tenant.auth0.com"
+
+# Disable external dependencies for local testing
+dependencies:
+  postgresql:
+    enabled: true
+  redis:
+    enabled: true
+    auth:
+      enabled: false
+
+# Disable monitoring for local testing
+monitoring:
+  enabled: false
+
+# Disable backup for local testing
+backup:
+  enabled: false
+
+# Disable cert-manager for local testing
+certManager:
+  enabled: false

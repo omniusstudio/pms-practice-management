@@ -1,0 +1,391 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pms-backup
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: database
+    tier: infrastructure
+spec:
+  # Run daily at 2:00 AM UTC
+  schedule: "0 2 * * *"
+  timeZone: "UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  startingDeadlineSeconds: 3600  # 1 hour
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 7200  # 2 hours
+      template:
+        metadata:
+          labels:
+            app: pms-backup
+            component: database
+        spec:
+          restartPolicy: Never
+          serviceAccountName: pms-backup
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+          - name: backup
+            image: postgres:15-alpine
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -euo pipefail
+              
+              # Install required tools
+              apk add --no-cache aws-cli gnupg curl
+              
+              # Copy backup script
+              cp /scripts/pg_backup.sh /tmp/pg_backup.sh
+              chmod +x /tmp/pg_backup.sh
+              
+              # Run backup
+              /tmp/pg_backup.sh
+            env:
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: pms-database-secret
+                  key: host
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: pms-database-secret
+                  key: port
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: pms-database-secret
+                  key: database
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: pms-database-secret
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pms-database-secret
+                  key: password
+            - name: BACKUP_S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: s3-bucket
+            - name: BACKUP_RETENTION_DAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: retention-days
+            - name: BACKUP_ENCRYPTION_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: encryption-key-id
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: aws-secret-access-key
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: aws-region
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-config
+                  key: environment
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: gpg-keys
+              mountPath: /root/.gnupg
+              readOnly: true
+            - name: backup-logs
+              mountPath: /var/log/pms
+            resources:
+              requests:
+                memory: "512Mi"
+                cpu: "250m"
+              limits:
+                memory: "2Gi"
+                cpu: "1000m"
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: pms-backup-scripts
+              defaultMode: 0755
+          - name: gpg-keys
+            secret:
+              secretName: pms-backup-gpg-keys
+              defaultMode: 0600
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: pms-backup-logs
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pms-backup-monitor
+  namespace: pms
+  labels:
+    app: pms-backup-monitor
+    component: monitoring
+    tier: infrastructure
+spec:
+  # Run every hour
+  schedule: "0 * * * *"
+  timeZone: "UTC"
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  startingDeadlineSeconds: 300  # 5 minutes
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 600  # 10 minutes
+      template:
+        metadata:
+          labels:
+            app: pms-backup-monitor
+            component: monitoring
+        spec:
+          restartPolicy: Never
+          serviceAccountName: pms-backup
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+          - name: monitor
+            image: postgres:15-alpine
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -euo pipefail
+              
+              # Install required tools
+              apk add --no-cache aws-cli curl bc
+              
+              # Copy monitoring script
+              cp /scripts/monitor_backups.sh /tmp/monitor_backups.sh
+              chmod +x /tmp/monitor_backups.sh
+              
+              # Run monitoring
+              /tmp/monitor_backups.sh
+            env:
+            - name: BACKUP_S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: s3-bucket
+            - name: MAX_BACKUP_AGE_HOURS
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: max-backup-age-hours
+            - name: MIN_BACKUP_SIZE_MB
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: min-backup-size-mb
+            - name: BACKUP_ALERT_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: alert-webhook-url
+                  optional: true
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: slack-webhook-url
+                  optional: true
+            - name: BACKUP_SLACK_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: slack-channel
+            - name: PROMETHEUS_PUSHGATEWAY
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: prometheus-pushgateway
+                  optional: true
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: aws-secret-access-key
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: aws-region
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-config
+                  key: environment
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: backup-logs
+              mountPath: /var/log/pms
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: pms-backup-scripts
+              defaultMode: 0755
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: pms-backup-logs
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pms-backup-verify
+  namespace: pms
+  labels:
+    app: pms-backup-verify
+    component: verification
+    tier: infrastructure
+spec:
+  # Run weekly on Sundays at 3:00 AM UTC
+  schedule: "0 3 * * 0"
+  timeZone: "UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  startingDeadlineSeconds: 1800  # 30 minutes
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 3600  # 1 hour
+      template:
+        metadata:
+          labels:
+            app: pms-backup-verify
+            component: verification
+        spec:
+          restartPolicy: Never
+          serviceAccountName: pms-backup
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+          - name: verify
+            image: postgres:15-alpine
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -euo pipefail
+              
+              # Install required tools
+              apk add --no-cache aws-cli gnupg curl
+              
+              # Copy verification script
+              cp /scripts/verify_backup.sh /tmp/verify_backup.sh
+              chmod +x /tmp/verify_backup.sh
+              
+              # Run verification on latest backup
+              /tmp/verify_backup.sh latest
+            env:
+            - name: BACKUP_S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: s3-bucket
+            - name: BACKUP_ENCRYPTION_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: encryption-key-id
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pms-backup-secret
+                  key: aws-secret-access-key
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-backup-config
+                  key: aws-region
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: pms-config
+                  key: environment
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: gpg-keys
+              mountPath: /root/.gnupg
+              readOnly: true
+            - name: backup-logs
+              mountPath: /var/log/pms
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "200m"
+              limits:
+                memory: "1Gi"
+                cpu: "500m"
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: pms-backup-scripts
+              defaultMode: 0755
+          - name: gpg-keys
+            secret:
+              secretName: pms-backup-gpg-keys
+              defaultMode: 0600
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: pms-backup-logs

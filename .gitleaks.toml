@@ -1,9 +1,5 @@
 # GitLeaks configuration file
 
-[extend]
-# Extend default rules
-path = "https://raw.githubusercontent.com/gitleaks/gitleaks/master/config/gitleaks.toml"
-
 # Files to ignore
 [allowlist]
 paths = [

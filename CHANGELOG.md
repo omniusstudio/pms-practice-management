@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/omniusstudio/pms-practice-management/compare/v1.2.0...v1.2.1) (2025-08-06)
+
+
+### Bug Fixes
+
+* resolve mypy type checking errors and diagnostic issues ([bbe7b83](https://github.com/omniusstudio/pms-practice-management/commit/bbe7b83421701c0e40d98d9ab7712f21148e6c00))
+
 ## [1.2.0](https://github.com/omniusstudio/pms-practice-management/compare/v1.1.0...v1.2.0) (2025-08-06)
 
 

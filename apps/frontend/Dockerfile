@@ -1,5 +1,5 @@
 # Production Dockerfile for Frontend
-FROM node:18-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Build arguments
 ARG VERSION=unknown

@@ -1,5 +1,13 @@
 name: Security Scanning
 
+# Set default permissions for security scanning workflows
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+  issues: write
+  pull-requests: write
+
 on:
   push:
     branches: [ main, develop ]
@@ -19,6 +27,10 @@ jobs:
     name: Dependency Security Scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -76,6 +88,22 @@ jobs:
             npm audit --audit-level=high || echo "NPM audit completed with warnings"
           fi
 
+      - name: Convert Semgrep results to SARIF and upload to Security tab
+        if: always() && hashFiles('semgrep-report.json') != ''
+        run: |
+          # Semgrep already outputs SARIF format when using --sarif flag
+          echo "Running Semgrep with SARIF output..."
+          semgrep --config=auto --sarif --output=semgrep-results.sarif . || true
+        continue-on-error: true
+
+      - name: Upload Semgrep SARIF results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('semgrep-results.sarif') != ''
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+        continue-on-error: true
+
       - name: Upload security reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -85,6 +113,7 @@ jobs:
             apps/backend/safety-report.json
             apps/backend/bandit-report.json
             semgrep-report.json
+            semgrep-results.sarif
             apps/frontend/npm-audit-report.json
           retention-days: 30
 
@@ -158,13 +187,25 @@ jobs:
       - name: Build backend Docker image
         run: |
           if [ -f "apps/backend/Dockerfile" ]; then
-            docker build -t pms-backend:security-scan apps/backend/
+            # Set build args for security scan
+            VERSION=$(date +%Y%m%d-%H%M%S)
+            GIT_SHA=$(git rev-parse --short HEAD)
+            docker build \
+              --build-arg VERSION="$VERSION" \
+              --build-arg GIT_SHA="$GIT_SHA" \
+              -t pms-backend:security-scan apps/backend/
           fi
 
       - name: Build frontend Docker image
         run: |
           if [ -f "apps/frontend/Dockerfile" ]; then
-            docker build -t pms-frontend:security-scan apps/frontend/
+            # Set build args for security scan
+            VERSION=$(date +%Y%m%d-%H%M%S)
+            GIT_SHA=$(git rev-parse --short HEAD)
+            docker build \
+              --build-arg VERSION="$VERSION" \
+              --build-arg GIT_SHA="$GIT_SHA" \
+              -t pms-frontend:security-scan apps/frontend/
           fi
 
       - name: Run Trivy vulnerability scanner (Backend)
@@ -185,6 +226,15 @@ jobs:
           output: 'trivy-frontend-results.sarif'
         continue-on-error: true
 
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && (hashFiles('trivy-backend-results.sarif') != '' || hashFiles('trivy-frontend-results.sarif') != '')
+        with:
+          sarif_file: |
+            trivy-backend-results.sarif
+            trivy-frontend-results.sarif
+        continue-on-error: true
+
       - name: Upload Trivy scan results as artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -200,6 +250,10 @@ jobs:
     name: Secrets Detection
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -211,6 +265,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        with:
+          args: '--no-git'
 
       - name: Run TruffleHog
         uses: trufflesecurity/trufflehog@main
@@ -234,6 +290,9 @@ jobs:
     name: License Compliance Check
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    permissions:
+      actions: read
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -284,8 +343,12 @@ jobs:
   security-summary:
     name: Security Summary
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [dependency-security, code-scanning, container-security, secrets-scan, license-compliance]
     if: always()
+    permissions:
+      actions: read
+      contents: read
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4

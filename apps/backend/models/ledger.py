@@ -114,7 +114,7 @@ class LedgerEntry(BaseModel):
     @property
     def signed_amount(self) -> Decimal:
         """Get amount with appropriate sign (negative for payments)."""
-        if self.is_payment or self.transaction_type == TransactionType.REFUND:
+        if self.is_payment() or self.transaction_type == TransactionType.REFUND:
             return -abs(self.amount)
         return abs(self.amount)
 

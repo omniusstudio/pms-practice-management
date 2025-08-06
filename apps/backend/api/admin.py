@@ -53,7 +53,9 @@ class UserResponse(BaseModel):
 
 
 @router.get(
-    "/users", response_model=APIResponse[List[UserResponse]], summary="List all users"
+    "/users",
+    response_model=APIResponse[List[UserResponse]],
+    summary="List all users",
 )
 async def list_users(
     skip: int = Query(0, ge=0, description="Number of users to skip"),
@@ -87,6 +89,7 @@ async def list_users(
             success=True,
             data=user_responses,
             message=f"Retrieved {len(user_responses)} users",
+            correlation_id="admin-list-users",
         )
 
     except Exception as e:
@@ -118,7 +121,10 @@ async def get_user(
         user_response = UserResponse.model_validate(user)
 
         return APIResponse(
-            success=True, data=user_response, message="User retrieved successfully"
+            success=True,
+            data=user_response,
+            message="User retrieved successfully",
+            correlation_id="admin-get-user",
         )
 
     except HTTPException:
@@ -165,10 +171,12 @@ async def update_user_roles(
         # Prevent removing admin role from the last admin
         if "admin" in user.roles and "admin" not in role_update.roles:
             admin_count_result = await db.execute(
-                select(func.count(User.id)).where(User.roles.contains(["admin"]))
+                select(func.count())
+                .select_from(User)
+                .where(User.roles.contains(["admin"]))
             )
             admin_count = admin_count_result.scalar()
-            if admin_count <= 1:
+            if admin_count is not None and admin_count <= 1:
                 raise HTTPException(
                     status_code=400,
                     detail=("Cannot remove admin role from the last administrator"),
@@ -187,6 +195,7 @@ async def update_user_roles(
             success=True,
             data=user_response,
             message=f"User roles updated to: {', '.join(role_update.roles)}",
+            correlation_id="admin-update-roles",
         )
 
     except HTTPException:
@@ -243,4 +252,5 @@ async def get_roles_info(
         success=True,
         data=roles_info,
         message="RBAC roles information retrieved successfully",
+        correlation_id="admin-get-roles",
     )

@@ -51,11 +51,17 @@ async def list_clients(
             success=True,
             data={"clients": [], "total": 0, "page": page, "per_page": per_page},
             message="Clients retrieved successfully",
+            correlation_id=correlation_id,
         )
 
     except Exception as e:
         logger.error(f"Error listing clients: {e}")
-        return APIResponse(success=False, data=None, message="Error retrieving clients")
+        return APIResponse(
+            success=False,
+            data=None,
+            message="Error retrieving clients",
+            correlation_id=correlation_id,
+        )
 
 
 @router.get(
@@ -79,8 +85,10 @@ async def get_client(
     try:
         logger.info(
             f"Getting client - correlation_id: {correlation_id}, "
-            f"client_id: {client_id}, include_appointments: {include_appointments}, "
-            f"include_notes: {include_notes}, include_ledger: {include_ledger}"
+            f"client_id: {client_id}, "
+            f"include_appointments: {include_appointments}, "
+            f"include_notes: {include_notes}, "
+            f"include_ledger: {include_ledger}"
         )
 
         # Return mock response for now
@@ -88,11 +96,17 @@ async def get_client(
             success=True,
             data={"client_id": str(client_id), "name": "Mock Client"},
             message="Client retrieved successfully",
+            correlation_id=correlation_id,
         )
 
     except Exception as e:
         logger.error(f"Error getting client: {e}")
-        return APIResponse(success=False, data=None, message="Error retrieving client")
+        return APIResponse(
+            success=False,
+            data=None,
+            message="Error retrieving client",
+            correlation_id=correlation_id,
+        )
 
 
 @router.get(
@@ -118,14 +132,22 @@ async def get_client_financial_summary(
         # Return mock response for now
         return APIResponse(
             success=True,
-            data={"client_id": str(client_id), "balance": 0, "total_charges": 0},
+            data={
+                "client_id": str(client_id),
+                "balance": 0,
+                "total_charges": 0,
+            },
             message="Financial summary retrieved successfully",
+            correlation_id=correlation_id,
         )
 
     except Exception as e:
         logger.error(f"Error getting financial summary: {e}")
         return APIResponse(
-            success=False, data=None, message="Error retrieving financial summary"
+            success=False,
+            data=None,
+            message="Error retrieving financial summary",
+            correlation_id=correlation_id,
         )
 
 
@@ -160,6 +182,7 @@ async def get_financial_dashboard(
                 "date_range": [date_from, date_to],
             },
             message="Financial dashboard data retrieved successfully",
+            correlation_id=correlation_id,
         )
 
     except Exception as e:
@@ -168,6 +191,7 @@ async def get_financial_dashboard(
             success=False,
             data=None,
             message="Error retrieving financial dashboard data",
+            correlation_id=correlation_id,
         )
 
 
@@ -184,7 +208,7 @@ async def get_performance_stats(
 
     try:
         logger.info(
-            f"Getting database performance stats - correlation_id: {correlation_id}"
+            f"Getting database performance stats - " f"correlation_id: {correlation_id}"
         )
 
         # Return mock response for now
@@ -192,10 +216,14 @@ async def get_performance_stats(
             success=True,
             data={"query_count": 0, "avg_response_time": 0, "active_connections": 0},
             message="Performance statistics retrieved successfully",
+            correlation_id=correlation_id,
         )
 
     except Exception as e:
         logger.error(f"Error getting performance stats: {e}")
         return APIResponse(
-            success=False, data=None, message="Error retrieving performance statistics"
+            success=False,
+            data=None,
+            message="Error retrieving performance statistics",
+            correlation_id=correlation_id,
         )

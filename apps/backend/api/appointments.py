@@ -58,7 +58,7 @@ class AppointmentResponse(BaseModel):
     "/",
     response_model=APIResponse[List[AppointmentResponse]],
     summary="Get all appointments",
-    description="Retrieve a list of all appointments with pagination " "support.",
+    description=("Retrieve a list of all appointments with pagination support."),
 )
 async def get_appointments(
     db: AsyncSession = Depends(get_db),
@@ -92,9 +92,7 @@ async def get_appointments(
             success=True,
             data=[],
             message="Appointments retrieved successfully",
-            total=0,
-            page=page,
-            per_page=per_page,
+            correlation_id=correlation_id,
         )
 
     except Exception as e:
@@ -103,7 +101,7 @@ async def get_appointments(
             extra={"error": str(e), "correlation_id": correlation_id},
         )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=500,
             detail="Failed to retrieve appointments",
         )
 

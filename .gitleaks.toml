@@ -5,7 +5,7 @@
 paths = [
     "keys.txt",
     ".env.test",
-    ".env.example", 
+    ".env.example",
     ".env.dev",
     ".env.docker",
     ".env.k8s",

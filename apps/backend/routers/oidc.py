@@ -17,7 +17,6 @@ from urllib.parse import urlencode
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import get_settings
@@ -25,9 +24,9 @@ from core.exceptions import AuthenticationError, ConfigurationError, ValidationE
 from database import get_db
 
 # from models.auth_token import AuthToken  # Disabled
-
 # from services.auth_service import AuthService  # Disabled
 from services.oidc_service import OIDCConfig, oidc_service
+
 
 logger = logging.getLogger(__name__)
 

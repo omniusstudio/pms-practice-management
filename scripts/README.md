@@ -6,14 +6,16 @@ This directory contains utility scripts for the PMS application, including devel
 
 ### `init-feature.sh` - Feature Branch Initialization
 
-A CLI script that helps developers create new feature branches following best practices.
+A CLI script that helps developers create new feature branches following best practices with automatic draft PR creation.
 
 #### Features:
 - ✅ Validates branch names and enforces naming conventions
 - ✅ Ensures clean working directory before branch creation
 - ✅ Updates main branch with latest changes
 - ✅ Creates feature branch from main
-- ✅ Provides comprehensive PR process reminders
+- ✅ **NEW**: Automatic draft PR creation with GitHub CLI integration
+- ✅ **NEW**: Ticket/issue number linking
+- ✅ Provides comprehensive workflow guidance
 - ✅ Integrates with branch protection rules
 
 #### Usage:
@@ -25,8 +27,11 @@ A CLI script that helps developers create new feature branches following best pr
 #### Interactive Process:
 1. **Branch Name**: Enter your feature branch name (e.g., `feature/user-authentication`)
 2. **Validation**: Script validates name format and availability
-3. **Confirmation**: Confirm branch creation
-4. **Setup**: Updates main, creates branch, provides PR guidance
+3. **Ticket Linking**: Optional ticket/issue number input for PR linking
+4. **Confirmation**: Confirm branch creation
+5. **Setup**: Updates main, creates branch
+6. **Draft PR Creation**: Optionally creates a draft PR with structured template
+7. **Workflow Guidance**: Displays comprehensive development workflow reminders
 
 #### Branch Name Formats:
 - `feature/description` - New features
@@ -34,11 +39,65 @@ A CLI script that helps developers create new feature branches following best pr
 - `hotfix/description` - Critical fixes
 - Must be 1-50 characters, alphanumeric with hyphens/underscores
 
+#### Draft PR Features:
+- **Automatic Creation**: Uses GitHub CLI to create draft PRs
+- **Structured Template**: Includes work-in-progress sections and checklists
+- **Ticket Linking**: Automatically references provided ticket numbers
+- **Fallback Support**: Provides manual PR creation URLs if GitHub CLI unavailable
+
 #### Pre-flight Checks:
 - ✅ Git repository validation
 - ✅ Main/master branch existence
 - ✅ No uncommitted changes
 - ✅ Branch name uniqueness
+- ✅ GitHub CLI availability (for draft PR creation)
+
+---
+
+### `ready-for-review.sh` - Draft PR Review Preparation
+
+A CLI script that converts draft PRs to ready-for-review status when development is complete, with comprehensive pre-review checks.
+
+#### Features:
+- ✅ Automatic draft PR detection and conversion
+- ✅ Pre-review checklist and validation
+- ✅ Uncommitted changes detection
+- ✅ Automated push of latest changes
+- ✅ Comprehensive readiness checklist
+- ✅ Next steps guidance for reviewers
+
+#### Usage:
+```bash
+# Run from project root
+./scripts/ready-for-review.sh
+```
+
+#### Process Flow:
+1. **Environment Checks**: Validates git repo and GitHub CLI authentication
+2. **PR Detection**: Finds and validates existing draft PR for current branch
+3. **Status Verification**: Confirms PR is in draft status
+4. **Readiness Checklist**: Displays comprehensive pre-review checklist
+5. **Pre-review Checks**: Validates uncommitted changes and pushes updates
+6. **Conversion**: Marks PR as ready for review
+7. **Next Steps**: Provides guidance for requesting reviews and managing feedback
+
+#### Readiness Checklist:
+- ✅ **Code Quality**: Standards compliance, documentation, no debug code
+- ✅ **Testing**: All tests pass, new tests added, edge cases covered
+- ✅ **Security**: No exposed secrets, input validation, security best practices
+- ✅ **Documentation**: README updates, API docs, complete PR description
+- ✅ **Integration**: Dev environment testing, no breaking changes, reversible migrations
+
+#### Requirements:
+- GitHub CLI (`gh`) installed and authenticated
+- Existing draft PR for current branch
+- Clean or committed working directory
+
+#### Error Handling:
+- Validates GitHub CLI availability and authentication
+- Checks for existing PR on current branch
+- Prevents operation on main/master branches
+- Handles push failures gracefully
 
 ---
 

@@ -17,10 +17,11 @@ from sqlalchemy.orm import sessionmaker
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
-from main import app
-from middleware.auth_middleware import AuthenticatedUser
+# Local imports after path setup
+from main import app  # noqa: E402
+from middleware.auth_middleware import AuthenticatedUser  # noqa: E402
 from models.base import Base  # noqa: E402
-from models.user import User
+from models.user import User  # noqa: E402
 
 # Load test environment variables from .env.test file
 test_env_file = Path(__file__).parent.parent.parent.parent / ".env.test"

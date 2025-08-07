@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from main import app
+from main import app  # noqa: E402
 
 
 class TestAppointmentsAPI:
@@ -52,7 +52,6 @@ class TestAppointmentsAPI:
     def test_get_appointments_with_pagination(self, client, mock_authenticated_user):
         """Test appointments retrieval with pagination."""
         from api.appointments import get_db
-        from main import app
         from middleware.auth_middleware import require_auth_dependency
         from middleware.correlation import get_correlation_id
 
@@ -85,7 +84,6 @@ class TestAppointmentsAPI:
     def test_get_appointments_with_filters(self, client, mock_authenticated_user):
         """Test appointments retrieval with filters."""
         from api.appointments import get_db
-        from main import app
         from middleware.auth_middleware import require_auth_dependency
         from middleware.correlation import get_correlation_id
 
@@ -117,7 +115,6 @@ class TestAppointmentsAPI:
     def test_get_appointment_by_id(self, client, mock_authenticated_user):
         """Test retrieval of a specific appointment by ID."""
         from api.appointments import get_db
-        from main import app
         from middleware.auth_middleware import require_auth_dependency
         from middleware.correlation import get_correlation_id
 
@@ -164,7 +161,6 @@ class TestAppointmentsAPI:
     def test_create_appointment(self, client, mock_authenticated_user):
         """Test appointment creation."""
         from api.appointments import get_db
-        from main import app
         from middleware.auth_middleware import require_auth_dependency
         from middleware.correlation import get_correlation_id
 
@@ -216,7 +212,6 @@ class TestAppointmentsAPI:
     def test_update_appointment(self, client, mock_authenticated_user):
         """Test appointment update."""
         from api.appointments import get_db
-        from main import app
         from middleware.auth_middleware import require_auth_dependency
         from middleware.correlation import get_correlation_id
 
@@ -268,7 +263,6 @@ class TestAppointmentsAPI:
     def test_delete_appointment(self, client, mock_authenticated_user):
         """Test appointment deletion."""
         from api.appointments import get_db
-        from main import app
         from middleware.auth_middleware import require_auth_dependency
         from middleware.correlation import get_correlation_id
 
@@ -307,7 +301,6 @@ class TestAppointmentsAPI:
 
     def test_create_appointment_invalid_data(self, client, mock_authenticated_user):
         """Test appointment creation with invalid data."""
-        from main import app
         from middleware.auth_middleware import require_auth_dependency
         from middleware.correlation import get_correlation_id
 
@@ -332,7 +325,6 @@ class TestAppointmentsAPI:
 
     def test_get_appointment_invalid_uuid(self, client, mock_authenticated_user):
         """Test getting appointment with invalid UUID."""
-        from main import app
         from middleware.auth_middleware import require_auth_dependency
         from middleware.correlation import get_correlation_id
 

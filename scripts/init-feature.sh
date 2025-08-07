@@ -154,111 +154,7 @@ create_feature_branch() {
     print_success "Feature branch '$branch_name' created and checked out"
 }
 
-# Function to create draft PR
-create_draft_pr() {
-    local branch_name="$1"
-    local ticket_number="$2"
-
-    print_info "Creating draft PR for branch '$branch_name'..."
-
-    # Push the branch first
-    if ! git push -u origin "$branch_name"; then
-        print_error "Failed to push branch '$branch_name'"
-        exit 1
-    fi
-
-    # Check if GitHub CLI is available
-    if ! command -v gh &> /dev/null; then
-        print_warning "GitHub CLI (gh) not found. Please install it to auto-create draft PRs."
-        print_info "Manual PR creation URL: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]//g' | sed 's/\.git$//')/pull/new/$branch_name"
-        return 1
-    fi
-
-    # Create draft PR title and body
-    local pr_title="[DRAFT] $branch_name"
-    local pr_body="## 🚧 Work in Progress
-
-This is a draft PR for ticket${ticket_number:+ #$ticket_number}.
-
-### Changes
-- [ ] TODO: Describe your changes here
-
-### Testing
-- [ ] TODO: Add testing details
-
-### Checklist
-- [ ] Code follows project standards
-- [ ] Tests added/updated
-- [ ] Documentation updated
-- [ ] Security review completed
-
----
-**Note**: This PR will be marked as ready for review when development is complete."
-
-    # Create the draft PR
-    if gh pr create --draft --title "$pr_title" --body "$pr_body" --head "$branch_name" --base "main"; then
-        print_success "Draft PR created successfully!"
-        local pr_url=$(gh pr view --json url --jq '.url')
-        print_info "PR URL: $pr_url"
-    else
-        print_error "Failed to create draft PR"
-        print_info "You can create it manually at: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]//g' | sed 's/\.git$//')/pull/new/$branch_name"
-    fi
-}
-
-# Function to display draft PR reminder
-show_draft_pr_reminder() {
-    local branch_name="$1"
-
-    echo
-    echo -e "${GREEN}"
-    echo "═══════════════════════════════════════════════════════════════"
-    echo "🎉 Feature branch and draft PR created!"
-    echo "═══════════════════════════════════════════════════════════════"
-    echo -e "${NC}"
-
-    print_info "Current branch: $(git branch --show-current)"
-    echo
-
-    print_warning "📋 DEVELOPMENT WORKFLOW"
-    echo
-    echo "Your draft PR is now ready for development:"
-    echo
-    echo "1. 💻 Develop your feature"
-    echo "   • Make commits as you work"
-    echo "   • Push changes regularly: git push"
-    echo "   • Update PR description with progress"
-    echo
-    echo "2. 🧪 Test your code locally"
-    echo "   • Run all tests: make test"
-    echo "   • Verify functionality works as expected"
-    echo
-    echo "3. 🔒 Security check"
-    echo "   • Remove any secrets, API keys, or sensitive data"
-    echo "   • Review code for security vulnerabilities"
-    echo
-    echo "4. ✅ When ready for review"
-    echo "   • Run: ./scripts/ready-for-review.sh"
-    echo "   • Or manually convert draft to ready in GitHub"
-    echo "   • Ensure all tests pass and CI is green"
-    echo
-    echo "5. 👥 Request reviews"
-    echo "   • At least 1 reviewer required (as per branch protection)"
-    echo "   • Address review feedback promptly"
-    echo
-
-    print_info "Branch protection rules are in place:"
-    echo "   • Direct commits to main are blocked"
-    echo "   • PR reviews are required"
-    echo "   • All CI checks must pass"
-    echo "   • Linear history is enforced"
-    echo
-
-    print_success "Happy coding! 🚀"
-    echo
-}
-
-# Function to display PR process reminder (for manual PR creation)
+# Function to display PR process reminder
 show_pr_process_reminder() {
     local branch_name="$1"
 
@@ -296,10 +192,9 @@ show_pr_process_reminder() {
     echo "   • Reference the related issue number in your PR"
     echo "   • Use format: 'Fixes #123' or 'Closes #123'"
     echo
-    echo "6. 📤 Push and create draft PR"
+    echo "6. 📤 Push and create PR"
     echo "   • git push -u origin $branch_name"
-    echo "   • Create draft PR through GitHub UI or CLI"
-    echo "   • Convert to ready when development is complete"
+    echo "   • Create PR through GitHub UI or CLI"
     echo
     echo "7. 👥 Request reviews"
     echo "   • At least 1 reviewer required (as per branch protection)"
@@ -348,15 +243,8 @@ main() {
         echo
     done
 
-    # Optional: Get ticket number
-    echo
-    read -p "Enter ticket/issue number (optional): " ticket_number
-
     echo
     print_info "Branch name: $branch_name"
-    if [[ -n "$ticket_number" ]]; then
-        print_info "Ticket number: #$ticket_number"
-    fi
 
     # Confirm with user
     read -p "Proceed with creating this branch? (y/N): " confirm
@@ -370,17 +258,7 @@ main() {
     # Execute the workflow
     update_main_branch
     create_feature_branch "$branch_name"
-
-    # Ask if user wants to create a draft PR
-    echo
-    read -p "Create a draft PR now? (Y/n): " create_pr
-    if [[ "$create_pr" =~ ^[Nn]$ ]]; then
-        print_info "Skipping draft PR creation"
-        show_pr_process_reminder "$branch_name"
-    else
-        create_draft_pr "$branch_name" "$ticket_number"
-        show_draft_pr_reminder "$branch_name"
-    fi
+    show_pr_process_reminder "$branch_name"
 }
 
 # Run main function

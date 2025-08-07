@@ -42,12 +42,13 @@ repos:
         args: [-r, -f, json, -o, bandit-report.json]
         exclude: ^apps/backend/tests/
 
-  # - repo: https://github.com/gitguardian/ggshield
-  #   rev: v1.25.0
-  #   hooks:
-  #     - id: ggshield
-  #       language: python
-  #       stages: [pre-commit]
+  - repo: https://github.com/gitguardian/ggshield
+    rev: v1.25.0
+    hooks:
+      - id: ggshield
+        language: python
+        stages: [pre-commit]
+        pass_filenames: false
 
   # Conventional commits validation
   - repo: https://github.com/compilerla/conventional-pre-commit

@@ -1,3 +1,21 @@
+## [1.3.0](https://github.com/omniusstudio/pms-practice-management/compare/v1.2.1...v1.3.0) (2025-08-07)
+
+
+### Features
+
+* improve test coverage to 70.29% by adding comprehensive env_loader tests and fixing database tests ([1363124](https://github.com/omniusstudio/pms-practice-management/commit/1363124ee70890a20c627146ce18e83a838d57e2))
+
+
+### Bug Fixes
+
+* ensure EDI mock service always stores claims for testing ([814e853](https://github.com/omniusstudio/pms-practice-management/commit/814e853a14a90c824fef0e0c6deb3f3f66bf712d))
+* resolve CI failures - fix backend tests and security scan permissions ([e3d94e8](https://github.com/omniusstudio/pms-practice-management/commit/e3d94e8ec6a96d6ab74a0f28b1da72475fff1d72))
+* resolve mypy type errors in EDI mock service with proper casting ([1c89e55](https://github.com/omniusstudio/pms-practice-management/commit/1c89e55ea24a12e1edd837e0f8aa73592446cc01))
+* resolve pre-commit issues by removing unused variable and disabling problematic hooks ([25bab8f](https://github.com/omniusstudio/pms-practice-management/commit/25bab8feb08c8bff34d80e52ae6346656105a9e5))
+* resolve SQLAlchemy 2.0 compatibility issues in optimized database service ([c1e4010](https://github.com/omniusstudio/pms-practice-management/commit/c1e40106300927f6dbb01aa133c14a32d4441c58))
+* resolve test coverage and diagnostic issues ([7ef0061](https://github.com/omniusstudio/pms-practice-management/commit/7ef006112853f27b6114b0b0735b0fcd9f614515))
+* temporarily disable conventional commit validation in release workflow ([4d3429d](https://github.com/omniusstudio/pms-practice-management/commit/4d3429d9dc2e1307b3a199957216d115555f4072))
+
 ## [1.2.1](https://github.com/omniusstudio/pms-practice-management/compare/v1.2.0...v1.2.1) (2025-08-06)
 
 

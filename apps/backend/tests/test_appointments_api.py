@@ -1,85 +1,202 @@
-"""Tests for Appointments API."""
+"""Tests for appointments API endpoints."""
 
-from unittest.mock import patch
+import os
+import sys
+from datetime import datetime, timezone
+from unittest.mock import AsyncMock
 from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
 
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import app
 
 
 class TestAppointmentsAPI:
-    """Test cases for Appointments API endpoints."""
+    """Test class for appointment API endpoints."""
 
     @pytest.fixture
     def client(self):
         """Create test client."""
         return TestClient(app)
 
-    @pytest.fixture
-    def appointment_id(self):
-        """Generate test appointment ID."""
-        return str(uuid4())
+    def test_get_appointments_success(self, client, mock_authenticated_user):
+        """Test successful retrieval of appointments."""
+        from api.appointments import get_db
+        from middleware.auth_middleware import require_auth_dependency
+        from middleware.correlation import get_correlation_id
 
-    @pytest.fixture
-    def client_id(self):
-        """Generate test client ID."""
-        return str(uuid4())
+        # Override dependencies
+        app.dependency_overrides[
+            require_auth_dependency
+        ] = lambda: mock_authenticated_user
+        app.dependency_overrides[get_db] = lambda: AsyncMock()
+        app.dependency_overrides[get_correlation_id] = lambda: "test-correlation-id"
 
-    @pytest.fixture
-    def provider_id(self):
-        """Generate test provider ID."""
-        return str(uuid4())
-
-    @patch("middleware.auth_middleware.require_auth_dependency")
-    def test_get_appointments_success(self, mock_auth, client):
-        """Test successful appointments retrieval."""
-        with patch("database.get_db"):
-            mock_auth.return_value = {"user_id": "test-user"}
-
+        try:
             response = client.get("/api/appointments/")
 
-            # Should return 200 even if no appointments found
-            assert response.status_code in [200, 404]
+            assert response.status_code == 200
+            data = response.json()
+            assert "success" in data
+            assert data["success"] is True
+            assert "data" in data
+            assert data["data"] == []
+            assert "correlation_id" in data
+        finally:
+            # Clean up dependency overrides
+            app.dependency_overrides.clear()
 
-    @patch("middleware.auth_middleware.require_auth_dependency")
-    def test_get_appointments_with_pagination(self, mock_auth, client):
+    def test_get_appointments_with_pagination(self, client, mock_authenticated_user):
         """Test appointments retrieval with pagination."""
-        with patch("database.get_db"):
-            mock_auth.return_value = {"user_id": "test-user"}
+        from api.appointments import get_db
+        from main import app
+        from middleware.auth_middleware import require_auth_dependency
+        from middleware.correlation import get_correlation_id
 
-            response = client.get("/api/appointments/?page=1&per_page=10")
+        # Mock database
+        mock_db = AsyncMock()
 
-            assert response.status_code in [200, 404]
+        # Mock query result
+        mock_result = AsyncMock()
+        mock_result.scalars.return_value.all.return_value = []
+        mock_db.execute.return_value = mock_result
 
-    @patch("middleware.auth_middleware.require_auth_dependency")
-    def test_get_appointments_with_filters(self, mock_auth, client, client_id):
+        # Override dependencies
+        app.dependency_overrides[
+            require_auth_dependency
+        ] = lambda: mock_authenticated_user
+        app.dependency_overrides[get_db] = lambda: mock_db
+        app.dependency_overrides[get_correlation_id] = lambda: "test-correlation-id"
+
+        try:
+            response = client.get("/api/appointments/?page=1&page_size=10")
+            assert response.status_code == 200
+            data = response.json()
+            assert "pagination" in data
+            assert data["pagination"]["page"] == 1
+            assert data["pagination"]["per_page"] == 10
+        finally:
+            # Clean up overrides
+            app.dependency_overrides.clear()
+
+    def test_get_appointments_with_filters(self, client, mock_authenticated_user):
         """Test appointments retrieval with filters."""
-        with patch("database.get_db"):
-            mock_auth.return_value = {"user_id": "test-user"}
+        from api.appointments import get_db
+        from main import app
+        from middleware.auth_middleware import require_auth_dependency
+        from middleware.correlation import get_correlation_id
 
-            url = f"/api/appointments/?client_id={client_id}&status=scheduled"
-            response = client.get(url)
+        # Mock database
+        mock_db = AsyncMock()
 
-            assert response.status_code in [200, 404]
+        # Mock query result
+        mock_result = AsyncMock()
+        mock_result.scalars.return_value.all.return_value = []
+        mock_db.execute.return_value = mock_result
 
-    @patch("middleware.auth_middleware.require_auth_dependency")
-    def test_get_appointment_by_id(self, mock_auth, client, appointment_id):
-        """Test single appointment retrieval."""
-        with patch("database.get_db"):
-            mock_auth.return_value = {"user_id": "test-user"}
+        # Override dependencies
+        app.dependency_overrides[
+            require_auth_dependency
+        ] = lambda: mock_authenticated_user
+        app.dependency_overrides[get_db] = lambda: mock_db
+        app.dependency_overrides[get_correlation_id] = lambda: "test-correlation-id"
 
+        try:
+            client_id = str(uuid4())
+            response = client.get(
+                f"/api/appointments/?client_id={client_id}&status=scheduled"
+            )
+            assert response.status_code == 200
+        finally:
+            # Clean up overrides
+            app.dependency_overrides.clear()
+
+    def test_get_appointment_by_id(self, client, mock_authenticated_user):
+        """Test retrieval of a specific appointment by ID."""
+        from api.appointments import get_db
+        from main import app
+        from middleware.auth_middleware import require_auth_dependency
+        from middleware.correlation import get_correlation_id
+
+        # Mock database
+        mock_db = AsyncMock()
+
+        # Mock appointment object
+        mock_appointment = AsyncMock()
+        mock_appointment.id = uuid4()
+        mock_appointment.client_id = uuid4()
+        mock_appointment.provider_id = uuid4()
+        mock_appointment.scheduled_start = datetime.now(timezone.utc)
+        mock_appointment.scheduled_end = datetime.now(timezone.utc)
+        mock_appointment.appointment_type = "consultation"
+        mock_appointment.status = "scheduled"
+        mock_appointment.reason_for_visit = "Regular checkup"
+        mock_appointment.location = "Room 101"
+        mock_appointment.is_telehealth = False
+        mock_appointment.created_at = datetime.now(timezone.utc)
+        mock_appointment.updated_at = datetime.now(timezone.utc)
+
+        # Mock query result
+        mock_result = AsyncMock()
+        mock_result.scalar_one_or_none.return_value = mock_appointment
+        mock_db.execute.return_value = mock_result
+
+        # Override dependencies
+        app.dependency_overrides[
+            require_auth_dependency
+        ] = lambda: mock_authenticated_user
+        app.dependency_overrides[get_db] = lambda: mock_db
+        app.dependency_overrides[get_correlation_id] = lambda: "test-correlation-id"
+
+        try:
+            appointment_id = str(uuid4())
             response = client.get(f"/api/appointments/{appointment_id}")
+            assert response.status_code == 200
+            data = response.json()
+            assert "data" in data
+        finally:
+            # Clean up overrides
+            app.dependency_overrides.clear()
 
-            assert response.status_code in [200, 404]
-
-    @patch("middleware.auth_middleware.require_auth_dependency")
-    def test_create_appointment(self, mock_auth, client, client_id, provider_id):
+    def test_create_appointment(self, client, mock_authenticated_user):
         """Test appointment creation."""
-        with patch("database.get_db"):
-            mock_auth.return_value = {"user_id": "test-user"}
+        from api.appointments import get_db
+        from main import app
+        from middleware.auth_middleware import require_auth_dependency
+        from middleware.correlation import get_correlation_id
 
+        # Mock database
+        mock_db = AsyncMock()
+
+        # Mock created appointment
+        mock_appointment = AsyncMock()
+        mock_appointment.id = uuid4()
+        mock_appointment.client_id = uuid4()
+        mock_appointment.provider_id = uuid4()
+        mock_appointment.scheduled_start = datetime.now(timezone.utc)
+        mock_appointment.scheduled_end = datetime.now(timezone.utc)
+        mock_appointment.appointment_type = "consultation"
+        mock_appointment.status = "scheduled"
+        mock_appointment.created_at = datetime.now(timezone.utc)
+        mock_appointment.updated_at = datetime.now(timezone.utc)
+
+        mock_db.add = AsyncMock()
+        mock_db.commit = AsyncMock()
+        mock_db.refresh = AsyncMock()
+
+        # Override dependencies
+        app.dependency_overrides[
+            require_auth_dependency
+        ] = lambda: mock_authenticated_user
+        app.dependency_overrides[get_db] = lambda: mock_db
+        app.dependency_overrides[get_correlation_id] = lambda: "test-correlation-id"
+
+        try:
+            client_id = str(uuid4())
+            provider_id = str(uuid4())
             appointment_data = {
                 "client_id": client_id,
                 "provider_id": provider_id,
@@ -91,18 +208,45 @@ class TestAppointmentsAPI:
             }
 
             response = client.post("/api/appointments/", json=appointment_data)
+            assert response.status_code == 201
+        finally:
+            # Clean up overrides
+            app.dependency_overrides.clear()
 
-            # Should return 201 on success or error status
-            assert response.status_code in [201, 400, 422, 500]
-
-    @patch("middleware.auth_middleware.require_auth_dependency")
-    def test_update_appointment(
-        self, mock_auth, client, appointment_id, client_id, provider_id
-    ):
+    def test_update_appointment(self, client, mock_authenticated_user):
         """Test appointment update."""
-        with patch("database.get_db"):
-            mock_auth.return_value = {"user_id": "test-user"}
+        from api.appointments import get_db
+        from main import app
+        from middleware.auth_middleware import require_auth_dependency
+        from middleware.correlation import get_correlation_id
 
+        # Mock database
+        mock_db = AsyncMock()
+
+        # Mock existing appointment
+        appointment_id = str(uuid4())
+        client_id = str(uuid4())
+        provider_id = str(uuid4())
+
+        mock_appointment = AsyncMock()
+        mock_appointment.id = appointment_id
+        mock_appointment.client_id = client_id
+        mock_appointment.provider_id = provider_id
+
+        mock_result = AsyncMock()
+        mock_result.scalar_one_or_none.return_value = mock_appointment
+        mock_db.execute.return_value = mock_result
+        mock_db.commit = AsyncMock()
+        mock_db.refresh = AsyncMock()
+
+        # Override dependencies
+        app.dependency_overrides[
+            require_auth_dependency
+        ] = lambda: mock_authenticated_user
+        app.dependency_overrides[get_db] = lambda: mock_db
+        app.dependency_overrides[get_correlation_id] = lambda: "test-correlation-id"
+
+        try:
             appointment_data = {
                 "client_id": client_id,
                 "provider_id": provider_id,
@@ -116,49 +260,91 @@ class TestAppointmentsAPI:
             response = client.put(
                 f"/api/appointments/{appointment_id}", json=appointment_data
             )
+            assert response.status_code == 200
+        finally:
+            # Clean up overrides
+            app.dependency_overrides.clear()
 
-            assert response.status_code in [200, 404, 422, 500]
-
-    @patch("middleware.auth_middleware.require_auth_dependency")
-    def test_delete_appointment(self, mock_auth, client, appointment_id):
+    def test_delete_appointment(self, client, mock_authenticated_user):
         """Test appointment deletion."""
-        with patch("database.get_db"):
-            mock_auth.return_value = {"user_id": "test-user"}
+        from api.appointments import get_db
+        from main import app
+        from middleware.auth_middleware import require_auth_dependency
+        from middleware.correlation import get_correlation_id
 
+        # Mock database
+        mock_db = AsyncMock()
+
+        # Mock existing appointment
+        appointment_id = str(uuid4())
+        mock_appointment = AsyncMock()
+        mock_appointment.id = appointment_id
+
+        mock_result = AsyncMock()
+        mock_result.scalar_one_or_none.return_value = mock_appointment
+        mock_db.execute.return_value = mock_result
+        mock_db.delete = AsyncMock()
+        mock_db.commit = AsyncMock()
+
+        # Override dependencies
+        app.dependency_overrides[
+            require_auth_dependency
+        ] = lambda: mock_authenticated_user
+        app.dependency_overrides[get_db] = lambda: mock_db
+        app.dependency_overrides[get_correlation_id] = lambda: "test-correlation-id"
+
+        try:
             response = client.delete(f"/api/appointments/{appointment_id}")
-
-            assert response.status_code in [200, 404, 500]
+            assert response.status_code == 200
+        finally:
+            # Clean up overrides
+            app.dependency_overrides.clear()
 
     def test_get_appointments_unauthorized(self, client):
-        """Test appointments access without authentication."""
+        """Test unauthorized access to appointments."""
         response = client.get("/api/appointments/")
+        assert response.status_code == 401
 
-        # Should return 401 or 403 for unauthorized access
-        assert response.status_code in [401, 403]
-
-    def test_create_appointment_invalid_data(self, client):
+    def test_create_appointment_invalid_data(self, client, mock_authenticated_user):
         """Test appointment creation with invalid data."""
-        with patch("middleware.auth_middleware.require_auth_dependency") as mock_auth:
-            mock_auth.return_value = {"user_id": "test-user"}
+        from main import app
+        from middleware.auth_middleware import require_auth_dependency
+        from middleware.correlation import get_correlation_id
 
+        # Override dependencies
+        app.dependency_overrides[
+            require_auth_dependency
+        ] = lambda: mock_authenticated_user
+        app.dependency_overrides[get_correlation_id] = lambda: "test-correlation-id"
+
+        try:
             invalid_data = {
                 "client_id": "invalid-uuid",
                 "provider_id": "invalid-uuid",
                 "scheduled_start": "invalid-date",
-                "scheduled_end": "invalid-date",
             }
 
             response = client.post("/api/appointments/", json=invalid_data)
-
-            # Should return validation error
             assert response.status_code == 422
+        finally:
+            # Clean up overrides
+            app.dependency_overrides.clear()
 
-    def test_get_appointment_invalid_uuid(self, client):
-        """Test appointment retrieval with invalid UUID."""
-        with patch("middleware.auth_middleware.require_auth_dependency") as mock_auth:
-            mock_auth.return_value = {"user_id": "test-user"}
+    def test_get_appointment_invalid_uuid(self, client, mock_authenticated_user):
+        """Test getting appointment with invalid UUID."""
+        from main import app
+        from middleware.auth_middleware import require_auth_dependency
+        from middleware.correlation import get_correlation_id
 
+        # Override dependencies
+        app.dependency_overrides[
+            require_auth_dependency
+        ] = lambda: mock_authenticated_user
+        app.dependency_overrides[get_correlation_id] = lambda: "test-correlation-id"
+
+        try:
             response = client.get("/api/appointments/invalid-uuid")
-
-            # Should return validation error
             assert response.status_code == 422
+        finally:
+            # Clean up overrides
+            app.dependency_overrides.clear()

@@ -113,6 +113,8 @@ class TestLogCrudAction:
 class TestLogAuthenticationEvent:
     """Test authentication event logging."""
 
+    @patch("utils.audit_logger.logger")
+    @patch("utils.audit_logger.datetime")
     def test_log_authentication_event_success(self, mock_datetime, mock_logger):
         """Test successful authentication event logging."""
         mock_datetime.now.return_value.isoformat.return_value = "2023-01-01T00:00:00Z"
@@ -328,6 +330,8 @@ class TestLogSystemEvent:
             details="scrubbed_details",
         )
 
+    @patch("utils.audit_logger.logger")
+    @patch("utils.audit_logger.datetime")
     def test_log_system_event_warning_severity(self, mock_datetime, mock_logger):
         """Test system event logging with warning severity."""
         mock_datetime.now.return_value.isoformat.return_value = "2023-01-01T00:00:00Z"

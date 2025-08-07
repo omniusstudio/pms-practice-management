@@ -3,7 +3,7 @@
 
 import uuid
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from sqlalchemy import create_engine, event
@@ -33,7 +33,9 @@ class TestDatabaseInfrastructure:
         """Create a test database engine."""
         # Use in-memory SQLite for testing
         test_engine = create_engine(
-            "sqlite:///:memory:", echo=True, connect_args={"check_same_thread": False}
+            "sqlite:///:memory:",
+            echo=True,
+            connect_args={"check_same_thread": False},
         )
 
         # Enable foreign key constraints for SQLite
@@ -441,12 +443,23 @@ class TestDatabaseModule(TestDatabaseInfrastructure):
         from database import create_tables
 
         mock_conn = MagicMock()
-        mock_async_engine.begin.return_value.__aenter__.return_value = mock_conn
+        mock_conn.run_sync = AsyncMock()
+
+        # Create proper async context manager
+        class AsyncContextManager:
+            async def __aenter__(self):
+                return mock_conn
+
+            async def __aexit__(self, exc_type, exc_val, exc_tb):
+                return None
+
+        mock_async_engine.begin.return_value = AsyncContextManager()
 
         await create_tables()
 
         # Verify that the connection was used
         mock_async_engine.begin.assert_called_once()
+        mock_conn.run_sync.assert_called_once()
 
     @pytest.mark.asyncio
     @patch("database.async_engine")
@@ -455,12 +468,23 @@ class TestDatabaseModule(TestDatabaseInfrastructure):
         from database import drop_tables
 
         mock_conn = MagicMock()
-        mock_async_engine.begin.return_value.__aenter__.return_value = mock_conn
+        mock_conn.run_sync = AsyncMock()
+
+        # Create proper async context manager
+        class AsyncContextManager:
+            async def __aenter__(self):
+                return mock_conn
+
+            async def __aexit__(self, exc_type, exc_val, exc_tb):
+                return None
+
+        mock_async_engine.begin.return_value = AsyncContextManager()
 
         await drop_tables()
 
         # Verify that the connection was used
         mock_async_engine.begin.assert_called_once()
+        mock_conn.run_sync.assert_called_once()
 
     def test_receive_before_cursor_execute_dml(self):
         """Test SQL audit logging for DML operations."""
@@ -593,7 +617,17 @@ class TestDatabaseHealthChecksExtended(TestDatabaseInfrastructure):
         from database import check_database_health_async
 
         mock_conn = MagicMock()
-        mock_async_engine.begin.return_value.__aenter__.return_value = mock_conn
+        mock_conn.execute = AsyncMock()
+
+        # Create proper async context manager
+        class AsyncContextManager:
+            async def __aenter__(self):
+                return mock_conn
+
+            async def __aexit__(self, exc_type, exc_val, exc_tb):
+                return None
+
+        mock_async_engine.begin.return_value = AsyncContextManager()
 
         result = await check_database_health_async()
 

@@ -1,4 +1,4 @@
-"""Tests for OIDCService."""
+"""Tests for OIDC Service."""
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -32,7 +32,7 @@ class TestOIDCService:
 
     @pytest.fixture
     def discovery_doc(self):
-        """Mock discovery document."""
+        """Create test discovery document."""
         return {
             "issuer": "https://provider.com",
             "authorization_endpoint": "https://provider.com/auth",
@@ -43,13 +43,12 @@ class TestOIDCService:
 
     @pytest.fixture
     def jwks_response(self):
-        """Mock JWKS response."""
+        """Create test JWKS response."""
         return {
             "keys": [
                 {
                     "kty": "RSA",
                     "kid": "test-key-id",
-                    "use": "sig",
                     "n": "test-n",
                     "e": "AQAB",
                 }
@@ -60,7 +59,7 @@ class TestOIDCService:
     async def test_get_discovery_document_success(self, oidc_service, discovery_doc):
         """Test successful discovery document retrieval."""
         with patch("httpx.AsyncClient") as mock_client:
-            mock_response = AsyncMock()
+            mock_response = MagicMock()
             mock_response.json.return_value = discovery_doc
             mock_response.raise_for_status = MagicMock()
 
@@ -82,7 +81,6 @@ class TestOIDCService:
         oidc_service._discovery_cache[url] = discovery_doc
 
         result = await oidc_service.get_discovery_document(url)
-
         assert result == discovery_doc
 
     @pytest.mark.asyncio
@@ -94,7 +92,8 @@ class TestOIDCService:
             )
 
             with pytest.raises(
-                AuthenticationError, match="Failed to retrieve provider configuration"
+                AuthenticationError,
+                match="Failed to retrieve provider configuration",
             ):
                 url = "https://provider.com/.well-known/openid_configuration"
                 await oidc_service.get_discovery_document(url)
@@ -103,7 +102,7 @@ class TestOIDCService:
     async def test_get_jwks_success(self, oidc_service, jwks_response):
         """Test successful JWKS retrieval."""
         with patch("httpx.AsyncClient") as mock_client:
-            mock_response = AsyncMock()
+            mock_response = MagicMock()
             mock_response.json.return_value = jwks_response
             mock_response.raise_for_status = MagicMock()
 
@@ -123,7 +122,6 @@ class TestOIDCService:
         oidc_service._jwks_cache[url] = jwks_response
 
         result = await oidc_service.get_jwks(url)
-
         assert result == jwks_response
 
     @pytest.mark.asyncio
@@ -162,7 +160,7 @@ class TestOIDCService:
     @pytest.mark.asyncio
     async def test_get_authorization_url(self, oidc_service, oidc_config):
         """Test authorization URL generation."""
-        mock_client = AsyncMock()
+        mock_client = MagicMock()
         mock_client.create_authorization_url.return_value = (
             "https://auth.url",
             "state",
@@ -180,7 +178,9 @@ class TestOIDCService:
 
             assert result == "https://auth.url"
             mock_client.create_authorization_url.assert_called_once_with(
-                "https://provider.com/auth", state="test-state", nonce="test-nonce"
+                "https://provider.com/auth",
+                state="test-state",
+                nonce="test-nonce",
             )
 
     @pytest.mark.asyncio
@@ -245,7 +245,7 @@ class TestOIDCService:
             oidc_service, "get_discovery_document", return_value=discovery_doc
         ):
             with patch("httpx.AsyncClient") as mock_client:
-                mock_response = AsyncMock()
+                mock_response = MagicMock()
                 mock_response.json.return_value = user_data
                 mock_response.raise_for_status = MagicMock()
 
@@ -274,6 +274,7 @@ class TestOIDCService:
                 )
 
                 with pytest.raises(
-                    AuthenticationError, match="Failed to retrieve user information"
+                    AuthenticationError,
+                    match="Failed to retrieve user information",
                 ):
                     await oidc_service.get_user_info(oidc_config, "access-token")

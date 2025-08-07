@@ -108,16 +108,16 @@ repos:
       - id: hadolint-docker
         args: [--ignore, DL3008, --ignore, DL3009]
 
-  # Infrastructure as Code
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.83.6
-    hooks:
-      - id: terraform_fmt
-        files: ^apps/infra/terraform/
-      - id: terraform_validate
-        files: ^apps/infra/terraform/
-      - id: terraform_docs
-        files: ^apps/infra/terraform/
+  # Infrastructure as Code (disabled - terraform not installed)
+  # - repo: https://github.com/antonbabenko/pre-commit-terraform
+  #   rev: v1.83.6
+  #   hooks:
+  #     - id: terraform_fmt
+  #       files: ^apps/infra/terraform/
+  #     - id: terraform_validate
+  #       files: ^apps/infra/terraform/
+  #     - id: terraform_docs
+  #       files: ^apps/infra/terraform/
 
   # Commit message validation
   - repo: https://github.com/commitizen-tools/commitizen

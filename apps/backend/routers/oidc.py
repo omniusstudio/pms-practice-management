@@ -27,7 +27,6 @@ from database import get_db
 # from services.auth_service import AuthService  # Disabled
 from services.oidc_service import OIDCConfig, oidc_service
 
-
 logger = logging.getLogger(__name__)
 
 

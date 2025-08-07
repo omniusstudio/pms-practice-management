@@ -168,7 +168,7 @@ class KeyRotationScheduler:
 
         # Update policy's last rotation time
         if hasattr(policy, "last_rotation_at"):
-            policy.last_rotation_at = datetime.now(timezone.utc)  # type: ignore
+            policy.last_rotation_at = datetime.now(timezone.utc)
         policy.update_rotation_schedule()
         self.db.commit()
 
@@ -318,7 +318,7 @@ class KeyRotationScheduler:
             raise ValueError(f"Policy {policy_id} not found")
 
         if hasattr(policy, "status"):
-            policy.status = status  # type: ignore
+            policy.status = status
         self.db.commit()
         self.db.refresh(policy)
 

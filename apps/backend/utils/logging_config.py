@@ -116,7 +116,7 @@ def configure_structured_logging(
 
     # Configure structlog
     structlog.configure(
-        processors=processors,  # type: ignore
+        processors=processors,
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),
         wrapper_class=structlog.stdlib.BoundLogger,

@@ -1,6 +1,48 @@
-# Seed Data Scripts
+# Scripts Directory
 
-This directory contains comprehensive seed data management scripts for the PMS application, providing HIPAA-compliant anonymized data for development and staging environments.
+This directory contains utility scripts for the PMS application, including development workflow tools and comprehensive seed data management scripts providing HIPAA-compliant anonymized data for development and staging environments.
+
+## Development Workflow Scripts
+
+### `init-feature.sh` - Feature Branch Initialization
+
+A CLI script that helps developers create new feature branches following best practices.
+
+#### Features:
+- ✅ Validates branch names and enforces naming conventions
+- ✅ Ensures clean working directory before branch creation
+- ✅ Updates main branch with latest changes
+- ✅ Creates feature branch from main
+- ✅ Provides comprehensive PR process reminders
+- ✅ Integrates with branch protection rules
+
+#### Usage:
+```bash
+# Run from project root
+./scripts/init-feature.sh
+```
+
+#### Interactive Process:
+1. **Branch Name**: Enter your feature branch name (e.g., `feature/user-authentication`)
+2. **Validation**: Script validates name format and availability
+3. **Confirmation**: Confirm branch creation
+4. **Setup**: Updates main, creates branch, provides PR guidance
+
+#### Branch Name Formats:
+- `feature/description` - New features
+- `bugfix/description` - Bug fixes
+- `hotfix/description` - Critical fixes
+- Must be 1-50 characters, alphanumeric with hyphens/underscores
+
+#### Pre-flight Checks:
+- ✅ Git repository validation
+- ✅ Main/master branch existence
+- ✅ No uncommitted changes
+- ✅ Branch name uniqueness
+
+---
+
+# Seed Data Scripts
 
 ## Quick Start
 

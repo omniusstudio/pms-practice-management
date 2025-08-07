@@ -12,6 +12,9 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import sqltypes
 
+from .base import BaseModel
+from .types import UUID
+
 
 class JSONBType(sqltypes.TypeDecorator):
     """A type that uses JSONB for PostgreSQL and JSON for other databases."""
@@ -24,10 +27,6 @@ class JSONBType(sqltypes.TypeDecorator):
             return dialect.type_descriptor(JSONB())
         else:
             return dialect.type_descriptor(JSON())
-
-
-from .base import BaseModel
-from .types import UUID
 
 
 class KeyType(str, Enum):

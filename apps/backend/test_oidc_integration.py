@@ -3,42 +3,42 @@
 
 import os
 import sys
-from datetime import datetime, timezone
+
 
 # Add the backend directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Test imports
 try:
-    from core.config import get_settings
+    from core.config import get_settings  # noqa: F401
 
     print("✓ Config module imported successfully")
 except ImportError as e:
     print(f"✗ Config import failed: {e}")
 
 try:
-    from models.user import User
+    from models.user import User  # noqa: F401
 
     print("✓ User model imported successfully")
 except ImportError as e:
     print(f"✗ User model import failed: {e}")
 
 try:
-    from services.oidc_service import OIDCService
+    from services.oidc_service import OIDCService  # noqa: F401
 
     print("✓ OIDC service imported successfully")
 except ImportError as e:
     print(f"✗ OIDC service import failed: {e}")
 
 try:
-    from middleware.auth_middleware import get_current_user
+    from middleware.auth_middleware import get_current_user  # noqa: F401
 
     print("✓ Auth middleware imported successfully")
 except ImportError as e:
     print(f"✗ Auth middleware import failed: {e}")
 
 try:
-    from routers.oidc import router
+    from routers.oidc import router  # noqa: F401
 
     print("✓ OIDC router imported successfully")
 except ImportError as e:

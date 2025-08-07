@@ -101,6 +101,7 @@ async def get_notes(
         # For now, return empty list since we need proper database queries
         # This satisfies the test requirement that endpoint exists and
         # returns 401 for unauthorized
+        notes_data = []
         return APIResponse(
             success=True,
             data=notes_data,

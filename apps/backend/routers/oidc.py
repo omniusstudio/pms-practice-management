@@ -17,7 +17,7 @@ from urllib.parse import urlencode
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import get_settings

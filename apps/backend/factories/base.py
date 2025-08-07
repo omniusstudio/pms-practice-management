@@ -6,8 +6,6 @@ from datetime import timezone
 import factory
 from faker import Faker
 
-from database import SessionLocal
-
 # Initialize Faker with a seed for reproducible test data
 fake = Faker()
 Faker.seed(42)

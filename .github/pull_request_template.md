@@ -2,6 +2,14 @@
 
 Briefly describe the changes in this PR.
 
+## PR Checklist
+
+- [ ] Code tested locally
+- [ ] All secrets removed / verified
+- [ ] All tests passing
+- [ ] Staging deployment passed
+- [ ] Linked to issue: #_____
+
 ## Type of Change
 
 - [ ] Bug fix (non-breaking change which fixes an issue)

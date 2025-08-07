@@ -1,0 +1,206 @@
+name: Repository Audit
+
+on:
+  schedule:
+    # Run daily at 9 AM UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for audit
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Check for commits to main without PR
+        id: direct-commits
+        run: |
+          echo "Checking for direct commits to main branch..."
+
+          # Get commits to main in the last 7 days
+          SINCE_DATE=$(date -d '7 days ago' --iso-8601)
+          DIRECT_COMMITS=$(git log main --since="$SINCE_DATE" --pretty=format:"%H %s %an" --grep="Merge pull request" --invert-grep)
+
+          if [ -n "$DIRECT_COMMITS" ]; then
+            echo "⚠️ Direct commits to main found:"
+            echo "$DIRECT_COMMITS"
+            echo "direct_commits_found=true" >> $GITHUB_OUTPUT
+            echo "DIRECT_COMMITS<<EOF" >> $GITHUB_ENV
+            echo "$DIRECT_COMMITS" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "✅ No direct commits to main found"
+            echo "direct_commits_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for unmerged staging branches
+        id: staging-branches
+        run: |
+          echo "Checking for unmerged staging branches..."
+
+          # Find staging branches that haven't been merged
+          STAGING_BRANCHES=$(git branch -r --no-merged main | grep -E '(staging|stage)' | sed 's/origin\///' || true)
+
+          if [ -n "$STAGING_BRANCHES" ]; then
+            echo "⚠️ Unmerged staging branches found:"
+            echo "$STAGING_BRANCHES"
+            echo "staging_branches_found=true" >> $GITHUB_OUTPUT
+            echo "STAGING_BRANCHES<<EOF" >> $GITHUB_ENV
+            echo "$STAGING_BRANCHES" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "✅ No unmerged staging branches found"
+            echo "staging_branches_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for skipped tests in recent commits
+        id: skipped-tests
+        run: |
+          echo "Checking for skipped tests..."
+
+          # Look for test skip patterns in recent commits
+          SINCE_DATE=$(date -d '7 days ago' --iso-8601)
+          SKIPPED_TESTS=$(git log --since="$SINCE_DATE" --grep="skip.*test\|test.*skip\|@skip\|@ignore" --pretty=format:"%H %s %an" || true)
+
+          if [ -n "$SKIPPED_TESTS" ]; then
+            echo "⚠️ Commits with skipped tests found:"
+            echo "$SKIPPED_TESTS"
+            echo "skipped_tests_found=true" >> $GITHUB_OUTPUT
+            echo "SKIPPED_TESTS<<EOF" >> $GITHUB_ENV
+            echo "$SKIPPED_TESTS" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "✅ No skipped tests found"
+            echo "skipped_tests_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for CI skip flags
+        id: ci-skips
+        run: |
+          echo "Checking for CI skip flags..."
+
+          # Look for CI skip patterns in recent commits
+          SINCE_DATE=$(date -d '7 days ago' --iso-8601)
+          CI_SKIPS=$(git log --since="$SINCE_DATE" --grep="\[ci skip\]\|\[skip ci\]\|\[no ci\]" --pretty=format:"%H %s %an" || true)
+
+          if [ -n "$CI_SKIPS" ]; then
+            echo "⚠️ Commits with CI skip flags found:"
+            echo "$CI_SKIPS"
+            echo "ci_skips_found=true" >> $GITHUB_OUTPUT
+            echo "CI_SKIPS<<EOF" >> $GITHUB_ENV
+            echo "$CI_SKIPS" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "✅ No CI skip flags found"
+            echo "ci_skips_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create audit report issue
+        if: steps.direct-commits.outputs.direct_commits_found == 'true' || steps.staging-branches.outputs.staging_branches_found == 'true' || steps.skipped-tests.outputs.skipped_tests_found == 'true' || steps.ci-skips.outputs.ci_skips_found == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            const title = `Repository Audit Report - ${date}`;
+
+            let body = `# Repository Audit Report\n\n`;
+            body += `**Audit Date:** ${date}\n\n`;
+
+            // Direct commits section
+            if ('${{ steps.direct-commits.outputs.direct_commits_found }}' === 'true') {
+              body += `## ⚠️ Direct Commits to Main\n\n`;
+              body += `The following commits were made directly to the main branch without a pull request:\n\n`;
+              body += `\`\`\`\n${process.env.DIRECT_COMMITS}\n\`\`\`\n\n`;
+              body += `**Action Required:** Investigate these commits and ensure proper PR process is followed.\n\n`;
+            }
+
+            // Staging branches section
+            if ('${{ steps.staging-branches.outputs.staging_branches_found }}' === 'true') {
+              body += `## ⚠️ Unmerged Staging Branches\n\n`;
+              body += `The following staging branches have not been merged to main:\n\n`;
+              body += `\`\`\`\n${process.env.STAGING_BRANCHES}\n\`\`\`\n\n`;
+              body += `**Action Required:** Review these branches and merge or clean up as appropriate.\n\n`;
+            }
+
+            // Skipped tests section
+            if ('${{ steps.skipped-tests.outputs.skipped_tests_found }}' === 'true') {
+              body += `## ⚠️ Skipped Tests\n\n`;
+              body += `The following commits contain references to skipped tests:\n\n`;
+              body += `\`\`\`\n${process.env.SKIPPED_TESTS}\n\`\`\`\n\n`;
+              body += `**Action Required:** Review skipped tests and ensure they are re-enabled or properly documented.\n\n`;
+            }
+
+            // CI skips section
+            if ('${{ steps.ci-skips.outputs.ci_skips_found }}' === 'true') {
+              body += `## ⚠️ CI Skip Flags\n\n`;
+              body += `The following commits used CI skip flags:\n\n`;
+              body += `\`\`\`\n${process.env.CI_SKIPS}\n\`\`\`\n\n`;
+              body += `**Action Required:** Review these commits to ensure CI skipping was justified.\n\n`;
+            }
+
+            body += `## Next Steps\n\n`;
+            body += `1. Review all flagged items above\n`;
+            body += `2. Take corrective action where necessary\n`;
+            body += `3. Update processes to prevent future occurrences\n`;
+            body += `4. Close this issue once all items are addressed\n\n`;
+            body += `---\n`;
+            body += `*This audit was automatically generated by the Repository Audit workflow.*`;
+
+            // Check if there's already an open audit issue for today
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'audit,automated'
+            });
+
+            const existingIssue = issues.find(issue => issue.title === title);
+
+            if (existingIssue) {
+              // Update existing issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: body
+              });
+              console.log(`Updated existing audit issue #${existingIssue.number}`);
+            } else {
+              // Create new issue
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['audit', 'automated', 'needs-review']
+              });
+              console.log(`Created new audit issue #${issue.data.number}`);
+            }
+
+      - name: Summary
+        run: |
+          echo "## Audit Summary"
+          echo "Direct commits to main: ${{ steps.direct-commits.outputs.direct_commits_found }}"
+          echo "Unmerged staging branches: ${{ steps.staging-branches.outputs.staging_branches_found }}"
+          echo "Skipped tests: ${{ steps.skipped-tests.outputs.skipped_tests_found }}"
+          echo "CI skip flags: ${{ steps.ci-skips.outputs.ci_skips_found }}"
+
+          if [[ "${{ steps.direct-commits.outputs.direct_commits_found }}" == "true" || "${{ steps.staging-branches.outputs.staging_branches_found }}" == "true" || "${{ steps.skipped-tests.outputs.skipped_tests_found }}" == "true" || "${{ steps.ci-skips.outputs.ci_skips_found }}" == "true" ]]; then
+            echo "⚠️ Audit found issues - check the created/updated issue for details"
+            exit 1
+          else
+            echo "✅ Audit completed successfully - no issues found"
+          fi

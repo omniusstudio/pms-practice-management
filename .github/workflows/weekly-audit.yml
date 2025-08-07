@@ -1,0 +1,308 @@
+name: Weekly Repository Audit
+
+on:
+  schedule:
+    # Run weekly on Mondays at 8 AM UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  weekly-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for comprehensive audit
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Comprehensive commit analysis
+        id: commit-analysis
+        run: |
+          echo "Performing comprehensive commit analysis for the past week..."
+
+          SINCE_DATE=$(date -d '7 days ago' --iso-8601)
+
+          # Direct commits to main (more thorough check)
+          DIRECT_COMMITS=$(git log main --since="$SINCE_DATE" --pretty=format:"%H|%s|%an|%ad" --date=short --grep="Merge pull request" --invert-grep)
+
+          # Commits without proper commit message format
+          INVALID_COMMITS=$(git log main --since="$SINCE_DATE" --pretty=format:"%H|%s|%an" --grep="^(feat|fix|docs|style|refactor|test|chore):" --invert-grep --grep="Merge pull request" --invert-grep)
+
+          # Large commits (more than 20 files changed)
+          LARGE_COMMITS=$(git log main --since="$SINCE_DATE" --pretty=format:"%H|%s|%an" --numstat | awk 'BEGIN{commit=""; files=0} /^[0-9a-f]{40}\|/{if(files>20 && commit!="") print commit; commit=$0; files=0; next} /^[0-9]+\t[0-9]+\t/{files++} END{if(files>20 && commit!="") print commit}')
+
+          # Save results
+          echo "DIRECT_COMMITS<<EOF" >> $GITHUB_ENV
+          echo "$DIRECT_COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "INVALID_COMMITS<<EOF" >> $GITHUB_ENV
+          echo "$INVALID_COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "LARGE_COMMITS<<EOF" >> $GITHUB_ENV
+          echo "$LARGE_COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          # Set outputs
+          [ -n "$DIRECT_COMMITS" ] && echo "direct_commits_found=true" >> $GITHUB_OUTPUT || echo "direct_commits_found=false" >> $GITHUB_OUTPUT
+          [ -n "$INVALID_COMMITS" ] && echo "invalid_commits_found=true" >> $GITHUB_OUTPUT || echo "invalid_commits_found=false" >> $GITHUB_OUTPUT
+          [ -n "$LARGE_COMMITS" ] && echo "large_commits_found=true" >> $GITHUB_OUTPUT || echo "large_commits_found=false" >> $GITHUB_OUTPUT
+
+      - name: Branch analysis
+        id: branch-analysis
+        run: |
+          echo "Analyzing branch status..."
+
+          # Stale branches (no activity for 30 days)
+          STALE_BRANCHES=$(git for-each-ref --format='%(refname:short)|%(committerdate:iso8601)|%(authorname)' refs/remotes/origin |
+            while IFS='|' read branch date author; do
+              if [[ "$branch" != "origin/main" && "$branch" != "origin/HEAD" ]]; then
+                days_old=$(( ($(date +%s) - $(date -d "$date" +%s)) / 86400 ))
+                if [ $days_old -gt 30 ]; then
+                  echo "$branch|$days_old days|$author"
+                fi
+              fi
+            done)
+
+          # Unmerged feature branches
+          UNMERGED_FEATURES=$(git branch -r --no-merged main | grep -E '(feature|feat)/' | sed 's/origin\///' || true)
+
+          # Unmerged staging/development branches
+          UNMERGED_STAGING=$(git branch -r --no-merged main | grep -E '(staging|stage|develop|dev)' | sed 's/origin\///' || true)
+
+          # Save results
+          echo "STALE_BRANCHES<<EOF" >> $GITHUB_ENV
+          echo "$STALE_BRANCHES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "UNMERGED_FEATURES<<EOF" >> $GITHUB_ENV
+          echo "$UNMERGED_FEATURES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "UNMERGED_STAGING<<EOF" >> $GITHUB_ENV
+          echo "$UNMERGED_STAGING" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          # Set outputs
+          [ -n "$STALE_BRANCHES" ] && echo "stale_branches_found=true" >> $GITHUB_OUTPUT || echo "stale_branches_found=false" >> $GITHUB_OUTPUT
+          [ -n "$UNMERGED_FEATURES" ] && echo "unmerged_features_found=true" >> $GITHUB_OUTPUT || echo "unmerged_features_found=false" >> $GITHUB_OUTPUT
+          [ -n "$UNMERGED_STAGING" ] && echo "unmerged_staging_found=true" >> $GITHUB_OUTPUT || echo "unmerged_staging_found=false" >> $GITHUB_OUTPUT
+
+      - name: CI/CD analysis
+        id: cicd-analysis
+        run: |
+          echo "Analyzing CI/CD patterns..."
+
+          SINCE_DATE=$(date -d '7 days ago' --iso-8601)
+
+          # CI skip patterns
+          CI_SKIPS=$(git log --since="$SINCE_DATE" --grep="\[ci skip\]\|\[skip ci\]\|\[no ci\]\|\[skip-ci\]" --pretty=format:"%H|%s|%an|%ad" --date=short)
+
+          # Test skip patterns
+          TEST_SKIPS=$(git log --since="$SINCE_DATE" --grep="skip.*test\|test.*skip\|@skip\|@ignore\|@disabled" --pretty=format:"%H|%s|%an|%ad" --date=short)
+
+          # Emergency/hotfix commits
+          EMERGENCY_COMMITS=$(git log --since="$SINCE_DATE" --grep="emergency\|hotfix\|urgent\|critical" --pretty=format:"%H|%s|%an|%ad" --date=short)
+
+          # Save results
+          echo "CI_SKIPS<<EOF" >> $GITHUB_ENV
+          echo "$CI_SKIPS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "TEST_SKIPS<<EOF" >> $GITHUB_ENV
+          echo "$TEST_SKIPS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "EMERGENCY_COMMITS<<EOF" >> $GITHUB_ENV
+          echo "$EMERGENCY_COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          # Set outputs
+          [ -n "$CI_SKIPS" ] && echo "ci_skips_found=true" >> $GITHUB_OUTPUT || echo "ci_skips_found=false" >> $GITHUB_OUTPUT
+          [ -n "$TEST_SKIPS" ] && echo "test_skips_found=true" >> $GITHUB_OUTPUT || echo "test_skips_found=false" >> $GITHUB_OUTPUT
+          [ -n "$EMERGENCY_COMMITS" ] && echo "emergency_commits_found=true" >> $GITHUB_OUTPUT || echo "emergency_commits_found=false" >> $GITHUB_OUTPUT
+
+      - name: Get workflow run statistics
+        id: workflow-stats
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            // Get workflow runs from the past week
+            const { data: runs } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              created: `>=${oneWeekAgo.toISOString()}`,
+              per_page: 100
+            });
+
+            const stats = {
+              total: runs.total_count,
+              success: runs.workflow_runs.filter(run => run.conclusion === 'success').length,
+              failure: runs.workflow_runs.filter(run => run.conclusion === 'failure').length,
+              cancelled: runs.workflow_runs.filter(run => run.conclusion === 'cancelled').length,
+              skipped: runs.workflow_runs.filter(run => run.conclusion === 'skipped').length
+            };
+
+            const successRate = stats.total > 0 ? ((stats.success / stats.total) * 100).toFixed(1) : '0';
+
+            core.setOutput('total_runs', stats.total);
+            core.setOutput('success_runs', stats.success);
+            core.setOutput('failure_runs', stats.failure);
+            core.setOutput('cancelled_runs', stats.cancelled);
+            core.setOutput('skipped_runs', stats.skipped);
+            core.setOutput('success_rate', successRate);
+
+            console.log(`Workflow Statistics:`);
+            console.log(`Total runs: ${stats.total}`);
+            console.log(`Success: ${stats.success}`);
+            console.log(`Failure: ${stats.failure}`);
+            console.log(`Cancelled: ${stats.cancelled}`);
+            console.log(`Skipped: ${stats.skipped}`);
+            console.log(`Success rate: ${successRate}%`);
+
+      - name: Create comprehensive audit report
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            const title = `Weekly Repository Audit Report - ${date}`;
+
+            let body = `# 📊 Weekly Repository Audit Report\n\n`;
+            body += `**Audit Period:** ${new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0]} to ${date}\n\n`;
+
+            // Executive Summary
+            body += `## 📋 Executive Summary\n\n`;
+
+            const issues = [];
+            if ('${{ steps.commit-analysis.outputs.direct_commits_found }}' === 'true') issues.push('Direct commits to main');
+            if ('${{ steps.commit-analysis.outputs.invalid_commits_found }}' === 'true') issues.push('Invalid commit messages');
+            if ('${{ steps.commit-analysis.outputs.large_commits_found }}' === 'true') issues.push('Large commits');
+            if ('${{ steps.branch-analysis.outputs.stale_branches_found }}' === 'true') issues.push('Stale branches');
+            if ('${{ steps.branch-analysis.outputs.unmerged_features_found }}' === 'true') issues.push('Unmerged feature branches');
+            if ('${{ steps.branch-analysis.outputs.unmerged_staging_found }}' === 'true') issues.push('Unmerged staging branches');
+            if ('${{ steps.cicd-analysis.outputs.ci_skips_found }}' === 'true') issues.push('CI skips');
+            if ('${{ steps.cicd-analysis.outputs.test_skips_found }}' === 'true') issues.push('Test skips');
+            if ('${{ steps.cicd-analysis.outputs.emergency_commits_found }}' === 'true') issues.push('Emergency commits');
+
+            if (issues.length === 0) {
+              body += `✅ **Status:** All checks passed - no issues found\n\n`;
+            } else {
+              body += `⚠️ **Status:** ${issues.length} issue(s) found\n`;
+              body += `**Issues:** ${issues.join(', ')}\n\n`;
+            }
+
+            // CI/CD Health
+            body += `## 🔄 CI/CD Health\n\n`;
+            body += `- **Total Workflow Runs:** ${{ steps.workflow-stats.outputs.total_runs }}\n`;
+            body += `- **Success Rate:** ${{ steps.workflow-stats.outputs.success_rate }}%\n`;
+            body += `- **Successful Runs:** ${{ steps.workflow-stats.outputs.success_runs }}\n`;
+            body += `- **Failed Runs:** ${{ steps.workflow-stats.outputs.failure_runs }}\n`;
+            body += `- **Cancelled Runs:** ${{ steps.workflow-stats.outputs.cancelled_runs }}\n`;
+            body += `- **Skipped Runs:** ${{ steps.workflow-stats.outputs.skipped_runs }}\n\n`;
+
+            // Detailed findings
+            if ('${{ steps.commit-analysis.outputs.direct_commits_found }}' === 'true') {
+              body += `## ⚠️ Direct Commits to Main\n\n`;
+              body += `\`\`\`\n${process.env.DIRECT_COMMITS}\n\`\`\`\n\n`;
+            }
+
+            if ('${{ steps.commit-analysis.outputs.invalid_commits_found }}' === 'true') {
+              body += `## ⚠️ Invalid Commit Messages\n\n`;
+              body += `Commits not following conventional commit format:\n\n`;
+              body += `\`\`\`\n${process.env.INVALID_COMMITS}\n\`\`\`\n\n`;
+            }
+
+            if ('${{ steps.commit-analysis.outputs.large_commits_found }}' === 'true') {
+              body += `## ⚠️ Large Commits\n\n`;
+              body += `Commits affecting more than 20 files:\n\n`;
+              body += `\`\`\`\n${process.env.LARGE_COMMITS}\n\`\`\`\n\n`;
+            }
+
+            if ('${{ steps.branch-analysis.outputs.stale_branches_found }}' === 'true') {
+              body += `## 🗑️ Stale Branches\n\n`;
+              body += `Branches with no activity for 30+ days:\n\n`;
+              body += `\`\`\`\n${process.env.STALE_BRANCHES}\n\`\`\`\n\n`;
+            }
+
+            if ('${{ steps.branch-analysis.outputs.unmerged_features_found }}' === 'true') {
+              body += `## 🔀 Unmerged Feature Branches\n\n`;
+              body += `\`\`\`\n${process.env.UNMERGED_FEATURES}\n\`\`\`\n\n`;
+            }
+
+            if ('${{ steps.branch-analysis.outputs.unmerged_staging_found }}' === 'true') {
+              body += `## 🚀 Unmerged Staging Branches\n\n`;
+              body += `\`\`\`\n${process.env.UNMERGED_STAGING}\n\`\`\`\n\n`;
+            }
+
+            if ('${{ steps.cicd-analysis.outputs.ci_skips_found }}' === 'true') {
+              body += `## ⏭️ CI Skip Flags\n\n`;
+              body += `\`\`\`\n${process.env.CI_SKIPS}\n\`\`\`\n\n`;
+            }
+
+            if ('${{ steps.cicd-analysis.outputs.test_skips_found }}' === 'true') {
+              body += `## 🧪 Test Skips\n\n`;
+              body += `\`\`\`\n${process.env.TEST_SKIPS}\n\`\`\`\n\n`;
+            }
+
+            if ('${{ steps.cicd-analysis.outputs.emergency_commits_found }}' === 'true') {
+              body += `## 🚨 Emergency/Hotfix Commits\n\n`;
+              body += `\`\`\`\n${process.env.EMERGENCY_COMMITS}\n\`\`\`\n\n`;
+            }
+
+            // Recommendations
+            body += `## 💡 Recommendations\n\n`;
+            if (issues.length > 0) {
+              body += `1. **Review flagged items** above and take corrective action\n`;
+              body += `2. **Update team processes** to prevent recurring issues\n`;
+              body += `3. **Consider additional automation** for problematic areas\n`;
+              body += `4. **Schedule team discussion** if patterns emerge\n\n`;
+            } else {
+              body += `✅ Repository is in good health - continue current practices\n\n`;
+            }
+
+            body += `---\n`;
+            body += `*This comprehensive audit was automatically generated by the Weekly Repository Audit workflow.*`;
+
+            // Create or update issue
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'weekly-audit,automated'
+            });
+
+            const existingIssue = issues.find(issue => issue.title === title);
+
+            if (existingIssue) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: body
+              });
+              console.log(`Updated existing weekly audit issue #${existingIssue.number}`);
+            } else {
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['weekly-audit', 'automated', 'report']
+              });
+              console.log(`Created new weekly audit issue #${issue.data.number}`);
+            }

@@ -77,7 +77,7 @@ jobs:
           echo "git-sha=${GIT_SHA}" >> $GITHUB_OUTPUT
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -161,7 +161,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download deployment artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: deployment-artifacts-${{ needs.build.outputs.version }}
 
@@ -257,7 +257,7 @@ jobs:
 
       - name: Download deployment artifacts
         if: ${{ !inputs.rollback }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: deployment-artifacts-${{ needs.build.outputs.version }}
 

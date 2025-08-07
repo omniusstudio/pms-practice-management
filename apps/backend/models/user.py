@@ -164,12 +164,14 @@ class User(BaseModel):
         self, max_attempts: int = 5, lockout_minutes: int = 30
     ) -> None:
         """Record a failed login attempt and lock account if necessary."""
+        from datetime import timedelta
+
         failed_count = int(self.failed_login_attempts or "0") + 1
         self.failed_login_attempts = str(failed_count)
 
         if failed_count >= max_attempts:
-            self.locked_until = datetime.now(timezone.utc).replace(
-                minute=datetime.now(timezone.utc).minute + lockout_minutes
+            self.locked_until = datetime.now(timezone.utc) + timedelta(
+                minutes=lockout_minutes
             )
 
     def unlock_account(self) -> None:
@@ -193,5 +195,6 @@ class User(BaseModel):
     def __repr__(self) -> str:
         """String representation of the user."""
         return (
-            f"<User(id={self.id}, email={self.email}, provider={self.provider_name})>"
+            f"<User(id={self.id}, email={self.email}, "
+            f"provider={self.provider_name})>"
         )

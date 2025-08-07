@@ -298,6 +298,7 @@ jobs:
         run: |
           if [ -f "apps/frontend/package.json" ]; then
             cd apps/frontend
+            npm install
             npm run build
             npx lhci autorun --config=.lighthouserc.json || echo "Lighthouse analysis completed"
           fi

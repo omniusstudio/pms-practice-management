@@ -374,7 +374,7 @@ class TestFHIRMappingService:
         unique_tenant = f"tenant-errors-{uuid4()}"
 
         # Create mapping without errors
-        mapping1 = service.create_mapping(
+        service.create_mapping(
             internal_id=uuid4(),
             fhir_resource_type=FHIRResourceType.PATIENT,
             fhir_resource_id=f"patient-error-1-{uuid4()}",

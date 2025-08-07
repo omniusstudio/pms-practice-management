@@ -19,6 +19,8 @@ jobs:
     name: Pre-commit Hooks Validation
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

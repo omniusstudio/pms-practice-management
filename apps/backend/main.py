@@ -23,6 +23,7 @@ from api.patients import router as patients_router
 from api.providers import router as providers_router
 from middleware.correlation import CorrelationIDMiddleware, get_correlation_id
 from middleware.metrics import PrometheusMetricsMiddleware, metrics_endpoint
+from middleware.security_middleware import add_security_middleware
 from middleware.session_middleware import add_session_middleware
 from routers.auth_router import router as auth_router
 from routers.oidc import router as oidc_router
@@ -227,6 +228,9 @@ async def not_found_handler(request: Request, exc: HTTPException):
 
 # Add session middleware for Auth0 authentication
 add_session_middleware(app)
+
+# Add security middleware (TLS enforcement, HSTS, secure headers)
+add_security_middleware(app)
 
 # Add correlation ID middleware first
 app.add_middleware(CorrelationIDMiddleware)

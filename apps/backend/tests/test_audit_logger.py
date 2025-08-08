@@ -30,7 +30,6 @@ class TestLogCrudAction:
 
         mock_logger.info.assert_called_once_with(
             "Audit: CREATE patient",
-            event="audit_log",
             audit_action="CREATE",
             resource_type="patient",
             user_id="user123",
@@ -59,7 +58,6 @@ class TestLogCrudAction:
 
         mock_logger.info.assert_called_once_with(
             "Audit: UPDATE patient",
-            event="audit_log",
             audit_action="UPDATE",
             resource_type="patient",
             user_id="user123",
@@ -98,7 +96,6 @@ class TestLogCrudAction:
 
         mock_logger.info.assert_called_once_with(
             "Audit: UPDATE patient",
-            event="audit_log",
             audit_action="UPDATE",
             resource_type="patient",
             user_id="user123",
@@ -230,7 +227,6 @@ class TestLogDataAccess:
 
         mock_logger.info.assert_called_once_with(
             "Data Access: READ patient",
-            event="data_access_audit",
             user_id="user123",
             correlation_id="corr456",
             resource_type="patient",
@@ -265,7 +261,6 @@ class TestLogDataAccess:
 
         mock_logger.info.assert_called_once_with(
             "Data Access: SEARCH patient",
-            event="data_access_audit",
             user_id="user123",
             correlation_id="corr456",
             resource_type="patient",
@@ -289,8 +284,7 @@ class TestLogSystemEvent:
         log_system_event(event_type="database_backup", correlation_id="corr456")
 
         mock_logger.info.assert_called_once_with(
-            "System: DATABASE_BACKUP",
-            event="system_audit",
+            "system_audit",
             system_event="DATABASE_BACKUP",
             correlation_id="corr456",
             severity="INFO",
@@ -320,8 +314,7 @@ class TestLogSystemEvent:
         mock_scrub_phi.assert_called_once_with(details)
 
         mock_logger.error.assert_called_once_with(
-            "System: DATABASE_ERROR",
-            event="system_audit",
+            "system_audit",
             system_event="DATABASE_ERROR",
             correlation_id="corr456",
             severity="ERROR",
@@ -341,8 +334,7 @@ class TestLogSystemEvent:
         )
 
         mock_logger.warning.assert_called_once_with(
-            "System: HIGH_MEMORY_USAGE",
-            event="system_audit",
+            "system_audit",
             system_event="HIGH_MEMORY_USAGE",
             correlation_id="corr456",
             severity="WARNING",

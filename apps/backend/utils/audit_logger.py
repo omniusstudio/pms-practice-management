@@ -32,7 +32,6 @@ def log_crud_action(
     """
     # Prepare audit log entry
     audit_entry = {
-        "event": "audit_log",
         "audit_action": action.upper(),
         "resource_type": resource,
         "user_id": user_id,
@@ -54,7 +53,8 @@ def log_crud_action(
         audit_entry["metadata"] = scrub_phi(metadata)
 
     # Log the audit entry (structured and immutable)
-    logger.info(f"Audit: {action.upper()} {resource}", **audit_entry)
+    message = f"Audit: {action.upper()} {resource}"
+    logger.info(message, **audit_entry)
 
 
 def log_authentication_event(
@@ -123,7 +123,6 @@ def log_data_access(
         query_params: Query parameters used
     """
     audit_entry = {
-        "event": "data_access_audit",
         "user_id": user_id,
         "correlation_id": correlation_id,
         "resource_type": resource_type,
@@ -138,7 +137,8 @@ def log_data_access(
         audit_entry["query_params"] = scrub_phi(query_params)
 
     # Log the data access event
-    logger.info(f"Data Access: {access_type.upper()} {resource_type}", **audit_entry)
+    message = f"Data Access: {access_type.upper()} {resource_type}"
+    logger.info(message, **audit_entry)
 
 
 def log_system_event(
@@ -156,7 +156,6 @@ def log_system_event(
         details: Additional event details
     """
     audit_entry = {
-        "event": "system_audit",
         "system_event": event_type.upper(),
         "correlation_id": correlation_id,
         "severity": severity.upper(),
@@ -170,4 +169,4 @@ def log_system_event(
 
     # Log the system event
     log_method = getattr(logger, severity.lower(), logger.info)
-    log_method(f"System: {event_type.upper()}", **audit_entry)
+    log_method("system_audit", **audit_entry)

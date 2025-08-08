@@ -101,6 +101,24 @@ async def evaluate_flag(
             request.flag_name, user_id=user_id, default=request.default, **context
         )
 
+        # Log data access for audit trail
+        if flags_service.is_enabled("audit_trail_enhanced", user_id):
+            from utils.audit_logger import log_data_access
+
+            log_data_access(
+                resource_type="FeatureFlag",
+                resource_id=request.flag_name,
+                access_type="READ",
+                user_id=user_id or "anonymous",
+                correlation_id=correlation_id,
+                query_params={
+                    "endpoint": "/feature-flags/evaluate",
+                    "method": "POST",
+                    "flag_name": request.flag_name,
+                    "enabled": enabled,
+                },
+            )
+
         logger.info(
             "Feature flag evaluated via API",
             flag_name=request.flag_name,
@@ -161,6 +179,23 @@ async def get_all_flags(
         # Get all flags
         flags = flags_service.get_all_flags(effective_user_id, **context)
 
+        # Log data access for audit trail
+        if flags_service.is_enabled("audit_trail_enhanced", effective_user_id):
+            from utils.audit_logger import log_data_access
+
+            log_data_access(
+                resource_type="FeatureFlags",
+                resource_id="all",
+                access_type="READ",
+                user_id=effective_user_id or "anonymous",
+                correlation_id=correlation_id,
+                query_params={
+                    "endpoint": "/feature-flags/all",
+                    "method": "GET",
+                    "flags_count": len(flags),
+                },
+            )
+
         logger.info(
             "All feature flags retrieved via API",
             flags_count=len(flags),
@@ -208,6 +243,24 @@ async def get_flag_info(
 
     try:
         flag_info = flags_service.get_flag_info(flag_name)
+
+        # Log data access for audit trail
+        user_id = current_user.get("sub")
+        if flags_service.is_enabled("audit_trail_enhanced", user_id):
+            from utils.audit_logger import log_data_access
+
+            log_data_access(
+                resource_type="FeatureFlagInfo",
+                resource_id=flag_name,
+                access_type="READ",
+                user_id=user_id or "anonymous",
+                correlation_id=correlation_id,
+                query_params={
+                    "endpoint": (f"/feature-flags/{flag_name}/info"),
+                    "method": "GET",
+                    "flag_name": flag_name,
+                },
+            )
 
         logger.info(
             "Feature flag info retrieved via API",
@@ -261,6 +314,22 @@ async def clear_flags_cache(
             )
 
         flags_service.clear_cache()
+
+        # Log system event for audit trail
+        user_id = current_user.get("sub")
+        if flags_service.is_enabled("audit_trail_enhanced", user_id):
+            from utils.audit_logger import log_system_event
+
+            log_system_event(
+                event_type=("FEATURE_FLAGS_CACHE_CLEARED"),
+                severity="INFO",
+                details={
+                    "user_id": user_id,
+                    "endpoint": ("/feature-flags/cache/clear"),
+                    "action": "CACHE_CLEAR",
+                },
+                correlation_id=correlation_id,
+            )
 
         logger.info(
             "Feature flags cache cleared via API",

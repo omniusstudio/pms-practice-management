@@ -9,11 +9,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from database import SessionLocal
+from middleware.correlation import get_correlation_id
 from models.appointment import Appointment, AppointmentStatus
 from models.client import Client
 from models.ledger import LedgerEntry
 from models.note import Note
 from models.provider import Provider
+from services.feature_flags_service import is_enabled
+from utils.audit_logger import log_crud_action
 
 # Type alias for audit logger
 AuditLogger = Callable[..., Any]
@@ -52,8 +55,35 @@ class DatabaseService:
     def _log_action(
         self, action: str, resource_type: str, resource_id: str, **kwargs: Any
     ) -> None:
-        if self.audit_logger:
-            self.audit_logger(action, resource_type, resource_id, **kwargs)
+        """Log CRUD action with enhanced audit trail."""
+        try:
+            correlation_id = get_correlation_id()
+            user_id = kwargs.get("user_id", "system")
+
+            # Use the proper audit logger if available
+            if self.audit_logger:
+                self.audit_logger(action, resource_type, resource_id, **kwargs)
+            else:
+                # Fallback to direct audit logging
+                log_crud_action(
+                    action=action,
+                    resource=resource_type,
+                    user_id=user_id,
+                    correlation_id=correlation_id,
+                    resource_id=resource_id,
+                    changes=kwargs.get("changes"),
+                    metadata={
+                        "old_values": kwargs.get("old_values"),
+                        "new_values": kwargs.get("new_values"),
+                        "enhanced_audit": is_enabled("audit_trail_enhanced", user_id),
+                    },
+                )
+        except Exception as e:
+            # Log audit failure but don't break the operation
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.error(f"Audit logging failed: {e}")
 
     # Client operations
     async def create_client(self, client_data: Dict[str, Any]) -> Client:
@@ -119,6 +149,27 @@ class DatabaseService:
         )
 
         return client
+
+    async def delete_client(self, client_id: UUID) -> bool:
+        """Soft delete client with audit logging."""
+        client = await self.get_client(client_id)
+        if not client:
+            return False
+
+        # Soft delete by setting is_active to False
+        result = await self.update_client(client_id, {"is_active": False})
+
+        # Log as DELETE action for audit purposes
+        if result:
+            self._log_action(
+                action="DELETE",
+                resource_type="Client",
+                resource_id=str(client_id),
+                old_values={"is_active": True},
+                new_values={"is_active": False},
+            )
+
+        return result is not None
 
     # Provider operations
     async def create_provider(self, provider_data: Dict[str, Any]) -> Provider:

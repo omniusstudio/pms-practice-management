@@ -6,18 +6,15 @@ from fastapi import APIRouter, Depends, Header, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from core.database import get_db
-from middleware.auth import require_permissions
+from database import get_db
+from middleware.auth_middleware import require_auth_dependency
 
 # from models.patient import Patient  # TODO: Implement Patient model
-from utils.exceptions import (
-    NotFoundError,
-    ValidationError
-)
+from utils.error_handlers import NotFoundError, ValidationError, handle_database_error
 from utils.pagination import (
     PaginationParams,
+    create_pagination_response,
     paginate_query,
-    create_paginated_response
 )
 
 # from utils.idempotency import (  # TODO: Implement idempotency
@@ -35,12 +32,8 @@ class Patient:
             setattr(self, key, value)
 
 
-def require_auth_dependency():
-    """Placeholder for auth dependency"""
-    pass
-
-
 def require_permissions(user, permissions):
+    """Check if user has required permissions"""
     pass
 
 
@@ -68,10 +61,11 @@ def log_api_access(user, action, resource_id=None):
     pass
 
 
-def handle_database_error(error, correlation_id):
+def create_paginated_response(items, pagination_meta, correlation_id):
     return {
-        "error": str(error),
-        "correlation_id": correlation_id
+        "data": items,
+        "pagination": pagination_meta,
+        "correlation_id": correlation_id,
     }
 
 
@@ -84,8 +78,8 @@ class PatientCreateRequest(BaseModel):
 
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
-    date_of_birth: str = Field(..., regex=r"^\d{4}-\d{2}-\d{2}$")
-    email: Optional[str] = Field(None, regex=r"^[^@]+@[^@]+\.[^@]+$")
+    date_of_birth: str = Field(..., pattern=r"^\d{4}-\d{2}-\d{2}$")
+    email: Optional[str] = Field(None, pattern=r"^[^@]+@[^@]+\.[^@]+$")
     phone: Optional[str] = Field(None, min_length=10, max_length=15)
     address: Optional[str] = Field(None, max_length=500)
     emergency_contact_name: Optional[str] = Field(None, max_length=100)
@@ -115,7 +109,7 @@ class PatientUpdateRequest(BaseModel):
 
     first_name: Optional[str] = Field(None, min_length=1, max_length=100)
     last_name: Optional[str] = Field(None, min_length=1, max_length=100)
-    email: Optional[str] = Field(None, regex=r"^[^@]+@[^@]+\.[^@]+$")
+    email: Optional[str] = Field(None, pattern=r"^[^@]+@[^@]+\.[^@]+$")
     phone: Optional[str] = Field(None, min_length=10, max_length=15)
     address: Optional[str] = Field(None, max_length=500)
     emergency_contact_name: Optional[str] = Field(None, max_length=100)
@@ -174,14 +168,10 @@ class PatientResponse(BaseModel):
 async def list_patients(
     pagination: PaginationParams = Depends(),
     search: Optional[str] = Query(None, description="Search by name or email"),
-    is_active: Optional[bool] = Query(
-        None, description="Filter by active status"
-    ),
+    is_active: Optional[bool] = Query(None, description="Filter by active status"),
     db: Session = Depends(get_db),
     current_user=Depends(require_auth_dependency),
-    x_correlation_id: Optional[str] = Header(
-        None, alias="X-Correlation-ID"
-    ),
+    x_correlation_id: Optional[str] = Header(None, alias="X-Correlation-ID"),
 ):
     """List patients with pagination and filtering."""
     try:
@@ -189,11 +179,7 @@ async def list_patients(
         require_permissions(current_user, ["patients:read"])
 
         # Log API access
-        log_api_access(
-            current_user,
-            "list_patients",
-            correlation_id=x_correlation_id
-        )
+        log_api_access(current_user, "list_patients", x_correlation_id)
 
         # Build query
         query = db.query(Patient)
@@ -211,24 +197,14 @@ async def list_patients(
             query = query.filter(Patient.is_active == is_active)
 
         # Apply pagination
-        paginated_result = paginate_query(
-            query, pagination.page, pagination.per_page
-        )
+        paginated_result = paginate_query(query, pagination.page, pagination.per_page)
 
         # Convert to response models
-        items = (
-            paginated_result.items
-            if hasattr(paginated_result, "items")
-            else []
-        )
-        patients = [
-            PatientResponse.from_orm(patient) for patient in items
-        ]
+        items = paginated_result.items if hasattr(paginated_result, "items") else []
+        patients = [PatientResponse.from_orm(patient) for patient in items]
 
-        return create_paginated_response(
-            patients,
-            paginated_result.pagination,
-            x_correlation_id
+        return create_pagination_response(
+            patients, paginated_result.pagination, x_correlation_id
         )
 
     except Exception as e:
@@ -246,9 +222,7 @@ async def get_patient(
     patient_id: int,
     db: Session = Depends(get_db),
     current_user=Depends(require_auth_dependency),
-    x_correlation_id: Optional[str] = Header(
-        None, alias="X-Correlation-ID"
-    ),
+    x_correlation_id: Optional[str] = Header(None, alias="X-Correlation-ID"),
 ):
     """Get a specific patient by ID."""
     try:
@@ -256,18 +230,12 @@ async def get_patient(
         require_permissions(current_user, ["patients:read"])
 
         # Log API access
-        log_api_access(
-            current_user,
-            "get_patient",
-            correlation_id=x_correlation_id
-        )
+        log_api_access(current_user, "get_patient", x_correlation_id)
 
         # Get patient
         patient = db.query(Patient).filter(Patient.id == patient_id).first()
         if not patient:
-            raise NotFoundError(
-                f"Patient with ID {patient_id} not found"
-            )
+            raise NotFoundError(f"Patient with ID {patient_id} not found")
 
         return {
             "data": PatientResponse.from_orm(patient),
@@ -307,23 +275,15 @@ async def create_patient(
             return cached_response
 
         # Log API access
-        log_api_access(
-            current_user,
-            "create_patient",
-            correlation_id=x_correlation_id
-        )
+        log_api_access(current_user, "create_patient", x_correlation_id)
 
         # Validate unique constraints
         if patient_data.email:
             existing_patient = (
-                db.query(Patient)
-                .filter(Patient.email == patient_data.email)
-                .first()
+                db.query(Patient).filter(Patient.email == patient_data.email).first()
             )
             if existing_patient:
-                raise ValidationError(
-                    "A patient with this email already exists"
-                )
+                raise ValidationError("A patient with this email already exists")
 
         # Create patient
         patient = Patient(**patient_data.dict())
@@ -374,33 +334,22 @@ async def update_patient(
             return cached_response
 
         # Log API access
-        log_api_access(
-            current_user,
-            "update_patient",
-            correlation_id=x_correlation_id
-        )
+        log_api_access(current_user, "update_patient", x_correlation_id)
 
         # Get existing patient
         patient = db.query(Patient).filter(Patient.id == patient_id).first()
         if not patient:
-            raise NotFoundError(
-                f"Patient with ID {patient_id} not found"
-            )
+            raise NotFoundError(f"Patient with ID {patient_id} not found")
 
         # Validate unique constraints if email is being updated
         if patient_data.email and patient_data.email != patient.email:
             existing_patient = (
                 db.query(Patient)
-                .filter(
-                    Patient.email == patient_data.email,
-                    Patient.id != patient_id
-                )
+                .filter(Patient.email == patient_data.email, Patient.id != patient_id)
                 .first()
             )
             if existing_patient:
-                raise ValidationError(
-                    "A patient with this email already exists"
-                )
+                raise ValidationError("A patient with this email already exists")
 
         # Update patient
         update_data = patient_data.dict(exclude_unset=True)
@@ -452,18 +401,12 @@ async def delete_patient(
             return cached_response
 
         # Log API access
-        log_api_access(
-            current_user,
-            "delete_patient",
-            correlation_id=x_correlation_id
-        )
+        log_api_access(current_user, "delete_patient", x_correlation_id)
 
         # Get patient
         patient = db.query(Patient).filter(Patient.id == patient_id).first()
         if not patient:
-            raise NotFoundError(
-                f"Patient with ID {patient_id} not found"
-            )
+            raise NotFoundError(f"Patient with ID {patient_id} not found")
 
         # Soft delete (mark as inactive)
         patient.is_active = False

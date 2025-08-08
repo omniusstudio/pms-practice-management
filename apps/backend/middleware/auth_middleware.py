@@ -9,6 +9,7 @@ from typing import List, Optional
 
 from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from utils.error_handlers import AuthenticationError
 from pydantic import BaseModel, ConfigDict, PrivateAttr
 
 from core.config import get_settings
@@ -261,10 +262,10 @@ async def require_auth(
         logger.warning(
             "Authentication required but not provided", extra={"path": request.url.path}
         )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required",
-            headers={"WWW-Authenticate": "Bearer"},
+        correlation_id = getattr(request.state, "correlation_id", "unknown")
+        raise AuthenticationError(
+            message="Authentication failed",
+            correlation_id=correlation_id
         )
 
     return user
@@ -398,10 +399,10 @@ async def require_auth_dependency(request: Request) -> AuthenticatedUser:
     user = getattr(request.state, "user", None)
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required",
-            headers={"WWW-Authenticate": "Bearer"},
+        correlation_id = getattr(request.state, "correlation_id", "unknown")
+        raise AuthenticationError(
+            message="Authentication failed",
+            correlation_id=correlation_id
         )
 
     return user

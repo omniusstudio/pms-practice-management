@@ -10,8 +10,10 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_async_db
+from middleware.auth_middleware import AuthenticatedUser, require_auth_dependency
 from models.ledger import PaymentMethod, TransactionType
 from services.database_service import DatabaseService
+from services.feature_flags_service import is_financial_ledger_enabled
 
 router = APIRouter(tags=["ledger"])
 
@@ -107,8 +109,15 @@ async def get_ledger_entries(
     skip: int = Query(0, ge=0, description="Number of entries to skip"),
     limit: int = Query(100, ge=1, le=1000, description="Number of entries to return"),
     db: AsyncSession = Depends(get_async_db),
+    current_user: AuthenticatedUser = Depends(require_auth_dependency),
 ) -> List[LedgerEntryResponse]:
     """Get ledger entries with optional filtering."""
+    # Check if financial ledger feature is enabled
+    if not is_financial_ledger_enabled(current_user.user_id):
+        raise HTTPException(
+            status_code=503, detail="Financial ledger feature is currently disabled"
+        )
+
     # For now, return empty list - will be implemented with database service
     return []
 

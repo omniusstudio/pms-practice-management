@@ -97,7 +97,7 @@ class BaseEvent(BaseModel):
     @classmethod
     def validate_environment(cls, v):
         """Validate environment values."""
-        valid_envs = {"development", "staging", "production"}
+        valid_envs = {"development", "staging", "production", "demo"}
         if v not in valid_envs:
             raise ValueError(f"environment must be one of {valid_envs}")
         return v

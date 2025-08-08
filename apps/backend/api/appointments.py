@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from middleware.auth_middleware import AuthenticatedUser, require_auth_dependency
 from middleware.correlation import get_correlation_id
+from services.feature_flags_service import is_enabled
 from utils.response_models import APIResponse, ListResponse, create_list_response
 
 logger = logging.getLogger(__name__)
@@ -74,6 +75,12 @@ async def get_appointments(
     status: Optional[str] = Query(None, description="Filter by status"),
 ):
     """Get all appointments with pagination and filtering."""
+    # Check if appointments feature is enabled
+    if not is_enabled("appointments_enabled", current_user.user_id, default=True):
+        raise HTTPException(
+            status_code=503, detail="Appointments feature is currently disabled"
+        )
+
     try:
         # Use page_size if provided, otherwise use per_page
         items_per_page = page_size if page_size is not None else per_page

@@ -13,6 +13,7 @@ from api.appointments import router as appointments_router
 from api.auth import router as auth_api_router
 from api.clients import router as clients_router
 from api.events import router as events_router
+from api.feature_flags import router as feature_flags_router
 from api.ledger import router as ledger_router
 from api.mock_services import router as mock_services_router
 from api.notes import router as notes_router
@@ -25,6 +26,7 @@ from routers.auth_router import router as auth_router
 from routers.oidc import router as oidc_router
 from services.etl_pipeline import initialize_etl_pipeline
 from services.event_bus import initialize_event_bus
+from services.feature_flags_service import get_feature_flags_service
 from utils.logging_config import configure_structured_logging
 
 # TrustedHostMiddleware removed - not needed for Kubernetes deployment
@@ -66,6 +68,16 @@ async def lifespan(app: FastAPI):
 
         # Start ETL pipeline in background
         asyncio.create_task(etl_pipeline.start())
+
+        # Initialize feature flags service
+        feature_flags_service = get_feature_flags_service()
+        logger.info(
+            "Feature flags service initialized",
+            extra={
+                "provider": feature_flags_service.config.provider,
+                "environment": feature_flags_service.config.environment,
+            },
+        )
 
         logger.info(
             "Event bus and ETL pipeline initialized",
@@ -279,6 +291,7 @@ app.include_router(notes_router, prefix="/api")
 app.include_router(ledger_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(auth_api_router, prefix="/api")
+app.include_router(feature_flags_router, prefix="/api")
 app.include_router(mock_services_router, prefix="/api")
 app.include_router(oidc_router, prefix="/oidc")
 app.include_router(auth_router, prefix="/api")

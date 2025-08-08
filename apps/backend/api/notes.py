@@ -13,6 +13,10 @@ from middleware.auth_middleware import AuthenticatedUser, require_auth_dependenc
 from middleware.correlation import get_correlation_id
 from models.note import NoteType
 from services.database_service import DatabaseService
+from services.feature_flags_service import (
+    is_clinical_notes_enabled,
+    is_note_signing_enabled,
+)
 from utils.response_models import APIResponse
 
 logger = logging.getLogger(__name__)
@@ -83,6 +87,12 @@ async def get_notes(
     is_signed: Optional[bool] = Query(None, description="Filter by signed status"),
 ):
     """Get all notes with pagination and filtering."""
+    # Check if clinical notes feature is enabled
+    if not is_clinical_notes_enabled(current_user.user_id):
+        raise HTTPException(
+            status_code=503, detail="Clinical notes feature is currently disabled"
+        )
+
     try:
         logger.info(
             "Fetching notes",
@@ -334,6 +344,12 @@ async def sign_note(
     correlation_id: str = Depends(get_correlation_id),
 ):
     """Sign a note."""
+    # Check if note signing feature is enabled
+    if not is_note_signing_enabled(current_user.user_id):
+        raise HTTPException(
+            status_code=503, detail="Note signing feature is currently disabled"
+        )
+
     try:
         logger.info(
             "Signing note",

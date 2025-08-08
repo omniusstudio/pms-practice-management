@@ -44,6 +44,9 @@ pytest-cov==4.1.0
 factory-boy==3.3.0
 httpx==0.25.2
 
+# Error Tracking & Monitoring
+sentry-sdk[fastapi]==1.38.0
+
 # Code Quality
 black==23.11.0
 flake8==6.1.0

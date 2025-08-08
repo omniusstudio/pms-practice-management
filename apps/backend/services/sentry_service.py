@@ -46,18 +46,14 @@ class PHIScrubberProcessor:
                             if "vars" in frame:
                                 frame["vars"] = scrub_phi(frame["vars"])
                             if "context_line" in frame:
-                                frame["context_line"] = scrub_phi(
-                                    frame["context_line"]
-                                )
+                                frame["context_line"] = scrub_phi(frame["context_line"])
                             if "pre_context" in frame:
                                 frame["pre_context"] = [
-                                    scrub_phi(line)
-                                    for line in frame["pre_context"]
+                                    scrub_phi(line) for line in frame["pre_context"]
                                 ]
                             if "post_context" in frame:
                                 frame["post_context"] = [
-                                    scrub_phi(line)
-                                    for line in frame["post_context"]
+                                    scrub_phi(line) for line in frame["post_context"]
                                 ]
 
             # Scrub request data
@@ -71,9 +67,7 @@ class PHIScrubberProcessor:
                     )
                 if "headers" in request_data:
                     # Remove sensitive headers
-                    sensitive_headers = [
-                        "authorization", "cookie", "x-api-key"
-                    ]
+                    sensitive_headers = ["authorization", "cookie", "x-api-key"]
                     for header in sensitive_headers:
                         request_data["headers"].pop(header, None)
 
@@ -82,9 +76,7 @@ class PHIScrubberProcessor:
                 user_data = event["user"]
                 if "id" in user_data:
                     # Keep user ID for session tracking but anonymize
-                    user_data["id"] = (
-                        f"user_{hash(user_data['id']) % 10000:04d}"
-                    )
+                    user_data["id"] = f"user_{hash(user_data['id']) % 10000:04d}"
                 # Remove other potentially identifying user data
                 user_data.pop("email", None)
                 user_data.pop("username", None)
@@ -141,7 +133,7 @@ class SentryService:
                 traces_sample_rate=self.traces_sample_rate,
                 profiles_sample_rate=self.profiles_sample_rate,
                 integrations=[
-                    FastApiIntegration(auto_enabling_integrations=False),
+                    FastApiIntegration(),
                     LoggingIntegration(level=logging.INFO, event_level=logging.ERROR),
                     SqlalchemyIntegration(),
                 ],

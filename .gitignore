@@ -212,6 +212,12 @@ test_integration.db
 eslint-report.json
 **/eslint-report.json
 
+# E2E test artifacts
+tests/e2e/playwright-report/
+tests/e2e/test-results/
+tests/e2e/test-results.xml
+apps/frontend/test-results.xml
+
 # Performance test artifacts
 tests/performance/reports/
 tests/performance/node_modules/

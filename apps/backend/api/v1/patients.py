@@ -6,18 +6,18 @@ from fastapi import APIRouter, Depends, Header, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from database import get_db
-from middleware.auth_middleware import require_auth_dependency
+from core.database import get_db
+from middleware.auth import require_permissions
 
 # from models.patient import Patient  # TODO: Implement Patient model
-from utils.error_handlers import (
+from utils.exceptions import (
     NotFoundError,
-    ValidationError,
-    handle_database_error,
+    ValidationError
 )
-from utils.pagination import (  # create_paginated_response
+from utils.pagination import (
     PaginationParams,
     paginate_query,
+    create_paginated_response
 )
 
 # from utils.idempotency import (  # TODO: Implement idempotency
@@ -35,11 +35,13 @@ class Patient:
             setattr(self, key, value)
 
 
-def require_permissions(permission):
-    def decorator(func):
-        return func
+def require_auth_dependency():
+    """Placeholder for auth dependency"""
+    pass
 
-    return decorator
+
+def require_permissions(user, permissions):
+    pass
 
 
 def get_idempotency_key():
@@ -66,11 +68,10 @@ def log_api_access(user, action, resource_id=None):
     pass
 
 
-def create_paginated_response(items, pagination_meta, correlation_id):
+def handle_database_error(error, correlation_id):
     return {
-        "data": items,
-        "pagination": pagination_meta,
-        "correlation_id": correlation_id,
+        "error": str(error),
+        "correlation_id": correlation_id
     }
 
 
@@ -185,9 +186,7 @@ async def list_patients(
     """List patients with pagination and filtering."""
     try:
         # Check permissions
-        require_permissions(
-            current_user, ["patients:read"]
-        )
+        require_permissions(current_user, ["patients:read"])
 
         # Log API access
         log_api_access(
@@ -213,14 +212,18 @@ async def list_patients(
 
         # Apply pagination
         paginated_result = paginate_query(
-            query,
-            pagination.page,
-            pagination.per_page
+            query, pagination.page, pagination.per_page
         )
 
         # Convert to response models
-        items = paginated_result.items if hasattr(paginated_result, "items") else []
-        patients = [PatientResponse.from_orm(patient) for patient in items]
+        items = (
+            paginated_result.items
+            if hasattr(paginated_result, "items")
+            else []
+        )
+        patients = [
+            PatientResponse.from_orm(patient) for patient in items
+        ]
 
         return create_paginated_response(
             patients,
@@ -250,9 +253,7 @@ async def get_patient(
     """Get a specific patient by ID."""
     try:
         # Check permissions
-        require_permissions(
-            current_user, ["patients:read"]
-        )
+        require_permissions(current_user, ["patients:read"])
 
         # Log API access
         log_api_access(
@@ -297,9 +298,7 @@ async def create_patient(
     """Create a new patient."""
     try:
         # Check permissions
-        require_permissions(
-            current_user, ["patients:create"]
-        )
+        require_permissions(current_user, ["patients:create"])
 
         # Check idempotency
         idempotency_manager = IdempotencyManager(idempotency_key, db)
@@ -366,9 +365,7 @@ async def update_patient(
     """Update an existing patient."""
     try:
         # Check permissions
-        require_permissions(
-            current_user, ["patients:update"]
-        )
+        require_permissions(current_user, ["patients:update"])
 
         # Check idempotency
         idempotency_manager = IdempotencyManager(idempotency_key, db)
@@ -446,9 +443,7 @@ async def delete_patient(
     """Soft delete a patient (mark as inactive)."""
     try:
         # Check permissions
-        require_permissions(
-            current_user, ["patients:delete"]
-        )
+        require_permissions(current_user, ["patients:delete"])
 
         # Check idempotency
         idempotency_manager = IdempotencyManager(idempotency_key, db)

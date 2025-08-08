@@ -16,7 +16,8 @@
     "database_query_optimization": true,
     "caching_enabled": true,
     "enhanced_encryption": true,
-    "two_factor_auth_required": false
+    "two_factor_auth_required": false,
+    "data_retention": true
   },
   "development": {
     "video_calls_enabled": false,
@@ -35,7 +36,8 @@
     "database_query_optimization": true,
     "caching_enabled": true,
     "enhanced_encryption": true,
-    "two_factor_auth_required": false
+    "two_factor_auth_required": false,
+    "data_retention": false
   },
   "staging": {
     "video_calls_enabled": false,
@@ -54,7 +56,8 @@
     "database_query_optimization": true,
     "caching_enabled": true,
     "enhanced_encryption": true,
-    "two_factor_auth_required": true
+    "two_factor_auth_required": true,
+    "data_retention": false
   },
   "production": {
     "video_calls_enabled": false,
@@ -73,6 +76,7 @@
     "database_query_optimization": true,
     "caching_enabled": true,
     "enhanced_encryption": true,
-    "two_factor_auth_required": true
+    "two_factor_auth_required": true,
+    "data_retention": false
   }
 }

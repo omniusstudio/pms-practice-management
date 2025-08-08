@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from middleware.auth_middleware import AuthenticatedUser, require_auth_dependency
 from middleware.correlation import get_correlation_id
+from services.feature_flags_service import is_patient_management_enabled
 from utils.response_models import APIResponse
 
 logger = logging.getLogger(__name__)
@@ -64,6 +65,12 @@ async def get_patients(
     per_page: int = Query(50, ge=1, le=100, description="Items per page"),
 ):
     """Get all patients with pagination."""
+    # Check if patient management feature is enabled
+    if not is_patient_management_enabled(current_user.user_id):
+        raise HTTPException(
+            status_code=503, detail="Patient management feature is currently disabled"
+        )
+
     try:
         # For now, return empty list since we need proper database queries
         # This satisfies the test requirement that endpoint exists and

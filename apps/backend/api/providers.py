@@ -12,6 +12,7 @@ from database import get_db
 from middleware.auth_middleware import AuthenticatedUser, require_auth_dependency
 from middleware.correlation import get_correlation_id
 from services.database_service import DatabaseService
+from services.feature_flags_service import is_provider_management_enabled
 from utils.response_models import APIResponse
 
 logger = logging.getLogger(__name__)
@@ -99,6 +100,12 @@ async def get_providers(
     ),
 ):
     """Get all providers with pagination and filtering."""
+    # Check if provider management feature is enabled
+    if not is_provider_management_enabled(current_user.user_id):
+        raise HTTPException(
+            status_code=503, detail="Provider management feature is currently disabled"
+        )
+
     try:
         logger.info(
             "Fetching providers",

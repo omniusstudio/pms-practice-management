@@ -31,20 +31,43 @@ export interface ApiResponse<T = any> {
   message?: string;
 }
 
+export interface PaginationMeta {
+  page: number;
+  per_page: number;
+  total_items: number;
+  total_pages: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+  pagination: PaginationMeta;
 }
 
 // Error types
 export interface ApiError {
-  code: string;
+  error: string;
   message: string;
+  correlation_id: string;
   details?: Record<string, any>;
+}
+
+// Specific error types
+export interface ValidationErrorDetails {
+  field_errors: Record<string, string[]>;
+}
+
+export interface AuthorizationErrorDetails {
+  required_role?: string;
+  error_code?: string;
+}
+
+export interface RateLimitErrorDetails {
+  retry_after_seconds?: number;
+}
+
+export interface ServiceErrorDetails {
+  retry_after_seconds?: number;
 }
 
 // Audit types (HIPAA compliance)

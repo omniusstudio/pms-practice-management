@@ -1,7 +1,7 @@
 """Standardized error handling utilities for API endpoints."""
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from fastapi import HTTPException, Request, status
@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from middleware.correlation import get_correlation_id
 from utils.audit_logger import log_authentication_event
+from utils.phi_scrubber import scrub_phi
 
 logger = logging.getLogger(__name__)
 
@@ -45,17 +46,39 @@ class APIError(Exception):
         super().__init__(message)
 
 
+class NotFoundError(APIError):
+    """Not found error with 404 status."""
+
+    def __init__(
+        self,
+        message: str = "Resource not found",
+        details: Optional[Dict[str, Any]] = None,
+        correlation_id: Optional[str] = None,
+    ):
+        super().__init__(
+            message=scrub_phi(message),
+            error_type="NOT_FOUND_ERROR",
+            status_code=status.HTTP_404_NOT_FOUND,
+            details=details,
+            correlation_id=correlation_id,
+        )
+
+
 class ValidationError(APIError):
     """Validation error with 400 status."""
 
     def __init__(
         self,
-        message: str,
+        message: str = "Request validation failed",
+        field_errors: Optional[Dict[str, List[str]]] = None,
         details: Optional[Dict[str, Any]] = None,
         correlation_id: Optional[str] = None,
     ):
+        # Support both field_errors (legacy) and details (new) parameters
+        if details is None:
+            details = {"field_errors": field_errors or {}}
         super().__init__(
-            message=message,
+            message=scrub_phi(message),
             error_type="VALIDATION_ERROR",
             status_code=status.HTTP_400_BAD_REQUEST,
             details=details,
@@ -87,9 +110,13 @@ class AuthorizationError(APIError):
     def __init__(
         self,
         message: str = "Access denied",
-        details: Optional[Dict[str, Any]] = None,
+        required_role: Optional[str] = None,
         correlation_id: Optional[str] = None,
     ):
+        details = {}
+        if required_role:
+            details["required_role"] = required_role
+            details["error_code"] = "INSUFFICIENT_ROLE"
         super().__init__(
             message=message,
             error_type="AUTHORIZATION_ERROR",
@@ -99,19 +126,61 @@ class AuthorizationError(APIError):
         )
 
 
-class NotFoundError(APIError):
-    """Not found error with 404 status."""
+class ConflictError(APIError):
+    """Conflict error with 409 status."""
 
     def __init__(
         self,
-        message: str = "Resource not found",
+        message: str = "Resource conflict",
         details: Optional[Dict[str, Any]] = None,
         correlation_id: Optional[str] = None,
     ):
         super().__init__(
+            message=scrub_phi(message),
+            error_type="CONFLICT_ERROR",
+            status_code=status.HTTP_409_CONFLICT,
+            details=details,
+            correlation_id=correlation_id,
+        )
+
+
+class RateLimitError(APIError):
+    """Rate limit error with 429 status."""
+
+    def __init__(
+        self,
+        message: str = "Rate limit exceeded",
+        retry_after: Optional[int] = None,
+        correlation_id: Optional[str] = None,
+    ):
+        details = {}
+        if retry_after:
+            details["retry_after_seconds"] = retry_after
+        super().__init__(
             message=message,
-            error_type="NOT_FOUND_ERROR",
-            status_code=status.HTTP_404_NOT_FOUND,
+            error_type="RATE_LIMIT_ERROR",
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            details=details,
+            correlation_id=correlation_id,
+        )
+
+
+class ServiceUnavailableError(APIError):
+    """Service unavailable error with 503 status."""
+
+    def __init__(
+        self,
+        message: str = "Service temporarily unavailable",
+        retry_after: Optional[int] = None,
+        correlation_id: Optional[str] = None,
+    ):
+        details = {}
+        if retry_after:
+            details["retry_after_seconds"] = retry_after
+        super().__init__(
+            message=message,
+            error_type="SERVICE_UNAVAILABLE_ERROR",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             details=details,
             correlation_id=correlation_id,
         )

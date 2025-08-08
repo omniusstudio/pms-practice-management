@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+
 <testsuites name="vitest tests" tests="44" failures="0" errors="0" time="2.717">
     <testsuite name="tests/App.test.tsx" timestamp="2025-08-08T17:01:45.580Z" hostname="Mac.attlocal.net" tests="5" failures="0" errors="0" skipped="0" time="0.069">
         <testcase classname="tests/App.test.tsx" name="App Component &gt; renders without crashing" time="0.028">
@@ -44,14 +45,16 @@ Sentry DSN not configured, error tracking disabled
         <testcase classname="tests/deployment.test.js" name="Deployment Tests &gt; should validate rollback functionality" time="0">
         </testcase>
         <testcase classname="tests/deployment.test.js" name="Deployment Tests &gt; should validate deployment status monitoring" time="0.001">
+
         </testcase>
-        <testcase classname="tests/deployment.test.js" name="Deployment Tests &gt; should validate blue/green deployment" time="0">
+        <testcase classname="tests/deployment.test.js" name="Deployment Tests &gt; should validate blue/green deployment" time="0.022">
         </testcase>
     </testsuite>
+
     <testsuite name="src/hooks/__tests__/useMetrics.test.ts" timestamp="2025-08-08T17:01:45.584Z" hostname="Mac.attlocal.net" tests="15" failures="0" errors="0" skipped="0" time="0.209">
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useMetrics Hook &gt; should track component mount and unmount" time="0.021">
         </testcase>
-        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useMetrics Hook &gt; should provide trackAction function" time="0.012">
+        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useMetrics Hook &gt; should provide trackAction function" time="0.006">
         </testcase>
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useMetrics Hook &gt; should provide trackError function" time="0.012">
         </testcase>
@@ -59,11 +62,12 @@ Sentry DSN not configured, error tracking disabled
         </testcase>
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useMetrics Hook &gt; should provide startTimer function" time="0.009">
         </testcase>
+
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useMetrics Hook &gt; should provide trackAsyncAction function" time="0.007">
         </testcase>
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="usePageMetrics Hook &gt; should track page load on mount" time="0.012">
         </testcase>
-        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="usePageMetrics Hook &gt; should track component mount for page" time="0.005">
+        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="usePageMetrics Hook &gt; should track component mount for page" time="0.004">
         </testcase>
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track field interactions" time="0.014">
         </testcase>
@@ -87,11 +91,11 @@ Sentry DSN not configured, error tracking disabled
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Performance Metrics &gt; should record API call metrics" time="0.001">
         </testcase>
-        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Error Metrics &gt; should record JavaScript errors" time="0">
+        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Error Metrics &gt; should record JavaScript errors" time="0.001">
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Error Metrics &gt; should record string errors" time="0.001">
         </testcase>
-        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; User Action Metrics &gt; should record user actions" time="0.002">
+        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; User Action Metrics &gt; should record user actions" time="0.007">
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; User Action Metrics &gt; should record failed user actions" time="0">
         </testcase>

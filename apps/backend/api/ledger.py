@@ -15,7 +15,7 @@ from models.ledger import PaymentMethod, TransactionType
 from services.database_service import DatabaseService
 from services.feature_flags_service import is_financial_ledger_enabled
 
-router = APIRouter(tags=["ledger"])
+router = APIRouter(prefix="/ledger", tags=["ledger"])
 
 
 class LedgerEntryCreateRequest(BaseModel):
@@ -90,7 +90,7 @@ class ReconcileRequest(BaseModel):
     reconciliation_date: Optional[date] = None
 
 
-@router.get("/ledger/", response_model=List[LedgerEntryResponse])
+@router.get("/", response_model=List[LedgerEntryResponse])
 async def get_ledger_entries(
     client_id: Optional[UUID] = Query(None, description="Filter by client ID"),
     transaction_type: Optional[TransactionType] = Query(
@@ -122,7 +122,7 @@ async def get_ledger_entries(
     return []
 
 
-@router.get("/ledger/{entry_id}", response_model=LedgerEntryResponse)
+@router.get("/{entry_id}", response_model=LedgerEntryResponse)
 async def get_ledger_entry(
     entry_id: UUID,
     db: AsyncSession = Depends(get_async_db),
@@ -135,7 +135,7 @@ async def get_ledger_entry(
     return LedgerEntryResponse.model_validate(entry)
 
 
-@router.post("/ledger/", response_model=LedgerEntryResponse, status_code=201)
+@router.post("/", response_model=LedgerEntryResponse, status_code=201)
 async def create_ledger_entry(
     entry_data: LedgerEntryCreateRequest,
     db: AsyncSession = Depends(get_async_db),
@@ -162,7 +162,7 @@ async def create_ledger_entry(
     return LedgerEntryResponse.model_validate(entry)
 
 
-@router.put("/ledger/{entry_id}", response_model=LedgerEntryResponse)
+@router.put("/{entry_id}", response_model=LedgerEntryResponse)
 async def update_ledger_entry(
     entry_id: UUID,
     entry_data: LedgerEntryUpdateRequest,
@@ -183,7 +183,7 @@ async def update_ledger_entry(
     return LedgerEntryResponse.model_validate(updated_entry)
 
 
-@router.delete("/ledger/{entry_id}", status_code=204)
+@router.delete("/{entry_id}", status_code=204)
 async def delete_ledger_entry(
     entry_id: UUID,
     db: AsyncSession = Depends(get_async_db),
@@ -198,7 +198,7 @@ async def delete_ledger_entry(
     await db_service.delete_ledger_entry(entry_id)
 
 
-@router.post("/ledger/{entry_id}/reconcile", response_model=LedgerEntryResponse)
+@router.post("/{entry_id}/reconcile", response_model=LedgerEntryResponse)
 async def reconcile_ledger_entry(
     entry_id: UUID,
     reconcile_data: ReconcileRequest,
@@ -223,7 +223,7 @@ async def reconcile_ledger_entry(
     return LedgerEntryResponse.model_validate(updated_entry)
 
 
-@router.get("/ledger/client/{client_id}/balance")
+@router.get("/client/{client_id}/balance")
 async def get_client_balance(
     client_id: UUID,
     db: AsyncSession = Depends(get_async_db),

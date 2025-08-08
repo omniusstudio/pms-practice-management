@@ -38,7 +38,7 @@ class TestEDIServiceContract:
             return True
 
         monkeypatch.setattr(
-            "utils.feature_flags.FeatureFlags." "is_mock_edi_enabled", mock_is_enabled
+            "utils.feature_flags.FeatureFlags.is_mock_edi_enabled", mock_is_enabled
         )
 
     def test_submit_claim_contract(self, client):
@@ -177,7 +177,9 @@ class TestEDIServiceContract:
 
         assert response.status_code == 404
         data = response.json()
-        assert "detail" in data
+        assert "error" in data
+        assert "message" in data
+        assert "correlation_id" in data
 
     def test_edi_health_contract(self, client):
         """Test EDI service health check contract."""
@@ -398,7 +400,7 @@ class TestVideoServiceContract:
             return True
 
         monkeypatch.setattr(
-            "utils.feature_flags.FeatureFlags." "is_mock_video_enabled", mock_is_enabled
+            "utils.feature_flags.FeatureFlags.is_mock_video_enabled", mock_is_enabled
         )
 
     def test_create_session_contract(self, client):
@@ -652,7 +654,7 @@ class TestMockServicesIntegration:
             return False
 
         monkeypatch.setattr(
-            "utils.feature_flags.FeatureFlags." "is_mock_edi_enabled", mock_is_disabled
+            "utils.feature_flags.FeatureFlags.is_mock_edi_enabled", mock_is_disabled
         )
         monkeypatch.setattr(
             "utils.feature_flags.FeatureFlags." "is_mock_payments_enabled",

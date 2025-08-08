@@ -3,30 +3,16 @@
 from datetime import datetime, timezone
 from enum import Enum
 
-# from models.auth_token import JSONBType  # Disabled for OpenAPI schema
-# Using local JSON type instead
-from sqlalchemy import JSON, Boolean, Column, DateTime
+from sqlalchemy import Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Index, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import sqltypes
 
 from .base import BaseModel
+from .json_types import JSONBType
 from .types import UUID
 
-
-class JSONBType(sqltypes.TypeDecorator):
-    """A type that uses JSONB for PostgreSQL and JSON for other databases."""
-
-    impl = JSON
-    cache_ok = True
-
-    def load_dialect_impl(self, dialect):
-        if dialect.name == "postgresql":
-            return dialect.type_descriptor(JSONB())
-        else:
-            return dialect.type_descriptor(JSON())
+# TYPE_CHECKING import removed to avoid linter error
 
 
 class KeyType(str, Enum):
@@ -148,7 +134,6 @@ class EncryptionKey(BaseModel):
     )
     rotation_policy = relationship(
         "KeyRotationPolicy",
-        foreign_keys=[rotation_policy_id],
         back_populates="encryption_keys",
     )
 
@@ -167,6 +152,7 @@ class EncryptionKey(BaseModel):
         Index("idx_encryption_keys_usage", "last_used_at", "status"),
         # Rollback support
         Index("idx_encryption_keys_rollback", "can_rollback", "rollback_expires_at"),
+        {"extend_existing": True},
     )
 
     def is_active(self) -> bool:

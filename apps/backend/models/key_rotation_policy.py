@@ -9,7 +9,7 @@ from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, T
 from sqlalchemy.orm import relationship
 
 from models.base import BaseModel
-from models.encryption_key import JSONBType
+from models.json_types import JSONBType
 from models.types import UUID
 
 
@@ -39,6 +39,7 @@ class KeyRotationPolicy(BaseModel):
     """
 
     __tablename__ = "key_rotation_policies"
+    __table_args__ = {"extend_existing": True}
 
     # Primary identification
     id: Column[UUID] = Column(UUID, primary_key=True, default=uuid4, nullable=False)
@@ -47,8 +48,8 @@ class KeyRotationPolicy(BaseModel):
     description = Column(Text, nullable=True)
 
     # Policy configuration
-    key_type = Column(String(50), nullable=False)  # KeyType enum value
-    kms_provider = Column(String(50), nullable=False)  # KeyProvider enum
+    key_type = Column(String(50), nullable=False)  # KeyType enum
+    kms_provider = Column(String(50), nullable=False)  # KeyProvider
     rotation_trigger = Column(String(50), nullable=False)  # RotationTrigger enum
     status = Column(String(50), nullable=False, default=PolicyStatus.ACTIVE)
 
@@ -90,9 +91,7 @@ class KeyRotationPolicy(BaseModel):
     next_rotation_at = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships
-    encryption_keys = relationship(
-        "EncryptionKey", back_populates="rotation_policy", cascade="all, delete-orphan"
-    )
+    encryption_keys = relationship("EncryptionKey", back_populates="rotation_policy")
 
     def __repr__(self) -> str:
         """String representation of the policy."""

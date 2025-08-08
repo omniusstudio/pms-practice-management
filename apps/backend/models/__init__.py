@@ -8,10 +8,12 @@ from . import (
     auth_token,
     base,
     client,
+    data_retention_policy,
     encryption_key,
     fhir_mapping,
     key_rotation_policy,
     ledger,
+    legal_hold,
     location,
     note,
     practice_profile,
@@ -23,10 +25,16 @@ from .audit import AuditLog
 from .auth_token import AuthToken, TokenStatus, TokenType
 from .base import Base, BaseModel
 from .client import Client
+from .data_retention_policy import DataRetentionPolicy, DataType
+from .data_retention_policy import PolicyStatus as RetentionPolicyStatus
+from .data_retention_policy import RetentionPeriodUnit
 from .encryption_key import EncryptionKey, KeyProvider, KeyStatus, KeyType
 from .fhir_mapping import FHIRMapping, FHIRMappingStatus, FHIRResourceType
-from .key_rotation_policy import KeyRotationPolicy, PolicyStatus, RotationTrigger
+from .key_rotation_policy import KeyRotationPolicy
+from .key_rotation_policy import PolicyStatus as KeyRotationPolicyStatus
+from .key_rotation_policy import RotationTrigger
 from .ledger import LedgerEntry
+from .legal_hold import HoldReason, HoldStatus, LegalHold
 from .location import Location
 from .note import Note
 from .practice_profile import PracticeProfile
@@ -41,6 +49,10 @@ __all__ = [
     "TokenStatus",
     "TokenType",
     "Client",
+    "DataRetentionPolicy",
+    "DataType",
+    "RetentionPolicyStatus",
+    "RetentionPeriodUnit",
     "EncryptionKey",
     "KeyType",
     "KeyStatus",
@@ -50,7 +62,10 @@ __all__ = [
     "FHIRMappingStatus",
     "KeyRotationPolicy",
     "RotationTrigger",
-    "PolicyStatus",
+    "KeyRotationPolicyStatus",
+    "LegalHold",
+    "HoldStatus",
+    "HoldReason",
     "Provider",
     "Appointment",
     "Note",
@@ -62,9 +77,11 @@ __all__ = [
     "audit",
     "auth_token",
     "client",
+    "data_retention_policy",
     "encryption_key",
     "fhir_mapping",
     "key_rotation_policy",
+    "legal_hold",
     "provider",
     "appointment",
     "note",

@@ -6,14 +6,14 @@ from fastapi import APIRouter, Depends, Header, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from database import get_db
-from middleware.auth_middleware import require_auth_dependency
+from core.database import get_db
+from middleware.auth import require_auth_dependency
 
 # from models.patient import Patient  # TODO: Implement Patient model
-from utils.error_handlers import NotFoundError, ValidationError, handle_database_error
+from utils.exceptions import NotFoundError, ValidationError, handle_database_error
 from utils.pagination import (
     PaginationParams,
-    create_pagination_response,
+    create_paginated_response,
     paginate_query,
 )
 
@@ -28,6 +28,11 @@ from utils.pagination import (
 # Placeholder implementations
 class Patient:
     def __init__(self, **kwargs):
+        self.patient_id = kwargs.get('patient_id')
+        self.first_name = kwargs.get('first_name')
+        self.last_name = kwargs.get('last_name')
+        self.email = kwargs.get('email')
+        self.is_active = kwargs.get('is_active', True)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -179,7 +184,7 @@ async def list_patients(
         require_permissions(current_user, ["patients:read"])
 
         # Log API access
-        log_api_access(current_user, "list_patients", x_correlation_id)
+        log_api_access(current_user, "list_patients")
 
         # Build query
         query = db.query(Patient)
@@ -203,7 +208,7 @@ async def list_patients(
         items = paginated_result.items if hasattr(paginated_result, "items") else []
         patients = [PatientResponse.from_orm(patient) for patient in items]
 
-        return create_pagination_response(
+        return create_paginated_response(
             patients, paginated_result.pagination, x_correlation_id
         )
 
@@ -230,10 +235,10 @@ async def get_patient(
         require_permissions(current_user, ["patients:read"])
 
         # Log API access
-        log_api_access(current_user, "get_patient", x_correlation_id)
+        log_api_access(current_user, "get_patient")
 
         # Get patient
-        patient = db.query(Patient).filter(Patient.id == patient_id).first()
+        patient = db.query(Patient).filter(Patient.patient_id == patient_id).first()
         if not patient:
             raise NotFoundError(f"Patient with ID {patient_id} not found")
 
@@ -270,12 +275,12 @@ async def create_patient(
 
         # Check idempotency
         idempotency_manager = IdempotencyManager(idempotency_key, db)
-        cached_response = idempotency_manager.get_cached_response()
+        cached_response = idempotency_manager.get_response()
         if cached_response:
             return cached_response
 
         # Log API access
-        log_api_access(current_user, "create_patient", x_correlation_id)
+        log_api_access(current_user, "create_patient")
 
         # Validate unique constraints
         if patient_data.email:
@@ -329,15 +334,15 @@ async def update_patient(
 
         # Check idempotency
         idempotency_manager = IdempotencyManager(idempotency_key, db)
-        cached_response = idempotency_manager.get_cached_response()
+        cached_response = idempotency_manager.get_response()
         if cached_response:
             return cached_response
 
         # Log API access
-        log_api_access(current_user, "update_patient", x_correlation_id)
+        log_api_access(current_user, "update_patient")
 
         # Get existing patient
-        patient = db.query(Patient).filter(Patient.id == patient_id).first()
+        patient = db.query(Patient).filter(Patient.patient_id == patient_id).first()
         if not patient:
             raise NotFoundError(f"Patient with ID {patient_id} not found")
 
@@ -345,7 +350,7 @@ async def update_patient(
         if patient_data.email and patient_data.email != patient.email:
             existing_patient = (
                 db.query(Patient)
-                .filter(Patient.email == patient_data.email, Patient.id != patient_id)
+                .filter(Patient.email == patient_data.email, Patient.patient_id != patient_id)
                 .first()
             )
             if existing_patient:
@@ -396,15 +401,15 @@ async def delete_patient(
 
         # Check idempotency
         idempotency_manager = IdempotencyManager(idempotency_key, db)
-        cached_response = idempotency_manager.get_cached_response()
+        cached_response = idempotency_manager.get_response()
         if cached_response:
             return cached_response
 
         # Log API access
-        log_api_access(current_user, "delete_patient", x_correlation_id)
+        log_api_access(current_user, "delete_patient")
 
         # Get patient
-        patient = db.query(Patient).filter(Patient.id == patient_id).first()
+        patient = db.query(Patient).filter(Patient.patient_id == patient_id).first()
         if not patient:
             raise NotFoundError(f"Patient with ID {patient_id} not found")
 

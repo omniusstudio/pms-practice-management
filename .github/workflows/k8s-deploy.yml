@@ -77,7 +77,7 @@ jobs:
           helm template pms . --values values.yaml --dry-run
 
       - name: Security scan Kubernetes manifests
-        uses: azure/k8s-lint@v1
+        uses: azure/k8s-lint@v3
         with:
           manifests: |
             apps/infra/kubernetes/namespace.yaml

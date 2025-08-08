@@ -15,7 +15,7 @@ from utils.error_handlers import (
     ValidationError,
     handle_database_error,
 )
-from utils.pagination import (  # create_paginated_response  # TODO: Implement this function
+from utils.pagination import (  # create_paginated_response
     PaginationParams,
     paginate_query,
 )
@@ -172,9 +172,7 @@ class PatientResponse(BaseModel):
 )
 async def list_patients(
     pagination: PaginationParams = Depends(),
-    search: Optional[str] = Query(
-        None, description="Search by name or email"
-    ),
+    search: Optional[str] = Query(None, description="Search by name or email"),
     is_active: Optional[bool] = Query(
         None, description="Filter by active status"
     ),
@@ -187,13 +185,15 @@ async def list_patients(
     """List patients with pagination and filtering."""
     try:
         # Check permissions
-        require_permissions(current_user, ["patients:read"])
+        require_permissions(
+            current_user, ["patients:read"]
+        )
 
         # Log API access
-        await log_api_access(
-            user_id=current_user.id,
-            endpoint="GET /api/v1/patients",
-            correlation_id=x_correlation_id,
+        log_api_access(
+            current_user,
+            "list_patients",
+            correlation_id=x_correlation_id
         )
 
         # Build query
@@ -212,17 +212,20 @@ async def list_patients(
             query = query.filter(Patient.is_active == is_active)
 
         # Apply pagination
-        paginated_result = paginate_query(query, pagination.page, pagination.per_page)
+        paginated_result = paginate_query(
+            query,
+            pagination.page,
+            pagination.per_page
+        )
 
         # Convert to response models
         items = paginated_result.items if hasattr(paginated_result, "items") else []
         patients = [PatientResponse.from_orm(patient) for patient in items]
 
         return create_paginated_response(
-            data=patients,
-            pagination_meta=paginated_result.pagination,
-            message="Patients retrieved successfully",
-            correlation_id=x_correlation_id,
+            patients,
+            paginated_result.pagination,
+            x_correlation_id
         )
 
     except Exception as e:
@@ -247,19 +250,23 @@ async def get_patient(
     """Get a specific patient by ID."""
     try:
         # Check permissions
-        require_permissions(current_user, ["patients:read"])
+        require_permissions(
+            current_user, ["patients:read"]
+        )
 
         # Log API access
-        await log_api_access(
-            user_id=current_user.id,
-            endpoint=f"GET /api/v1/patients/{patient_id}",
-            correlation_id=x_correlation_id,
+        log_api_access(
+            current_user,
+            "get_patient",
+            correlation_id=x_correlation_id
         )
 
         # Get patient
         patient = db.query(Patient).filter(Patient.id == patient_id).first()
         if not patient:
-            raise NotFoundError(f"Patient with ID {patient_id} not found")
+            raise NotFoundError(
+                f"Patient with ID {patient_id} not found"
+            )
 
         return {
             "data": PatientResponse.from_orm(patient),
@@ -285,35 +292,39 @@ async def create_patient(
     db: Session = Depends(get_db),
     current_user=Depends(require_auth_dependency),
     idempotency_key: str = Depends(get_idempotency_key),
-    x_correlation_id: Optional[str] = Header(
-        None, alias="X-Correlation-ID"
-    ),
+    x_correlation_id: Optional[str] = Header(None, alias="X-Correlation-ID"),
 ):
     """Create a new patient."""
     try:
         # Check permissions
-        require_permissions(current_user, ["patients:create"])
+        require_permissions(
+            current_user, ["patients:create"]
+        )
 
         # Check idempotency
-        idempotency_manager = IdempotencyManager(db)
-        existing_response = await idempotency_manager.get_response(idempotency_key)
-        if existing_response:
-            return existing_response
+        idempotency_manager = IdempotencyManager(idempotency_key, db)
+        cached_response = idempotency_manager.get_cached_response()
+        if cached_response:
+            return cached_response
 
         # Log API access
-        await log_api_access(
-            user_id=current_user.id,
-            endpoint="POST /api/v1/patients",
-            correlation_id=x_correlation_id,
+        log_api_access(
+            current_user,
+            "create_patient",
+            correlation_id=x_correlation_id
         )
 
         # Validate unique constraints
         if patient_data.email:
             existing_patient = (
-                db.query(Patient).filter(Patient.email == patient_data.email).first()
+                db.query(Patient)
+                .filter(Patient.email == patient_data.email)
+                .first()
             )
             if existing_patient:
-                raise ValidationError("A patient with this email already exists")
+                raise ValidationError(
+                    "A patient with this email already exists"
+                )
 
         # Create patient
         patient = Patient(**patient_data.dict())
@@ -329,7 +340,7 @@ async def create_patient(
         }
 
         # Store idempotent response
-        await idempotency_manager.store_response(idempotency_key, response_data, 201)
+        idempotency_manager.cache_response(response_data)
 
         return response_data
 
@@ -350,42 +361,49 @@ async def update_patient(
     db: Session = Depends(get_db),
     current_user=Depends(require_auth_dependency),
     idempotency_key: str = Depends(get_idempotency_key),
-    x_correlation_id: Optional[str] = Header(
-        None, alias="X-Correlation-ID"
-    ),
+    x_correlation_id: Optional[str] = Header(None, alias="X-Correlation-ID"),
 ):
     """Update an existing patient."""
     try:
         # Check permissions
-        require_permissions(current_user, ["patients:update"])
+        require_permissions(
+            current_user, ["patients:update"]
+        )
 
         # Check idempotency
-        idempotency_manager = IdempotencyManager(db)
-        existing_response = await idempotency_manager.get_response(idempotency_key)
-        if existing_response:
-            return existing_response
+        idempotency_manager = IdempotencyManager(idempotency_key, db)
+        cached_response = idempotency_manager.get_cached_response()
+        if cached_response:
+            return cached_response
 
         # Log API access
-        await log_api_access(
-            user_id=current_user.id,
-            endpoint=f"PUT /api/v1/patients/{patient_id}",
-            correlation_id=x_correlation_id,
+        log_api_access(
+            current_user,
+            "update_patient",
+            correlation_id=x_correlation_id
         )
 
         # Get existing patient
         patient = db.query(Patient).filter(Patient.id == patient_id).first()
         if not patient:
-            raise NotFoundError(f"Patient with ID {patient_id} not found")
+            raise NotFoundError(
+                f"Patient with ID {patient_id} not found"
+            )
 
         # Validate unique constraints if email is being updated
         if patient_data.email and patient_data.email != patient.email:
             existing_patient = (
                 db.query(Patient)
-                .filter(Patient.email == patient_data.email, Patient.id != patient_id)
+                .filter(
+                    Patient.email == patient_data.email,
+                    Patient.id != patient_id
+                )
                 .first()
             )
             if existing_patient:
-                raise ValidationError("A patient with this email already exists")
+                raise ValidationError(
+                    "A patient with this email already exists"
+                )
 
         # Update patient
         update_data = patient_data.dict(exclude_unset=True)
@@ -403,7 +421,7 @@ async def update_patient(
         }
 
         # Store idempotent response
-        await idempotency_manager.store_response(idempotency_key, response_data, 200)
+        idempotency_manager.cache_response(response_data)
 
         return response_data
 
@@ -423,32 +441,34 @@ async def delete_patient(
     db: Session = Depends(get_db),
     current_user=Depends(require_auth_dependency),
     idempotency_key: str = Depends(get_idempotency_key),
-    x_correlation_id: Optional[str] = Header(
-        None, alias="X-Correlation-ID"
-    ),
+    x_correlation_id: Optional[str] = Header(None, alias="X-Correlation-ID"),
 ):
     """Soft delete a patient (mark as inactive)."""
     try:
         # Check permissions
-        require_permissions(current_user, ["patients:delete"])
+        require_permissions(
+            current_user, ["patients:delete"]
+        )
 
         # Check idempotency
-        idempotency_manager = IdempotencyManager(db)
-        existing_response = await idempotency_manager.get_response(idempotency_key)
-        if existing_response:
-            return existing_response
+        idempotency_manager = IdempotencyManager(idempotency_key, db)
+        cached_response = idempotency_manager.get_cached_response()
+        if cached_response:
+            return cached_response
 
         # Log API access
-        await log_api_access(
-            user_id=current_user.id,
-            endpoint=f"DELETE /api/v1/patients/{patient_id}",
-            correlation_id=x_correlation_id,
+        log_api_access(
+            current_user,
+            "delete_patient",
+            correlation_id=x_correlation_id
         )
 
         # Get patient
         patient = db.query(Patient).filter(Patient.id == patient_id).first()
         if not patient:
-            raise NotFoundError(f"Patient with ID {patient_id} not found")
+            raise NotFoundError(
+                f"Patient with ID {patient_id} not found"
+            )
 
         # Soft delete (mark as inactive)
         patient.is_active = False
@@ -462,7 +482,7 @@ async def delete_patient(
         }
 
         # Store idempotent response
-        await idempotency_manager.store_response(idempotency_key, response_data, 200)
+        idempotency_manager.cache_response(response_data)
 
         return response_data
 

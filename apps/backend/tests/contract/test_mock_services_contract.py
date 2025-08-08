@@ -38,8 +38,7 @@ class TestEDIServiceContract:
             return True
 
         monkeypatch.setattr(
-            "utils.feature_flags.FeatureFlags.is_mock_edi_enabled",
-            mock_is_enabled
+            "utils.feature_flags.FeatureFlags.is_mock_edi_enabled", mock_is_enabled
         )
 
     def test_submit_claim_contract(self, client):
@@ -58,9 +57,7 @@ class TestEDIServiceContract:
             "diagnosis_codes": ["Z00.00"],
         }
 
-        response = client.post(
-            "/api/mock/edi/submit-claim", json=sample_claim_data
-        )
+        response = client.post("/api/mock/edi/submit-claim", json=sample_claim_data)
 
         assert response.status_code == 200
         data = response.json()
@@ -101,9 +98,7 @@ class TestEDIServiceContract:
             "diagnosis_codes": [],
         }
 
-        response = client.post(
-            "/api/mock/edi/submit-claim", json=invalid_claim
-        )
+        response = client.post("/api/mock/edi/submit-claim", json=invalid_claim)
 
         # Should still return 200 but with rejection status
         assert response.status_code in [200, 400, 422]
@@ -194,9 +189,7 @@ class TestEDIServiceContract:
         data = response.json()
 
         # Validate required health fields
-        required_fields = [
-            "service", "status", "timestamp", "stats", "uptime_seconds"
-        ]
+        required_fields = ["service", "status", "timestamp", "stats", "uptime_seconds"]
         for field in required_fields:
             assert field in data, f"Missing required field: {field}"
 
@@ -237,8 +230,7 @@ class TestStripeServiceContract:
         }
 
         response = client.post(
-            "/api/mock/payments/payment-intents",
-            json=sample_payment_intent_request
+            "/api/mock/payments/payment-intents", json=sample_payment_intent_request
         )
 
         assert response.status_code == 200
@@ -297,9 +289,7 @@ class TestStripeServiceContract:
         payment_intent_id = create_response.json()["id"]
 
         # Retrieve the payment intent
-        response = client.get(
-            f"/api/mock/payments/payment-intents/{payment_intent_id}"
-        )
+        response = client.get(f"/api/mock/payments/payment-intents/{payment_intent_id}")
 
         assert response.status_code == 200
         data = response.json()
@@ -333,9 +323,7 @@ class TestStripeServiceContract:
 
         # Validate confirmation response
         assert data["id"] == payment_intent_id
-        assert data["status"] in [
-            "succeeded", "requires_action", "payment_failed"
-        ]
+        assert data["status"] in ["succeeded", "requires_action", "payment_failed"]
 
         # If succeeded, should have charges
         if data["status"] == "succeeded":
@@ -412,8 +400,7 @@ class TestVideoServiceContract:
             return True
 
         monkeypatch.setattr(
-            "utils.feature_flags.FeatureFlags.is_mock_video_enabled",
-            mock_is_enabled
+            "utils.feature_flags.FeatureFlags.is_mock_video_enabled", mock_is_enabled
         )
 
     def test_create_session_contract(self, client):
@@ -455,9 +442,9 @@ class TestVideoServiceContract:
         assert data["id"].startswith("session_")
         assert data["name"] == sample_video_session_request["session_name"]
         assert data["status"] == "created"
-        assert data["max_participants"] == sample_video_session_request[
-            "max_participants"
-        ]
+        assert (
+            data["max_participants"] == sample_video_session_request["max_participants"]
+        )
         assert data["current_participants"] == 0
         assert (
             data["recording_enabled"]
@@ -521,9 +508,7 @@ class TestVideoServiceContract:
 
         assert participant["name"] == join_request["participant_name"]
         assert participant["role"] == join_request["participant_role"]
-        assert participant["status"] in [
-            "connected", "connection_failed", "audio_only"
-        ]
+        assert participant["status"] in ["connected", "connection_failed", "audio_only"]
 
     def test_get_session_info_contract(self, client):
         """Test video session info retrieval contract."""
@@ -669,8 +654,7 @@ class TestMockServicesIntegration:
             return False
 
         monkeypatch.setattr(
-            "utils.feature_flags.FeatureFlags.is_mock_edi_enabled",
-            mock_is_disabled
+            "utils.feature_flags.FeatureFlags.is_mock_edi_enabled", mock_is_disabled
         )
         monkeypatch.setattr(
             "utils.feature_flags.FeatureFlags." "is_mock_payments_enabled",

@@ -9,7 +9,6 @@ from typing import List, Optional
 
 from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from utils.error_handlers import AuthenticationError
 from pydantic import BaseModel, ConfigDict, PrivateAttr
 
 from core.config import get_settings
@@ -17,6 +16,7 @@ from database import get_db
 
 # from models.auth_token import AuthToken  # Disabled
 from models.user import User
+from utils.error_handlers import AuthenticationError
 
 # SQLAlchemy imports removed - not currently used
 
@@ -264,8 +264,7 @@ async def require_auth(
         )
         correlation_id = getattr(request.state, "correlation_id", "unknown")
         raise AuthenticationError(
-            message="Authentication failed",
-            correlation_id=correlation_id
+            message="Authentication failed", correlation_id=correlation_id
         )
 
     return user
@@ -401,8 +400,7 @@ async def require_auth_dependency(request: Request) -> AuthenticatedUser:
     if not user:
         correlation_id = getattr(request.state, "correlation_id", "unknown")
         raise AuthenticationError(
-            message="Authentication failed",
-            correlation_id=correlation_id
+            message="Authentication failed", correlation_id=correlation_id
         )
 
     return user

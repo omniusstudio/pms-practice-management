@@ -5,7 +5,7 @@ import os
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
@@ -29,12 +29,8 @@ from routers.oidc import router as oidc_router
 from services.etl_pipeline import initialize_etl_pipeline
 from services.event_bus import initialize_event_bus
 from services.feature_flags_service import get_feature_flags_service
+from utils.error_handlers import APIError, api_error_handler, general_exception_handler
 from utils.logging_config import configure_structured_logging
-from utils.error_handlers import (
-    APIError,
-    api_error_handler,
-    general_exception_handler,
-)
 
 # TrustedHostMiddleware removed - not needed for Kubernetes deployment
 
@@ -43,9 +39,7 @@ from utils.error_handlers import (
 configure_structured_logging(
     environment=os.getenv("ENVIRONMENT", "development"),
     log_level=os.getenv("LOG_LEVEL", "INFO"),
-    enable_json_output=(
-        os.getenv("ENVIRONMENT", "development") == "production"
-    ),
+    enable_json_output=(os.getenv("ENVIRONMENT", "development") == "production"),
 )
 
 logger = structlog.get_logger()
@@ -178,16 +172,16 @@ app = FastAPI(
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
-    
+
     from fastapi.openapi.utils import get_openapi
-    
+
     openapi_schema = get_openapi(
         title=app.title,
         version=app.version,
         description=app.description,
         routes=app.routes,
     )
-    
+
     # Add security schemes
     openapi_schema["components"]["securitySchemes"] = {
         "BearerAuth": {
@@ -196,7 +190,7 @@ def custom_openapi():
             "bearerFormat": "JWT",
         }
     }
-    
+
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
@@ -212,15 +206,14 @@ app.add_exception_handler(Exception, general_exception_handler)
 # Custom 404 handler for proper error format
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: HTTPException):
-    from utils.error_handlers import NotFoundError
     from middleware.correlation import get_correlation_id
-    
+    from utils.error_handlers import NotFoundError
+
     correlation_id = get_correlation_id()
     error = NotFoundError(
-        message="The requested resource was not found",
-        correlation_id=correlation_id
+        message="The requested resource was not found", correlation_id=correlation_id
     )
-    
+
     return JSONResponse(
         status_code=404,
         content={

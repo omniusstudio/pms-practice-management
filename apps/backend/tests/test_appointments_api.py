@@ -6,9 +6,6 @@ from datetime import datetime, timezone
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
-import pytest
-from fastapi.testclient import TestClient
-
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import app  # noqa: E402
@@ -16,11 +13,6 @@ from main import app  # noqa: E402
 
 class TestAppointmentsAPI:
     """Test class for appointment API endpoints."""
-
-    @pytest.fixture
-    def client(self):
-        """Create test client."""
-        return TestClient(app)
 
     def test_get_appointments_success(self, client, mock_authenticated_user):
         """Test successful retrieval of appointments."""

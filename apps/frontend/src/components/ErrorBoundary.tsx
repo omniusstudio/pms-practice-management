@@ -1,6 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { Logger } from "../utils/logger";
 import { scrubPHI } from "../utils/phi-scrubber";
+import { captureSentryException, addSentryBreadcrumb } from "../services/sentryService";
 
 interface Props {
   children: ReactNode;
@@ -38,6 +39,21 @@ export class ErrorBoundary extends Component<Props, State> {
       componentStack: scrubPHI(errorInfo.componentStack),
     };
 
+    // Add breadcrumb for error context
+    addSentryBreadcrumb("React Error Boundary caught an error", "error", "error", {
+      component: "ErrorBoundary",
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+    });
+
+    // Capture exception in Sentry
+    captureSentryException(error, {
+      errorInfo: scrubbedErrorInfo,
+      component: "ErrorBoundary",
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+    });
+
     Logger.error("React Error Boundary caught an error", error, {
       component: "ErrorBoundary",
       action: "error_caught",
@@ -54,6 +70,10 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private handleRetry = () => {
+    addSentryBreadcrumb("Error boundary retry attempted", "user", "info", {
+      component: "ErrorBoundary",
+    });
+
     Logger.info("Error boundary retry attempted", {
       component: "ErrorBoundary",
       action: "retry",
@@ -63,6 +83,10 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   private handleReload = () => {
+    addSentryBreadcrumb("Error boundary page reload initiated", "user", "info", {
+      component: "ErrorBoundary",
+    });
+
     Logger.info("Error boundary page reload initiated", {
       component: "ErrorBoundary",
       action: "reload",

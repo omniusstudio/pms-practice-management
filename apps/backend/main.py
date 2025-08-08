@@ -21,8 +21,10 @@ from api.mock_services import router as mock_services_router
 from api.notes import router as notes_router
 from api.patients import router as patients_router
 from api.providers import router as providers_router
+from integrations.sentry_integration import add_error_tracking_routes, init_sentry
 from middleware.correlation import CorrelationIDMiddleware, get_correlation_id
 from middleware.metrics import PrometheusMetricsMiddleware, metrics_endpoint
+from middleware.security_middleware import add_security_middleware
 from middleware.session_middleware import add_session_middleware
 from routers.auth_router import router as auth_router
 from routers.oidc import router as oidc_router
@@ -160,12 +162,26 @@ security = HTTPBearer()
 
 app = FastAPI(
     title="Mental Health Practice Management System",
-    description="HIPAA-compliant Practice Management System API",
+    description=(
+        "HIPAA-compliant Practice Management System API for " "mental health providers"
+    ),
     version=version_info["version"],
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     lifespan=lifespan,
 )
+
+# Initialize Sentry error tracking
+init_sentry(app)
+
+# Add error tracking test routes
+add_error_tracking_routes(app)
+
+
+# Test route to verify route registration works
+@app.get("/api/test/simple")
+async def simple_test():
+    return {"message": "Simple test route works"}
 
 
 # Custom OpenAPI schema with security schemes
@@ -227,6 +243,9 @@ async def not_found_handler(request: Request, exc: HTTPException):
 
 # Add session middleware for Auth0 authentication
 add_session_middleware(app)
+
+# Add security middleware (TLS enforcement, HSTS, secure headers)
+add_security_middleware(app)
 
 # Add correlation ID middleware first
 app.add_middleware(CorrelationIDMiddleware)

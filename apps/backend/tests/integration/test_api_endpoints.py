@@ -21,15 +21,12 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 
 def override_get_db():
-    """Override database dependency for testing."""
+    """Override get_db dependency for testing."""
     try:
         db = TestingSessionLocal()
         yield db
     finally:
         db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
 
 
 @pytest.fixture(scope="module")
@@ -42,9 +39,15 @@ def setup_database():
 
 @pytest.fixture
 def client(setup_database):
-    """Create test client."""
-    with TestClient(app) as test_client:
-        yield test_client
+    """Create test client with database override."""
+    # Set up database override for integration tests
+    app.dependency_overrides[get_db] = override_get_db
+    try:
+        with TestClient(app) as test_client:
+            yield test_client
+    finally:
+        # Clean up dependency overrides
+        app.dependency_overrides.clear()
 
 
 @pytest.mark.integration

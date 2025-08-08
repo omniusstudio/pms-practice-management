@@ -3,18 +3,43 @@
 import os
 from unittest.mock import MagicMock, patch
 
-from demo_database import cleanup_demo, create_demo_database
-
 
 class TestDemoDatabase:
     """Test demo database functionality."""
 
+    def setup_method(self):
+        """Set up test environment before each test."""
+        # Store original environment variables
+        self.original_env = {
+            "DATABASE_URL": os.environ.get("DATABASE_URL"),
+            "ENVIRONMENT": os.environ.get("ENVIRONMENT"),
+        }
+
+    def teardown_method(self):
+        """Clean up test environment after each test."""
+        # Restore original environment variables
+        for key, value in self.original_env.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+        # Clear any modules that might have been imported with wrong env vars
+        import sys
+
+        if "demo_database" in sys.modules:
+            del sys.modules["demo_database"]
+
     def test_create_demo_database_function_exists(self):
         """Test that create_demo_database function exists."""
+        from demo_database import create_demo_database
+
         assert callable(create_demo_database)
 
     def test_cleanup_demo_function_exists(self):
         """Test that cleanup_demo function exists."""
+        from demo_database import cleanup_demo
+
         assert callable(cleanup_demo)
 
     @patch("demo_database.create_engine")
@@ -36,6 +61,8 @@ class TestDemoDatabase:
         mock_session.close.return_value = None
 
         with patch("demo_database.logger") as mock_logger:
+            from demo_database import create_demo_database
+
             result = create_demo_database()
 
             mock_create_engine.assert_called_once_with("sqlite:///demo.db", echo=False)
@@ -60,6 +87,8 @@ class TestDemoDatabase:
         mock_session.add.side_effect = Exception("Database error")
 
         with patch("demo_database.logger") as mock_logger:
+            from demo_database import create_demo_database
+
             result = create_demo_database()
 
             assert result is False
@@ -75,6 +104,8 @@ class TestDemoDatabase:
         mock_path.exists.return_value = True
 
         with patch("demo_database.logger") as mock_logger:
+            from demo_database import cleanup_demo
+
             cleanup_demo()
 
             mock_path_class.assert_called_once_with("demo.db")
@@ -88,6 +119,8 @@ class TestDemoDatabase:
         mock_path = MagicMock()
         mock_path_class.return_value = mock_path
         mock_path.exists.return_value = False
+
+        from demo_database import cleanup_demo
 
         cleanup_demo()
 
@@ -104,6 +137,8 @@ class TestDemoDatabase:
         mock_path.unlink.side_effect = OSError("Permission denied")
 
         # This should raise the exception since there's no error handling
+        from demo_database import cleanup_demo
+
         try:
             cleanup_demo()
             assert False, "Expected OSError to be raised"
@@ -116,6 +151,9 @@ class TestDemoDatabase:
 
     def test_environment_variables_set(self):
         """Test that required environment variables are set."""
+        # Import demo_database to trigger environment variable setting
+        import demo_database  # noqa: F401
+
         # The demo_database module should set these on import
         assert os.environ.get("DATABASE_URL") == "sqlite:///demo.db"
         assert os.environ.get("ENVIRONMENT") == "demo"

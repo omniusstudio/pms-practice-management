@@ -14,7 +14,7 @@ from services.feature_flags_service import (
 )
 
 logger = structlog.get_logger(__name__)
-router = APIRouter(tags=["feature-flags"])
+router = APIRouter(prefix="/feature-flags", tags=["feature-flags"])
 
 
 class FlagEvaluationRequest(BaseModel):
@@ -58,7 +58,7 @@ class FlagInfoResponse(BaseModel):
 
 
 @router.post(
-    "/feature-flags/evaluate",
+    "/evaluate",
     response_model=FlagEvaluationResponse,
     summary="Evaluate a feature flag",
     description="Evaluate a specific feature flag for a user or context",
@@ -129,7 +129,7 @@ async def evaluate_flag(
 
 
 @router.get(
-    "/feature-flags/all",
+    "/all",
     response_model=AllFlagsResponse,
     summary="Get all feature flags",
     description="Get all feature flags for the current user",
@@ -189,7 +189,7 @@ async def get_all_flags(
 
 
 @router.get(
-    "/feature-flags/{flag_name}/info",
+    "/{flag_name}/info",
     response_model=FlagInfoResponse,
     summary="Get feature flag information",
     description="Get detailed information about a specific feature flag",
@@ -237,7 +237,7 @@ async def get_flag_info(
 
 
 @router.post(
-    "/feature-flags/cache/clear",
+    "/cache/clear",
     summary="Clear feature flags cache",
     description="Clear the feature flags cache (admin only)",
 )
@@ -290,7 +290,7 @@ async def clear_flags_cache(
 
 # Convenience endpoints for kill-switch flags
 @router.get(
-    "/feature-flags/video-calls/enabled",
+    "/video-calls/enabled",
     summary="Check if video calls are enabled",
     description="Check if video calls feature is enabled (kill-switch)",
 )
@@ -316,7 +316,7 @@ async def is_video_calls_enabled(
 
 
 @router.get(
-    "/feature-flags/edi-integration/enabled",
+    "/edi-integration/enabled",
     summary="Check if EDI integration is enabled",
     description="Check if EDI integration feature is enabled (kill-switch)",
 )
@@ -342,7 +342,7 @@ async def is_edi_integration_enabled(
 
 
 @router.get(
-    "/feature-flags/payments/enabled",
+    "/payments/enabled",
     summary="Check if payments are enabled",
     description="Check if payments feature is enabled (kill-switch)",
 )

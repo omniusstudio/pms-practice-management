@@ -39,13 +39,25 @@ class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
     tenant_id = factory.Sequence(lambda n: f"tenant_{n:03d}")
 
     @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        """Override create to ensure HIPAA compliance."""
-        # Ensure no real PHI is accidentally included
+    def _check_for_phi(cls, data_dict):
+        """Check for PHI fields in data dictionary.
+
+        Args:
+            data_dict: Dictionary of field names and values to check
+
+        Raises:
+            ValueError: If PHI field is detected
+        """
         sensitive_fields = ["ssn", "social_security", "real_name", "actual_email"]
         for field in sensitive_fields:
-            if field in kwargs:
-                raise ValueError(f"HIPAA Violation: Real PHI field '{field}' detected")
+            if field in data_dict:
+                raise ValueError("HIPAA Violation")
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """Override create to ensure HIPAA compliance."""
+        # Check for PHI fields
+        cls._check_for_phi(kwargs)
 
         return super()._create(model_class, *args, **kwargs)
 

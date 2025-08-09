@@ -169,33 +169,34 @@ def upgrade() -> None:
 
     # Partial indexes for active records (PostgreSQL specific)
     # These will be ignored on other databases
-    try:
-        op.create_index(
-            "idx_clients_active_only",
-            "clients",
-            ["last_name", "first_name"],
-            unique=False,
-            postgresql_where=sa.text("is_active = true"),
-        )
-        op.create_index(
-            "idx_providers_active_only",
-            "providers",
-            ["last_name", "first_name"],
-            unique=False,
-            postgresql_where=sa.text("is_active = true"),
-        )
-        op.create_index(
-            "idx_appointments_upcoming",
-            "appointments",
-            ["provider_id", "scheduled_start"],
-            unique=False,
-            postgresql_where=sa.text(
-                "status IN ('scheduled', 'confirmed', 'in_progress')"
-            ),
-        )
-    except Exception:
-        # Ignore if database doesn't support partial indexes
-        pass
+    # Temporarily commented out to debug migration issues
+    # try:
+    #     op.create_index(
+    #         "idx_clients_active_only",
+    #         "clients",
+    #         ["last_name", "first_name"],
+    #         unique=False,
+    #         postgresql_where=sa.text("is_active = true"),
+    #     )
+    #     op.create_index(
+    #         "idx_providers_active_only",
+    #         "providers",
+    #         ["last_name", "first_name"],
+    #         unique=False,
+    #         postgresql_where=sa.text("is_active = true"),
+    #     )
+    #     op.create_index(
+    #         "idx_appointments_upcoming",
+    #         "appointments",
+    #         ["provider_id", "scheduled_start"],
+    #         unique=False,
+    #         postgresql_where=sa.text(
+    #             "status IN ('scheduled', 'confirmed', 'in_progress')"
+    #         ),
+    #     )
+    # except Exception:
+    #     # Ignore if database doesn't support partial indexes
+    #     pass
 
 
 def downgrade() -> None:

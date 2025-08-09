@@ -19,6 +19,10 @@ from pathlib import Path
 backend_dir = Path(__file__).parent.parent / "apps" / "backend"
 sys.path.insert(0, str(backend_dir))
 
+# Add scripts directory to path
+scripts_dir = Path(__file__).parent
+sys.path.insert(0, str(scripts_dir))
+
 from seed_manager import SeedManager
 
 # Configure logging

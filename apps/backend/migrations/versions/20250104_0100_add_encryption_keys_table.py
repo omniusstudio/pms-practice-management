@@ -19,8 +19,17 @@ depends_on = None
 
 def upgrade() -> None:
     """Upgrade database schema to add encryption_keys table."""
+    
+    # Helper function to check if enum exists
+    def enum_exists(enum_name: str) -> bool:
+        conn = op.get_bind()
+        result = conn.execute(
+            sa.text("SELECT EXISTS(SELECT 1 FROM pg_type WHERE typname = :name)"),
+            {"name": enum_name}
+        )
+        return result.scalar()
 
-    # Create KeyType enum
+    # Define enum objects (always define them for table creation)
     key_type_enum = postgresql.ENUM(
         "PHI_DATA",
         "PII_DATA",
@@ -31,9 +40,7 @@ def upgrade() -> None:
         "COMMUNICATION",
         name="keytype",
     )
-    key_type_enum.create(op.get_bind())  # type: ignore
-
-    # Create KeyStatus enum
+    
     key_status_enum = postgresql.ENUM(
         "ACTIVE",
         "INACTIVE",
@@ -43,9 +50,7 @@ def upgrade() -> None:
         "PENDING",
         name="keystatus",
     )
-    key_status_enum.create(op.get_bind())  # type: ignore
-
-    # Create KeyProvider enum
+    
     key_provider_enum = postgresql.ENUM(
         "AWS_KMS",
         "AZURE_KV",
@@ -54,7 +59,18 @@ def upgrade() -> None:
         "LOCAL_HSM",
         name="keyprovider",
     )
-    key_provider_enum.create(op.get_bind())  # type: ignore
+
+    # Create KeyType enum if it doesn't exist
+    if not enum_exists("keytype"):
+        key_type_enum.create(op.get_bind())  # type: ignore
+
+    # Create KeyStatus enum if it doesn't exist
+    if not enum_exists("keystatus"):
+        key_status_enum.create(op.get_bind())  # type: ignore
+
+    # Create KeyProvider enum if it doesn't exist
+    if not enum_exists("keyprovider"):
+        key_provider_enum.create(op.get_bind())  # type: ignore
 
     # Create encryption_keys table
     op.create_table(  # type: ignore
@@ -72,14 +88,14 @@ def upgrade() -> None:
         sa.Column("tenant_id", sa.String(length=255), nullable=True),
         # Key identification and metadata
         sa.Column("key_name", sa.String(length=255), nullable=False),
-        sa.Column("key_type", key_type_enum, nullable=False),
+        sa.Column("key_type", postgresql.ENUM(name="keytype"), nullable=False),
         # External KMS reference (never store actual key material)
         sa.Column("kms_key_id", sa.String(length=512), nullable=False, unique=True),
-        sa.Column("kms_provider", key_provider_enum, nullable=False),
+        sa.Column("kms_provider", postgresql.ENUM(name="keyprovider"), nullable=False),
         sa.Column("kms_region", sa.String(length=100), nullable=True),
         sa.Column("kms_endpoint", sa.String(length=512), nullable=True),
         # Key lifecycle management
-        sa.Column("status", key_status_enum, nullable=False, server_default="PENDING"),
+        sa.Column("status", postgresql.ENUM(name="keystatus"), nullable=False, server_default="PENDING"),
         sa.Column("version", sa.String(length=50), nullable=False, server_default="1"),
         # Key rotation and expiration
         sa.Column("activated_at", sa.DateTime(timezone=True), nullable=True),

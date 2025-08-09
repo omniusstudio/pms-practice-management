@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format build clean test-backend test-frontend test-ci lint-ci coverage-backend coverage-frontend seed-data reset-data seed-staging validate-data deploy-dev setup-phase4 test-pre-commit quality-checks install-hooks update-hooks release-setup release-dry-run release validate-commits check-version update-version
+.PHONY: help install dev test lint format build clean test-backend test-frontend test-ci lint-ci coverage-backend coverage-frontend seed-data reset-data seed-staging validate-data deploy-dev setup-phase4 test-pre-commit quality-checks install-hooks update-hooks release-setup release-dry-run release validate-commits check-version update-version ff-status ff-enable ff-disable ff-list ff-validate ff-backup ff-audit ff-test-rollback ff-monitor
 
 # Default target
 help:
@@ -36,6 +36,17 @@ help:
 	@echo "  validate-commits - Validate recent commits follow conventional format"
 	@echo "  check-version    - Display current version information"
 	@echo "  update-version   - Update version across all components"
+	@echo ""
+	@echo "Feature Flag Management:"
+	@echo "  ff-status        - Show current feature flag status"
+	@echo "  ff-enable        - Enable a feature flag (usage: make ff-enable FLAG=flag_name)"
+	@echo "  ff-disable       - Disable a feature flag (usage: make ff-disable FLAG=flag_name)"
+	@echo "  ff-list          - List all available feature flags"
+	@echo "  ff-validate      - Validate feature flag configuration"
+	@echo "  ff-backup        - Backup current feature flag configuration"
+	@echo "  ff-audit         - Show feature flag audit trail"
+	@echo "  ff-test-rollback - Test feature flag rollback procedures"
+	@echo "  ff-monitor       - Monitor feature rollout (usage: make ff-monitor FLAG=flag_name)"
 
 # Install dependencies
 install:
@@ -333,6 +344,58 @@ release-setup:
 release-dry-run:
 	@echo "🔍 Running semantic-release in dry-run mode..."
 	@chmod +x scripts/update-version.sh
+
+# Feature Flag Management
+ff-status:
+	@echo "📊 Checking feature flag status..."
+	@./scripts/manage-feature-flags.sh status
+
+ff-enable:
+	@if [ -z "$(FLAG)" ]; then \
+		echo "❌ Error: FLAG parameter is required"; \
+		echo "Usage: make ff-enable FLAG=flag_name"; \
+		exit 1; \
+	fi
+	@echo "🚀 Enabling feature flag: $(FLAG)"
+	@./scripts/manage-feature-flags.sh enable $(FLAG)
+
+ff-disable:
+	@if [ -z "$(FLAG)" ]; then \
+		echo "❌ Error: FLAG parameter is required"; \
+		echo "Usage: make ff-disable FLAG=flag_name"; \
+		exit 1; \
+	fi
+	@echo "🛑 Disabling feature flag: $(FLAG)"
+	@./scripts/manage-feature-flags.sh disable $(FLAG)
+
+ff-list:
+	@echo "📋 Available feature flags:"
+	@./scripts/manage-feature-flags.sh list
+
+ff-validate:
+	@echo "✅ Validating feature flag configuration..."
+	@./scripts/manage-feature-flags.sh validate
+
+ff-backup:
+	@echo "💾 Creating feature flag configuration backup..."
+	@./scripts/manage-feature-flags.sh backup
+
+ff-audit:
+	@echo "📜 Feature flag audit trail:"
+	@./scripts/manage-feature-flags.sh audit
+
+ff-test-rollback:
+	@echo "🧪 Testing feature flag rollback procedures..."
+	@./scripts/test-feature-flag-rollback.py --verbose
+
+ff-monitor:
+	@if [ -z "$(FLAG)" ]; then \
+		echo "❌ Error: FLAG parameter is required"; \
+		echo "Usage: make ff-monitor FLAG=flag_name [DURATION=300]"; \
+		exit 1; \
+	fi
+	@echo "📈 Starting monitoring for feature flag: $(FLAG)"
+	@./scripts/monitor-feature-rollout.sh -f $(FLAG) -d $(or $(DURATION),300) -v
 	@chmod +x scripts/generate-release-notes.js
 	@npx semantic-release --dry-run
 	@echo "✅ Dry-run completed"

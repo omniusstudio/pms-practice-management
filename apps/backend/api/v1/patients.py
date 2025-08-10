@@ -11,11 +11,7 @@ from middleware.auth import require_auth_dependency
 
 # from models.patient import Patient  # TODO: Implement Patient model
 from utils.exceptions import NotFoundError, ValidationError, handle_database_error
-from utils.pagination import (
-    PaginationParams,
-    create_paginated_response,
-    paginate_query,
-)
+from utils.pagination import PaginationParams, paginate_query
 
 # from utils.idempotency import (  # TODO: Implement idempotency
 #     get_idempotency_key,
@@ -28,11 +24,11 @@ from utils.pagination import (
 # Placeholder implementations
 class Patient:
     def __init__(self, **kwargs):
-        self.patient_id = kwargs.get('patient_id')
-        self.first_name = kwargs.get('first_name')
-        self.last_name = kwargs.get('last_name')
-        self.email = kwargs.get('email')
-        self.is_active = kwargs.get('is_active', True)
+        self.patient_id = kwargs.get("patient_id")
+        self.first_name = kwargs.get("first_name")
+        self.last_name = kwargs.get("last_name")
+        self.email = kwargs.get("email")
+        self.is_active = kwargs.get("is_active", True)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -67,6 +63,7 @@ def log_api_access(user, action, resource_id=None):
 
 
 def create_paginated_response(items, pagination_meta, correlation_id):
+    """Local helper for patient API pagination response."""
     return {
         "data": items,
         "pagination": pagination_meta,
@@ -350,7 +347,10 @@ async def update_patient(
         if patient_data.email and patient_data.email != patient.email:
             existing_patient = (
                 db.query(Patient)
-                .filter(Patient.email == patient_data.email, Patient.patient_id != patient_id)
+                .filter(
+                    Patient.email == patient_data.email,
+                    Patient.patient_id != patient_id,
+                )
                 .first()
             )
             if existing_patient:

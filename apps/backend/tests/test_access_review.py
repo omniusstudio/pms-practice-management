@@ -104,8 +104,10 @@ class TestAccessReviewAPI:
             "compliance_score": 85.5,
             "recommendations": [
                 "Review and remove excessive permissions for 1 users",
-                "Review inactive accounts: 3 users have not accessed "
-                "the system recently",
+                (
+                    "Review inactive accounts: 3 users have not accessed the "
+                    "system recently"
+                ),
                 "Complete overdue access reviews for 2 users",
             ],
         }

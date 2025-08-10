@@ -26,37 +26,37 @@ readonly MAX_BRANCH_NAME_LENGTH=80
 # Function to validate branch name
 validate_branch_name() {
     local branch_name="$1"
-    
+
     # Check if branch name starts with required prefix
     if [[ ! "$branch_name" =~ ^${REQUIRED_PREFIX} ]]; then
         log_error "Branch name must start with '${REQUIRED_PREFIX}'"
         return 1
     fi
-    
+
     # Check length
     if (( ${#branch_name} > MAX_BRANCH_NAME_LENGTH )); then
         log_error "Branch name too long (${#branch_name} chars). Maximum: ${MAX_BRANCH_NAME_LENGTH}"
         return 1
     fi
-    
+
     # Check for invalid characters (only allow alphanumeric, hyphens, underscores, slashes)
     if [[ ! "$branch_name" =~ ^[a-zA-Z0-9/_-]+$ ]]; then
         log_error "Branch name contains invalid characters. Only alphanumeric, hyphens, underscores, and slashes allowed."
         return 1
     fi
-    
+
     # Check for consecutive special characters
     if [[ "$branch_name" =~ [-_/]{2,} ]]; then
         log_error "Branch name cannot contain consecutive special characters"
         return 1
     fi
-    
+
     # Check it doesn't end with special characters
     if [[ "$branch_name" =~ [-_/]$ ]]; then
         log_error "Branch name cannot end with special characters"
         return 1
     fi
-    
+
     return 0
 }
 
@@ -75,7 +75,7 @@ is_protected_branch() {
 ensure_on_main() {
     local current_branch
     current_branch=$(git rev-parse --abbrev-ref HEAD)
-    
+
     if [[ "$current_branch" != "main" ]]; then
         log_warning "Not on main branch (currently on: $current_branch)"
         read -p "Switch to main branch? (y/N): " -r
@@ -96,25 +96,25 @@ update_main() {
         log_error "Failed to fetch main branch"
         exit 1
     fi
-    
+
     if ! git rebase origin/main; then
         log_error "Failed to rebase main branch"
         exit 1
     fi
-    
+
     log_success "Main branch updated successfully"
 }
 
 # Function to create feature branch
 create_feature_branch() {
     local branch_name="$1"
-    
+
     # Check if branch already exists locally
     if git show-ref --verify --quiet "refs/heads/$branch_name"; then
         log_error "Branch '$branch_name' already exists locally"
         exit 1
     fi
-    
+
     # Check if branch exists on remote
     if git ls-remote --exit-code origin "$branch_name" >/dev/null 2>&1; then
         log_warning "Branch '$branch_name' exists on remote"
@@ -128,33 +128,33 @@ create_feature_branch() {
             exit 1
         fi
     fi
-    
+
     # Create new branch
     if ! git checkout -b "$branch_name"; then
         log_error "Failed to create branch: $branch_name"
         exit 1
     fi
-    
+
     log_success "Created and switched to branch: $branch_name"
 }
 
 # Function to set up branch tracking
 setup_tracking() {
     local branch_name="$1"
-    
+
     log_info "Setting up remote tracking..."
     if ! git push -u origin "$branch_name"; then
         log_error "Failed to set up remote tracking"
         exit 1
     fi
-    
+
     log_success "Remote tracking set up successfully"
 }
 
 # Function to display next steps
 display_next_steps() {
     local branch_name="$1"
-    
+
     cat << EOF
 
 ${GREEN}✅ Branch Setup Complete!${NC}

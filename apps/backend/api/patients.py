@@ -11,9 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from middleware.auth_middleware import AuthenticatedUser, require_auth_dependency
 from middleware.correlation import get_correlation_id
-from services.database_service import DatabaseService
-from services.feature_flags_service import is_enabled, is_patient_management_enabled
-from utils.audit_logger import log_crud_action, log_data_access
+from services.feature_flags_service import is_patient_management_enabled
+from utils.phi_scrubber import scrub_phi
 from utils.response_models import APIResponse
 
 logger = logging.getLogger(__name__)
@@ -70,7 +69,7 @@ class PatientResponse(BaseModel):
     "/",
     response_model=APIResponse[List[PatientResponse]],
     summary="Get all patients",
-    description="Retrieve a list of all patients with pagination " "support.",
+    description=("Retrieve a list of all patients with pagination support."),
 )
 async def get_patients(
     request: Request,
@@ -84,7 +83,8 @@ async def get_patients(
     # Check if patient management feature is enabled
     if not is_patient_management_enabled(current_user.user_id):
         raise HTTPException(
-            status_code=503, detail="Patient management feature is currently disabled"
+            status_code=503,
+            detail="Patient management feature is currently disabled",
         )
 
     try:
@@ -174,11 +174,13 @@ async def get_patient(
 
         logger.info(
             "Fetching patient",
-            extra={
-                "user_id": current_user.user_id,
-                "patient_id": str(patient_id),
-                "correlation_id": correlation_id,
-            },
+            extra=scrub_phi(
+                {
+                    "user_id": current_user.user_id,
+                    "patient_id": str(patient_id),
+                    "correlation_id": correlation_id,
+                }
+            ),
         )
 
         # TODO: Implement actual database query with DatabaseService
@@ -216,11 +218,13 @@ async def get_patient(
     except Exception as e:
         logger.error(
             "Error fetching patient",
-            extra={
-                "error": str(e),
-                "patient_id": str(patient_id),
-                "correlation_id": correlation_id,
-            },
+            extra=scrub_phi(
+                {
+                    "error": str(e),
+                    "patient_id": str(patient_id),
+                    "correlation_id": correlation_id,
+                }
+            ),
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -335,11 +339,13 @@ async def update_patient(
     try:
         logger.info(
             "Updating patient",
-            extra={
-                "user_id": current_user.user_id,
-                "patient_id": str(patient_id),
-                "correlation_id": correlation_id,
-            },
+            extra=scrub_phi(
+                {
+                    "user_id": current_user.user_id,
+                    "patient_id": str(patient_id),
+                    "correlation_id": correlation_id,
+                }
+            ),
         )
 
         # Get existing patient for audit trail
@@ -423,11 +429,13 @@ async def update_patient(
     except Exception as e:
         logger.error(
             "Error updating patient",
-            extra={
-                "error": str(e),
-                "patient_id": str(patient_id),
-                "correlation_id": correlation_id,
-            },
+            extra=scrub_phi(
+                {
+                    "error": str(e),
+                    "patient_id": str(patient_id),
+                    "correlation_id": correlation_id,
+                }
+            ),
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -452,11 +460,13 @@ async def delete_patient(
     try:
         logger.info(
             "Deleting patient",
-            extra={
-                "user_id": current_user.user_id,
-                "patient_id": str(patient_id),
-                "correlation_id": correlation_id,
-            },
+            extra=scrub_phi(
+                {
+                    "user_id": current_user.user_id,
+                    "patient_id": str(patient_id),
+                    "correlation_id": correlation_id,
+                }
+            ),
         )
 
         # Perform soft delete using DatabaseService
@@ -489,11 +499,13 @@ async def delete_patient(
     except Exception as e:
         logger.error(
             "Error deleting patient",
-            extra={
-                "error": str(e),
-                "patient_id": str(patient_id),
-                "correlation_id": correlation_id,
-            },
+            extra=scrub_phi(
+                {
+                    "error": str(e),
+                    "patient_id": str(patient_id),
+                    "correlation_id": correlation_id,
+                }
+            ),
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

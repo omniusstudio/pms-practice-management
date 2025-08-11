@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
 from pathlib import Path
-import logging
 
 
 @dataclass
@@ -242,12 +241,7 @@ class RBACAuditor:
                     if current_date > next_date:
                         status = 'overdue'
                 except ValueError:
--                    pass
-+                    logging.warning(
-+                        "Could not parse next_review date '%s' for service account '%s'",
-+                        next_review,
-+                        sa_name,
-+                    )
+                    pass
 
             # Get permissions
             permissions = []

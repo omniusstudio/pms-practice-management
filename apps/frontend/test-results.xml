@@ -85,7 +85,7 @@ Sentry DSN not configured, error tracking disabled
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Performance Metrics &gt; should record page load metrics" time="0.002">
         </testcase>
-        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Performance Metrics &gt; should record API call metrics" time="0.001">
+        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Performance Metrics &gt; should record API call metrics" time="0.007">
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Error Metrics &gt; should record JavaScript errors" time="0.001">
         </testcase>
@@ -103,15 +103,15 @@ Sentry DSN not configured, error tracking disabled
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Buffer Management &gt; should flush metrics when buffer is full" time="0.103">
         </testcase>
-        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; HIPAA Compliance &gt; should not expose PHI in metrics" time="0.001">
+        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; HIPAA Compliance &gt; should not expose PHI in metrics" time="0.002">
         </testcase>
-        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; HIPAA Compliance &gt; should scrub sensitive data from tags" time="0">
+        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; HIPAA Compliance &gt; should scrub sensitive data from tags" time="0.001">
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Error Handling &gt; should handle flush errors gracefully" time="0.001">
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Error Handling &gt; should continue collecting metrics after flush error" time="0.001">
         </testcase>
-        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Timestamp and Correlation &gt; should add timestamps to metrics" time="0">
+        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Timestamp and Correlation &gt; should add timestamps to metrics" time="0.001">
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Timestamp and Correlation &gt; should preserve correlation IDs when available" time="0">
         </testcase>

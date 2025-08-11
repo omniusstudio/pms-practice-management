@@ -200,7 +200,7 @@ ${YELLOW}Next Steps:${NC}
 1. Make your changes
 2. Commit frequently with descriptive messages
 3. Push changes: ${BLUE}git push${NC}
-4. Create a Pull Request targeting ${BLUE}staging${NC}
+4. Create a Pull Request targeting ${BLUE}main${NC}
 
 ${YELLOW}Important Reminders:${NC}
 • Follow HIPAA compliance guidelines
@@ -260,8 +260,8 @@ This is a draft PR for ticket${ticket_number:+ #$ticket_number}.
 ---
 **Note**: This PR will be marked as ready for review when development is complete."
 
-    # Create the draft PR targeting staging
-    if gh pr create --draft --title "$pr_title" --body "$pr_body" --head "$branch_name" --base "staging"; then
+    # Create the draft PR targeting main (Trunk-Based Development)
+    if gh pr create --draft --title "$pr_title" --body "$pr_body" --head "$branch_name" --base "main"; then
         print_success "Draft PR created successfully!"
         local pr_url=$(gh pr view --json url --jq '.url')
         print_info "PR URL: $pr_url"
@@ -363,7 +363,7 @@ show_pr_process_reminder() {
     echo
     echo "6. 📤 Push and create draft PR"
     echo "   • git push -u origin $branch_name"
-    echo "   • Create draft PR through GitHub UI or CLI targeting 'staging'"
+    echo "   • Create draft PR through GitHub UI or CLI targeting 'main'"
     echo "   • Convert to ready when development is complete"
     echo
     echo "7. 👥 Request reviews"

@@ -1,0 +1,48 @@
+{
+  "audit_date": "2025-08-09T01:48:43.918545",
+  "namespace": "pms",
+  "compliance_score": 90,
+  "summary": {
+    "total_service_accounts": 1,
+    "total_roles": 0,
+    "total_violations": 0,
+    "high_severity_violations": 0,
+    "overdue_reviews": 1
+  },
+  "service_accounts": [
+    {
+      "name": "default",
+      "metadata": {
+        "annotations": {
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"ServiceAccount\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":\"2025-08-06T01:48:18Z\",\"name\":\"default\",\"namespace\":\"pms\",\"resourceVersion\":\"985\",\"uid\":\"61da3886-d88a-4d11-a1a6-008fb55d10e1\"}}\n"
+        },
+        "creationTimestamp": "2025-08-06T01:48:18Z",
+        "name": "default",
+        "namespace": "pms",
+        "resourceVersion": "368293",
+        "uid": "61da3886-d88a-4d11-a1a6-008fb55d10e1"
+      },
+      "role_bindings": []
+    }
+  ],
+  "roles": [],
+  "violations": [],
+  "access_review_items": [
+    {
+      "service_account": "default",
+      "role": "",
+      "permissions": [],
+      "last_reviewed": "never",
+      "next_review": "2025-08-09",
+      "status": "overdue",
+      "justification": "No justification provided"
+    }
+  ],
+  "recommendations": [
+    "Complete 1 overdue access reviews",
+    "RBAC configuration appears compliant",
+    "Implement automated RBAC monitoring",
+    "Schedule quarterly access reviews",
+    "Document all service account justifications"
+  ]
+}

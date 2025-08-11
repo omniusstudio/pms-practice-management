@@ -10,8 +10,8 @@ from core.database import get_db
 from middleware.auth import require_auth_dependency
 
 # from models.patient import Patient  # TODO: Implement Patient model
-from utils.exceptions import handle_database_error
-from utils.pagination import PaginationParams, create_paginated_response
+from utils.exceptions import NotFoundError, ValidationError, handle_database_error
+from utils.pagination import PaginationParams, paginate_query
 
 # from utils.idempotency import (  # TODO: Implement idempotency
 #     get_idempotency_key,
@@ -60,6 +60,15 @@ def get_standard_responses():
 
 def log_api_access(user, action, resource_id=None):
     pass
+
+
+def create_paginated_response(items, pagination_meta, correlation_id):
+    """Local helper for patient API pagination response."""
+    return {
+        "data": items,
+        "pagination": pagination_meta,
+        "correlation_id": correlation_id,
+    }
 
 
 router = APIRouter(prefix="/patients", tags=["patients"])
@@ -271,9 +280,42 @@ async def update_patient(
     idempotency_key: str = Depends(get_idempotency_key),
     x_correlation_id: Optional[str] = Header(None, alias="X-Correlation-ID"),
 ):
-    """Update a patient."""
-    require_permissions(current_user, ["patients:update"])
-    log_api_access(current_user, "update_patient", resource_id=patient_id)
+    """Update an existing patient."""
+    try:
+        # Check permissions
+        require_permissions(current_user, ["patients:update"])
+
+        # Check idempotency
+        idempotency_manager = IdempotencyManager(idempotency_key, db)
+        cached_response = idempotency_manager.get_response()
+        if cached_response:
+            return cached_response
+
+        # Log API access
+        log_api_access(current_user, "update_patient")
+
+        # Get existing patient
+        patient = db.query(Patient).filter(Patient.patient_id == patient_id).first()
+        if not patient:
+            raise NotFoundError(f"Patient with ID {patient_id} not found")
+
+        # Validate unique constraints if email is being updated
+        if patient_data.email and patient_data.email != patient.email:
+            existing_patient = (
+                db.query(Patient)
+                .filter(
+                    Patient.email == patient_data.email,
+                    Patient.patient_id != patient_id,
+                )
+                .first()
+            )
+            if existing_patient:
+                raise ValidationError("A patient with this email already exists")
+
+        # Update patient
+        update_data = patient_data.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(patient, field, value)
 
     # Check idempotency
     idempotency_manager = IdempotencyManager(idempotency_key, db)

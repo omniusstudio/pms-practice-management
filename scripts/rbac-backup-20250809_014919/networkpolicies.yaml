@@ -1,0 +1,107 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    annotations:
+      description: Network isolation to complement RBAC policies
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{"description":"Network isolation to complement RBAC policies"},"labels":{"rbac-version":"v2.0"},"name":"pms-rbac-network-policy","namespace":"pms"},"spec":{"egress":[{"ports":[{"port":53,"protocol":"UDP"}],"to":[]},{"ports":[{"port":443,"protocol":"TCP"}],"to":[{"namespaceSelector":{"matchLabels":{"name":"kube-system"}}}]},{"ports":[{"port":5432,"protocol":"TCP"},{"port":6379,"protocol":"TCP"}],"to":[]}],"ingress":[{"from":[{"namespaceSelector":{"matchLabels":{"name":"ingress-nginx"}}},{"namespaceSelector":{"matchLabels":{"name":"kube-system"}}}],"ports":[{"port":8000,"protocol":"TCP"},{"port":80,"protocol":"TCP"}]}],"podSelector":{"matchLabels":{"rbac-version":"v2.0"}},"policyTypes":["Ingress","Egress"]}}
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    generation: 1
+    labels:
+      rbac-version: v2.0
+    name: pms-rbac-network-policy
+    namespace: pms
+    resourceVersion: "368421"
+    uid: d0b7389e-7ba7-4cae-bcdf-56da6b206962
+  spec:
+    egress:
+    - ports:
+      - port: 53
+        protocol: UDP
+    - ports:
+      - port: 443
+        protocol: TCP
+      to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+    - ports:
+      - port: 5432
+        protocol: TCP
+      - port: 6379
+        protocol: TCP
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+      - port: 8000
+        protocol: TCP
+      - port: 80
+        protocol: TCP
+    podSelector:
+      matchLabels:
+        rbac-version: v2.0
+    policyTypes:
+    - Ingress
+    - Egress
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"labels":{"app":"rbac-security","component":"network-policy"},"name":"rbac-security-netpol","namespace":"pms"},"spec":{"egress":[{"ports":[{"port":53,"protocol":"UDP"}],"to":[]},{"ports":[{"port":443,"protocol":"TCP"}],"to":[{"namespaceSelector":{"matchLabels":{"name":"kube-system"}}}]},{"ports":[{"port":5432,"protocol":"TCP"},{"port":6379,"protocol":"TCP"}],"to":[]}],"ingress":[{"from":[{"namespaceSelector":{"matchLabels":{"name":"kube-system"}}},{"namespaceSelector":{"matchLabels":{"name":"ingress-nginx"}}}],"ports":[{"port":8000,"protocol":"TCP"},{"port":80,"protocol":"TCP"}]}],"podSelector":{"matchLabels":{"rbac-version":"v2.0"}},"policyTypes":["Ingress","Egress"]}}
+    creationTimestamp: "2025-08-09T06:48:50Z"
+    generation: 1
+    labels:
+      app: rbac-security
+      component: network-policy
+    name: rbac-security-netpol
+    namespace: pms
+    resourceVersion: "368429"
+    uid: de54a7e2-886e-4f07-a070-fdf9143a624e
+  spec:
+    egress:
+    - ports:
+      - port: 53
+        protocol: UDP
+    - ports:
+      - port: 443
+        protocol: TCP
+      to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+    - ports:
+      - port: 5432
+        protocol: TCP
+      - port: 6379
+        protocol: TCP
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      ports:
+      - port: 8000
+        protocol: TCP
+      - port: 80
+        protocol: TCP
+    podSelector:
+      matchLabels:
+        rbac-version: v2.0
+    policyTypes:
+    - Ingress
+    - Egress
+kind: List
+metadata:
+  resourceVersion: ""

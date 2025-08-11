@@ -7,6 +7,7 @@ import { ErrorBoundary } from "../components/ErrorBoundary";
 // Lazy load pages for better performance
 const LoginPage = React.lazy(() => import("../pages/LoginPage"));
 const DashboardPage = React.lazy(() => import("../pages/DashboardPage"));
+const AccessReviewPage = React.lazy(() => import("../pages/AccessReviewPage"));
 const UnauthorizedPage = React.lazy(() => import("../pages/UnauthorizedPage"));
 const NotFoundPage = React.lazy(() => import("../pages/NotFoundPage"));
 
@@ -135,6 +136,18 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: "/access-review",
+    element: (
+      <ProtectedRoute requiredRoles={["admin"]}>
+        <Layout>
+          <LazyPageWrapper>
+            <AccessReviewPage />
+          </LazyPageWrapper>
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/settings",
     element: (
       <ProtectedRoute requiredRoles={["admin"]}>
@@ -172,6 +185,7 @@ export const routes = {
   appointments: "/appointments",
   billing: "/billing",
   reports: "/reports",
+  accessReview: "/access-review",
   settings: "/settings",
   unauthorized: "/unauthorized",
 } as const;
@@ -206,6 +220,12 @@ export const navigationItems = [
     name: "Reports",
     href: routes.reports,
     icon: "ChartBarIcon",
+    requiredRoles: ["admin"],
+  },
+  {
+    name: "Access Review",
+    href: routes.accessReview,
+    icon: "ShieldCheckIcon",
     requiredRoles: ["admin"],
   },
   {

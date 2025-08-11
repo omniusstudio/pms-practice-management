@@ -1,0 +1,268 @@
+# Basic RBAC Configuration Components
+# Simplified version without advanced admission controllers
+# Focuses on core RBAC enhancements and monitoring
+
+# Network Policy for RBAC Security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rbac-security-netpol
+  namespace: pms
+  labels:
+    app: rbac-security
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      rbac-version: "v2.0"
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 80
+  egress:
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53  # DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 443  # Kubernetes API
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis
+
+---
+# ConfigMap for RBAC Policy Documentation
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rbac-policy-config
+  namespace: pms
+  labels:
+    app: rbac-policy
+    component: configuration
+    rbac-version: "v2.0"
+data:
+  policy-rules.md: |
+    # RBAC Policy Rules Documentation
+
+    ## Service Account Policies
+
+    ### pms-backend
+    - **Purpose**: Backend API service with database and configuration access
+    - **Permissions**:
+      - get/list specific secrets (pms-secrets, database-credentials)
+      - get specific configmaps (pms-config, app-config)
+      - get own pod information
+      - create events for logging
+    - **Justification**: Requires database credentials and application configuration
+    - **Review Frequency**: Quarterly
+
+    ### pms-frontend
+    - **Purpose**: Frontend web service with minimal configuration access
+    - **Permissions**:
+      - get specific public configmaps (pms-public-config, frontend-config)
+      - create events for logging
+    - **Justification**: Only needs public configuration, no sensitive data
+    - **Review Frequency**: Quarterly
+
+    ### pms-backup
+    - **Purpose**: Backup service with read-only resource access
+    - **Permissions**:
+      - get/list pods and pod logs
+      - get specific configmaps (backup-config, pms-config)
+      - get specific backup credentials
+      - manage jobs and cronjobs
+      - create events for logging
+    - **Justification**: Needs to coordinate backups and access backup credentials
+    - **Review Frequency**: Quarterly
+
+    ### pms-monitoring
+    - **Purpose**: Monitoring service with metrics collection access
+    - **Permissions**:
+      - get/list pods, services, endpoints for metrics
+      - get node metrics (limited)
+      - create events for alerts
+    - **Justification**: Requires metrics access for monitoring and alerting
+    - **Review Frequency**: Quarterly
+
+    ## Security Principles
+
+    1. **Least Privilege**: Each service account has only the minimum permissions required
+    2. **Resource Name Restrictions**: Sensitive resources are restricted to specific names
+    3. **No Wildcard Permissions**: All permissions are explicitly defined
+    4. **Regular Reviews**: Quarterly access reviews are mandatory
+    5. **Documentation**: All permissions must be justified and documented
+
+    ## Compliance Requirements
+
+    - HIPAA compliance for healthcare data protection
+    - Regular audit trails and access reviews
+    - Principle of least privilege enforcement
+    - Segregation of duties between services
+
+  access-review-checklist.md: |
+    # Quarterly Access Review Checklist
+
+    ## Review Process
+
+    1. **Service Account Audit**
+       - [ ] Review all service accounts in the namespace
+       - [ ] Verify each service account has proper documentation
+       - [ ] Check that permissions align with current requirements
+       - [ ] Identify any unused or excessive permissions
+
+    2. **Permission Validation**
+       - [ ] Ensure no wildcard permissions exist
+       - [ ] Verify sensitive resources have name restrictions
+       - [ ] Check that write permissions are justified
+       - [ ] Validate network policy restrictions
+
+    3. **Compliance Check**
+       - [ ] Run RBAC audit script
+       - [ ] Review audit findings and violations
+       - [ ] Document any approved exceptions
+       - [ ] Update service account annotations
+
+    4. **Documentation Update**
+       - [ ] Update last-reviewed dates
+       - [ ] Refresh justification descriptions
+       - [ ] Update policy documentation
+       - [ ] Record review completion
+
+    ## Review Schedule
+
+    - **Frequency**: Every 90 days (quarterly)
+    - **Responsible**: DevOps/Security team
+    - **Approval**: Technical lead and compliance officer
+    - **Documentation**: Store in compliance repository
+
+  monitoring-alerts.yaml: |
+    # RBAC Monitoring and Alerting Configuration
+
+    alerts:
+      - name: "rbac-violation-detected"
+        description: "RBAC policy violation detected"
+        severity: "high"
+        conditions:
+          - "wildcard permissions created"
+          - "sensitive resource access without restrictions"
+          - "service account without documentation"
+        actions:
+          - "send notification to security team"
+          - "create incident ticket"
+          - "block deployment if possible"
+
+      - name: "access-review-overdue"
+        description: "Service account access review is overdue"
+        severity: "medium"
+        conditions:
+          - "last-reviewed date > 90 days ago"
+        actions:
+          - "send reminder to responsible team"
+          - "escalate if overdue > 30 days"
+
+      - name: "rbac-audit-failed"
+        description: "RBAC audit script failed or found violations"
+        severity: "medium"
+        conditions:
+          - "audit script exit code != 0"
+          - "compliance score < 80"
+        actions:
+          - "notify DevOps team"
+          - "schedule remediation review"
+
+---
+# Service Account for RBAC Management
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rbac-manager
+  namespace: pms
+  labels:
+    app: rbac-manager
+    component: management
+    rbac-version: "v2.0"
+  annotations:
+    description: "Service account for RBAC management and auditing operations"
+    last-reviewed: "2025-01-01"
+    review-frequency: "quarterly"
+    compliance: "hipaa-compliant"
+    purpose: "Manages RBAC policies and conducts compliance audits"
+
+---
+# Role for RBAC Management
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: pms
+  name: rbac-manager-role
+  labels:
+    app: rbac-manager
+    rbac-version: "v2.0"
+  annotations:
+    description: "Role for RBAC management operations and auditing"
+    last-reviewed: "2025-01-01"
+rules:
+# Read access to all RBAC resources for auditing
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles", "rolebindings"]
+  verbs: ["get", "list"]
+# Read access to service accounts for validation
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["get", "list"]
+# Access to configuration and policy documentation
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["rbac-policy-config"]
+  verbs: ["get", "list"]
+# Events for audit logging
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+# Pod access for monitoring
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+
+---
+# Role Binding for RBAC Management
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rbac-manager-rolebinding
+  namespace: pms
+  labels:
+    app: rbac-manager
+    rbac-version: "v2.0"
+  annotations:
+    description: "Binding for RBAC management service account"
+    last-reviewed: "2025-01-01"
+subjects:
+- kind: ServiceAccount
+  name: rbac-manager
+  namespace: pms
+roleRef:
+  kind: Role
+  name: rbac-manager-role
+  apiGroup: rbac.authorization.k8s.io

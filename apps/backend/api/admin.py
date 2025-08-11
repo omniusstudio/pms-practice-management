@@ -7,7 +7,7 @@ administrators to manage user roles and permissions.
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from middleware.auth_middleware import AuthenticatedUser, require_admin_role
 from models.user import User
+from utils.rbac_audit_logger import create_rbac_audit_record, log_rbac_role_assignment
 from utils.response_models import APIResponse
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -143,6 +144,7 @@ async def get_user(
 async def update_user_roles(
     user_id: UUID,
     role_update: UserRoleUpdate,
+    request: Request,
     current_user: AuthenticatedUser = Depends(require_admin_role),
     db: AsyncSession = Depends(get_db),
 ) -> APIResponse[UserResponse]:
@@ -182,9 +184,41 @@ async def update_user_roles(
                     detail=("Cannot remove admin role from the last administrator"),
                 )
 
+        # Calculate role changes for audit logging
+        old_roles = set(user.roles or [])
+        new_roles = set(role_update.roles)
+        roles_added = list(new_roles - old_roles)
+        roles_removed = list(old_roles - new_roles)
+
         # Update roles
         user.roles = role_update.roles
         user.is_admin = "admin" in role_update.roles
+
+        # Create audit record
+        correlation_id = f"admin-update-roles-{int(__import__('time').time())}"
+        await create_rbac_audit_record(
+            session=db,
+            user_id=str(current_user.user_id),
+            action="role_assignment",
+            resource_type="user_roles",
+            correlation_id=correlation_id,
+            resource_id=str(user_id),
+            old_values={"roles": list(old_roles)},
+            new_values={"roles": role_update.roles},
+            ip_address=(request.client.host if request.client else None),
+            user_agent=request.headers.get("user-agent"),
+        )
+
+        # Log RBAC role assignment
+        log_rbac_role_assignment(
+            user_id=str(current_user.user_id),
+            target_user_id=str(user_id),
+            roles_added=roles_added,
+            roles_removed=roles_removed,
+            correlation_id=correlation_id,
+            ip_address=(request.client.host if request.client else None),
+            user_agent=request.headers.get("user-agent"),
+        )
 
         await db.commit()
         await db.refresh(user)
@@ -195,7 +229,7 @@ async def update_user_roles(
             success=True,
             data=user_response,
             message=f"User roles updated to: {', '.join(role_update.roles)}",
-            correlation_id="admin-update-roles",
+            correlation_id=correlation_id,
         )
 
     except HTTPException:

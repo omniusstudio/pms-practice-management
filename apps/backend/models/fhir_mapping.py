@@ -63,7 +63,7 @@ class FHIRMapping(BaseModel):
 
     # FHIR resource information
     fhir_resource_type: Column[FHIRResourceType] = Column(
-        SQLEnum(FHIRResourceType),
+        SQLEnum(FHIRResourceType, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         index=True,
         comment="FHIR resource type (Patient, Practitioner, etc.)",
@@ -79,12 +79,12 @@ class FHIRMapping(BaseModel):
     fhir_server_url = Column(
         String(500),
         nullable=True,
-        comment="Base URL of the FHIR server where resource is stored",
+        comment="Base URL of FHIR server where resource is stored",
     )
 
     # Mapping metadata
     status: Column[FHIRMappingStatus] = Column(
-        SQLEnum(FHIRMappingStatus),
+        SQLEnum(FHIRMappingStatus, values_callable=lambda x: [e.value for e in x]),
         default=FHIRMappingStatus.ACTIVE,
         nullable=False,
         index=True,
@@ -113,7 +113,7 @@ class FHIRMapping(BaseModel):
     )
 
     error_count = Column(
-        String(10),  # Using string to avoid integer overflow issues
+        String(10),  # Using string to avoid overflow issues
         default="0",
         nullable=False,
         comment="Number of consecutive errors",
@@ -197,8 +197,7 @@ class FHIRMapping(BaseModel):
         """Check if synchronization is needed based on last sync time.
 
         Args:
-            threshold_minutes: Minutes since last sync to consider
-                sync needed
+            threshold_minutes: Minutes since last sync to consider sync needed
 
         Returns:
             True if sync is needed, False otherwise
@@ -272,7 +271,8 @@ class FHIRMapping(BaseModel):
         self.status = FHIRMappingStatus.INACTIVE
         if reason:
             current_notes = self.notes or ""
-            self.notes = f"{current_notes}\nDeactivated: {reason}".strip()
+            deactivation_note = f"\nDeactivated: {reason}"
+            self.notes = f"{current_notes}{deactivation_note}".strip()
 
     def to_dict(self) -> dict:
         """Convert mapping to dictionary for API responses.

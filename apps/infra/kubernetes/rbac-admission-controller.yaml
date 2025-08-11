@@ -1,0 +1,360 @@
+# RBAC Admission Controller Configuration
+# Enforces least-privilege policies and prevents RBAC violations
+# Validates service account permissions at deployment time
+
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionWebhook
+metadata:
+  name: rbac-policy-validator
+  labels:
+    app: rbac-admission-controller
+    component: security
+    compliance: hipaa
+webhooks:
+- name: rbac.pms.local
+  clientConfig:
+    service:
+      name: rbac-admission-controller
+      namespace: pms
+      path: "/validate-rbac"
+  rules:
+  - operations: ["CREATE", "UPDATE"]
+    apiGroups: ["rbac.authorization.k8s.io"]
+    apiVersions: ["v1"]
+    resources: ["roles", "rolebindings"]
+  - operations: ["CREATE", "UPDATE"]
+    apiGroups: [""]
+    apiVersions: ["v1"]
+    resources: ["serviceaccounts"]
+  admissionReviewVersions: ["v1", "v1beta1"]
+  sideEffects: None
+  failurePolicy: Fail
+
+---
+# OPA Gatekeeper Constraint Template for RBAC Validation
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: rbacpolicyvalidation
+  labels:
+    compliance: hipaa
+    security-policy: rbac
+spec:
+  crd:
+    spec:
+      names:
+        kind: RBACPolicyValidation
+      validation:
+        type: object
+        properties:
+          allowedVerbs:
+            type: array
+            items:
+              type: string
+          deniedResources:
+            type: array
+            items:
+              type: string
+          requireResourceNames:
+            type: boolean
+          maxPermissions:
+            type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package rbacpolicyvalidation
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Role"
+          rule := input.review.object.rules[_]
+
+          # Check for wildcard permissions
+          rule.resources[_] == "*"
+          msg := "Wildcard resource permissions are not allowed"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Role"
+          rule := input.review.object.rules[_]
+
+          # Check for wildcard verbs
+          rule.verbs[_] == "*"
+          msg := "Wildcard verb permissions are not allowed"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Role"
+          rule := input.review.object.rules[_]
+
+          # Check for sensitive resources without resource names
+          sensitive_resources := ["secrets", "serviceaccounts", "roles", "rolebindings"]
+          rule.resources[_] == sensitive_resources[_]
+          write_verbs := ["create", "update", "patch", "delete"]
+          rule.verbs[_] == write_verbs[_]
+          count(rule.resourceNames) == 0
+          msg := sprintf("Sensitive resource '%s' requires specific resourceNames", [rule.resources[_]])
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Role"
+          rule := input.review.object.rules[_]
+
+          # Check for excessive permissions count
+          count(rule.resources) * count(rule.verbs) > input.parameters.maxPermissions
+          msg := sprintf("Role exceeds maximum allowed permissions: %d", [input.parameters.maxPermissions])
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "ServiceAccount"
+
+          # Check for missing required annotations
+          not input.review.object.metadata.annotations["description"]
+          msg := "ServiceAccount must have a 'description' annotation explaining its purpose"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "ServiceAccount"
+
+          # Check for missing review frequency
+          not input.review.object.metadata.annotations["review-frequency"]
+          msg := "ServiceAccount must have a 'review-frequency' annotation (quarterly/annually)"
+        }
+
+---
+# RBAC Policy Validation Constraint
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: RBACPolicyValidation
+metadata:
+  name: rbac-least-privilege-policy
+  namespace: pms
+  labels:
+    compliance: hipaa
+    policy-type: security
+spec:
+  match:
+    kinds:
+      - apiGroups: ["rbac.authorization.k8s.io"]
+        kinds: ["Role"]
+      - apiGroups: [""]
+        kinds: ["ServiceAccount"]
+    namespaces: ["pms"]
+  parameters:
+    allowedVerbs: ["get", "list", "watch", "create", "update", "patch"]
+    deniedResources: ["*"]
+    requireResourceNames: true
+    maxPermissions: 20
+
+---
+# Network Policy for RBAC Admission Controller
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rbac-admission-controller-netpol
+  namespace: pms
+  labels:
+    app: rbac-admission-controller
+spec:
+  podSelector:
+    matchLabels:
+      app: rbac-admission-controller
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 8443
+  egress:
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53  # DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 443  # Kubernetes API
+
+---
+# ConfigMap for RBAC Policy Rules
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rbac-policy-config
+  namespace: pms
+  labels:
+    app: rbac-admission-controller
+    component: configuration
+data:
+  policy-rules.yaml: |
+    # RBAC Policy Rules Configuration
+    policies:
+      # Wildcard Prevention
+      - name: "no-wildcard-permissions"
+        description: "Prevent wildcard (*) permissions in roles"
+        severity: "high"
+        rule: |
+          deny[msg] {
+            input.kind == "Role"
+            rule := input.rules[_]
+            rule.resources[_] == "*"
+            msg := "Wildcard resource permissions are prohibited"
+          }
+          deny[msg] {
+            input.kind == "Role"
+            rule := input.rules[_]
+            rule.verbs[_] == "*"
+            msg := "Wildcard verb permissions are prohibited"
+          }
+
+      # Sensitive Resource Protection
+      - name: "sensitive-resource-protection"
+        description: "Require specific resource names for sensitive resources"
+        severity: "high"
+        rule: |
+          deny[msg] {
+            input.kind == "Role"
+            rule := input.rules[_]
+            sensitive := ["secrets", "serviceaccounts", "roles", "rolebindings"]
+            rule.resources[_] == sensitive[_]
+            write_verbs := ["create", "update", "patch", "delete"]
+            rule.verbs[_] == write_verbs[_]
+            count(rule.resourceNames) == 0
+            msg := sprintf("Sensitive resource '%s' requires specific resourceNames", [rule.resources[_]])
+          }
+
+      # Service Account Documentation
+      - name: "service-account-documentation"
+        description: "Require documentation for all service accounts"
+        severity: "medium"
+        rule: |
+          deny[msg] {
+            input.kind == "ServiceAccount"
+            not input.metadata.annotations.description
+            msg := "ServiceAccount must have a description annotation"
+          }
+          deny[msg] {
+            input.kind == "ServiceAccount"
+            not input.metadata.annotations["review-frequency"]
+            msg := "ServiceAccount must have a review-frequency annotation"
+          }
+
+      # Permission Limits
+      - name: "permission-limits"
+        description: "Limit the number of permissions per role"
+        severity: "medium"
+        rule: |
+          deny[msg] {
+            input.kind == "Role"
+            rule := input.rules[_]
+            permission_count := count(rule.resources) * count(rule.verbs)
+            permission_count > 20
+            msg := sprintf("Role exceeds maximum allowed permissions: %d > 20", [permission_count])
+          }
+
+  allowed-service-accounts.yaml: |
+    # Pre-approved service accounts with their justified permissions
+    approved_accounts:
+      - name: "pms-backend"
+        justification: "Backend API requires database and configuration access"
+        max_permissions: 15
+        allowed_resources: ["secrets", "configmaps", "pods", "events"]
+        allowed_verbs: ["get", "list", "create"]
+        resource_restrictions:
+          secrets: ["pms-secrets", "database-credentials"]
+          configmaps: ["pms-config", "app-config"]
+
+      - name: "pms-frontend"
+        justification: "Frontend web service requires minimal configuration access"
+        max_permissions: 5
+        allowed_resources: ["configmaps", "events"]
+        allowed_verbs: ["get", "create"]
+        resource_restrictions:
+          configmaps: ["pms-public-config", "frontend-config"]
+
+      - name: "pms-backup"
+        justification: "Backup service requires read access to resources and job management"
+        max_permissions: 12
+        allowed_resources: ["pods", "configmaps", "secrets", "jobs", "cronjobs", "events"]
+        allowed_verbs: ["get", "list", "create", "update"]
+        resource_restrictions:
+          secrets: ["backup-credentials", "s3-backup-credentials"]
+          configmaps: ["backup-config", "pms-config"]
+
+      - name: "pms-monitoring"
+        justification: "Monitoring service requires metrics collection access"
+        max_permissions: 8
+        allowed_resources: ["pods", "services", "endpoints", "events"]
+        allowed_verbs: ["get", "list", "create"]
+        resource_restrictions: {}
+
+---
+# RBAC for the Admission Controller itself
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rbac-admission-controller
+  namespace: pms
+  labels:
+    app: rbac-admission-controller
+  annotations:
+    description: "Service account for RBAC policy validation admission controller"
+    last-reviewed: "2025-01-01"
+    review-frequency: "quarterly"
+    compliance: "hipaa-compliant"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: pms
+  name: rbac-admission-controller-role
+  labels:
+    app: rbac-admission-controller
+  annotations:
+    description: "Role for RBAC admission controller operations"
+    last-reviewed: "2025-01-01"
+rules:
+# Read access to validate existing RBAC configurations
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles", "rolebindings"]
+  verbs: ["get", "list"]
+# Read access to service accounts for validation
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["get", "list"]
+# Access to configuration
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["rbac-policy-config"]
+  verbs: ["get"]
+# Events for audit logging
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rbac-admission-controller-rolebinding
+  namespace: pms
+  labels:
+    app: rbac-admission-controller
+  annotations:
+    description: "Binding for RBAC admission controller service account"
+    last-reviewed: "2025-01-01"
+subjects:
+- kind: ServiceAccount
+  name: rbac-admission-controller
+  namespace: pms
+roleRef:
+  kind: Role
+  name: rbac-admission-controller-role
+  apiGroup: rbac.authorization.k8s.io

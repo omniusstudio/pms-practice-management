@@ -1,0 +1,787 @@
+{
+  "audit_date": "2025-08-09T01:49:20.314590",
+  "namespace": "pms",
+  "compliance_score": 0,
+  "summary": {
+    "total_service_accounts": 6,
+    "total_roles": 6,
+    "total_violations": 10,
+    "high_severity_violations": 0,
+    "overdue_reviews": 6
+  },
+  "service_accounts": [
+    {
+      "name": "default",
+      "metadata": {
+        "annotations": {
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"ServiceAccount\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":\"2025-08-06T01:48:18Z\",\"name\":\"default\",\"namespace\":\"pms\",\"resourceVersion\":\"368293\",\"uid\":\"61da3886-d88a-4d11-a1a6-008fb55d10e1\"}}\n"
+        },
+        "creationTimestamp": "2025-08-06T01:48:18Z",
+        "name": "default",
+        "namespace": "pms",
+        "resourceVersion": "368435",
+        "uid": "61da3886-d88a-4d11-a1a6-008fb55d10e1"
+      },
+      "role_bindings": []
+    },
+    {
+      "name": "pms-backend",
+      "metadata": {
+        "annotations": {
+          "compliance": "hipaa-compliant",
+          "description": "Backend API service account with database and configuration access",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"ServiceAccount\",\"metadata\":{\"annotations\":{\"compliance\":\"hipaa-compliant\",\"description\":\"Backend API service account with database and configuration access\",\"last-reviewed\":\"2025-01-01\",\"review-frequency\":\"quarterly\"},\"labels\":{\"app\":\"pms-backend\",\"component\":\"api\",\"rbac-version\":\"v2.0\"},\"name\":\"pms-backend\",\"namespace\":\"pms\"}}\n",
+          "last-reviewed": "2025-01-01",
+          "review-frequency": "quarterly"
+        },
+        "creationTimestamp": "2025-08-09T06:48:44Z",
+        "labels": {
+          "app": "pms-backend",
+          "component": "api",
+          "rbac-version": "v2.0"
+        },
+        "name": "pms-backend",
+        "namespace": "pms",
+        "resourceVersion": "368407",
+        "uid": "f3fba5df-7001-4a6c-bc83-18db4b17a00f"
+      },
+      "role_bindings": []
+    },
+    {
+      "name": "pms-backup",
+      "metadata": {
+        "annotations": {
+          "compliance": "hipaa-compliant",
+          "description": "Backup service account with read-only access to resources",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"ServiceAccount\",\"metadata\":{\"annotations\":{\"compliance\":\"hipaa-compliant\",\"description\":\"Backup service account with read-only access to resources\",\"last-reviewed\":\"2025-01-01\",\"review-frequency\":\"quarterly\"},\"labels\":{\"app\":\"pms-backup\",\"component\":\"backup\",\"rbac-version\":\"v2.0\"},\"name\":\"pms-backup\",\"namespace\":\"pms\"}}\n",
+          "last-reviewed": "2025-01-01",
+          "review-frequency": "quarterly"
+        },
+        "creationTimestamp": "2025-08-09T06:48:44Z",
+        "labels": {
+          "app": "pms-backup",
+          "component": "backup",
+          "rbac-version": "v2.0"
+        },
+        "name": "pms-backup",
+        "namespace": "pms",
+        "resourceVersion": "368409",
+        "uid": "3029072a-e332-4609-b4a0-dc59ece3256d"
+      },
+      "role_bindings": []
+    },
+    {
+      "name": "pms-frontend",
+      "metadata": {
+        "annotations": {
+          "compliance": "hipaa-compliant",
+          "description": "Frontend web service account with configuration access only",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"ServiceAccount\",\"metadata\":{\"annotations\":{\"compliance\":\"hipaa-compliant\",\"description\":\"Frontend web service account with configuration access only\",\"last-reviewed\":\"2025-01-01\",\"review-frequency\":\"quarterly\"},\"labels\":{\"app\":\"pms-frontend\",\"component\":\"web\",\"rbac-version\":\"v2.0\"},\"name\":\"pms-frontend\",\"namespace\":\"pms\"}}\n",
+          "last-reviewed": "2025-01-01",
+          "review-frequency": "quarterly"
+        },
+        "creationTimestamp": "2025-08-09T06:48:44Z",
+        "labels": {
+          "app": "pms-frontend",
+          "component": "web",
+          "rbac-version": "v2.0"
+        },
+        "name": "pms-frontend",
+        "namespace": "pms",
+        "resourceVersion": "368408",
+        "uid": "43cb02a5-c8a2-40f6-a3dc-03d79311314f"
+      },
+      "role_bindings": []
+    },
+    {
+      "name": "pms-monitoring",
+      "metadata": {
+        "annotations": {
+          "compliance": "hipaa-compliant",
+          "description": "Monitoring service account with metrics collection access",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"ServiceAccount\",\"metadata\":{\"annotations\":{\"compliance\":\"hipaa-compliant\",\"description\":\"Monitoring service account with metrics collection access\",\"last-reviewed\":\"2025-01-01\",\"review-frequency\":\"quarterly\"},\"labels\":{\"app\":\"pms-monitoring\",\"component\":\"observability\",\"rbac-version\":\"v2.0\"},\"name\":\"pms-monitoring\",\"namespace\":\"pms\"}}\n",
+          "last-reviewed": "2025-01-01",
+          "review-frequency": "quarterly"
+        },
+        "creationTimestamp": "2025-08-09T06:48:44Z",
+        "labels": {
+          "app": "pms-monitoring",
+          "component": "observability",
+          "rbac-version": "v2.0"
+        },
+        "name": "pms-monitoring",
+        "namespace": "pms",
+        "resourceVersion": "368410",
+        "uid": "1990db1c-0148-453f-9ced-278080eadbba"
+      },
+      "role_bindings": []
+    },
+    {
+      "name": "rbac-manager",
+      "metadata": {
+        "annotations": {
+          "compliance": "hipaa-compliant",
+          "description": "Service account for RBAC management and auditing operations",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"ServiceAccount\",\"metadata\":{\"annotations\":{\"compliance\":\"hipaa-compliant\",\"description\":\"Service account for RBAC management and auditing operations\",\"last-reviewed\":\"2025-01-01\",\"purpose\":\"Manages RBAC policies and conducts compliance audits\",\"review-frequency\":\"quarterly\"},\"labels\":{\"app\":\"rbac-manager\",\"component\":\"management\",\"rbac-version\":\"v2.0\"},\"name\":\"rbac-manager\",\"namespace\":\"pms\"}}\n",
+          "last-reviewed": "2025-01-01",
+          "purpose": "Manages RBAC policies and conducts compliance audits",
+          "review-frequency": "quarterly"
+        },
+        "creationTimestamp": "2025-08-09T06:48:50Z",
+        "labels": {
+          "app": "rbac-manager",
+          "component": "management",
+          "rbac-version": "v2.0"
+        },
+        "name": "rbac-manager",
+        "namespace": "pms",
+        "resourceVersion": "368431",
+        "uid": "b3724d14-06a7-4a92-b9d2-4df03c81adea"
+      },
+      "role_bindings": []
+    }
+  ],
+  "roles": [
+    {
+      "name": "pms-backend-role",
+      "metadata": {
+        "annotations": {
+          "description": "Least-privilege role for backend API service",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"rbac.authorization.k8s.io/v1\",\"kind\":\"Role\",\"metadata\":{\"annotations\":{\"description\":\"Least-privilege role for backend API service\",\"last-reviewed\":\"2025-01-01\"},\"labels\":{\"app\":\"pms-backend\",\"rbac-version\":\"v2.0\"},\"name\":\"pms-backend-role\",\"namespace\":\"pms\"},\"rules\":[{\"apiGroups\":[\"\"],\"resourceNames\":[\"pms-secrets\",\"database-credentials\"],\"resources\":[\"secrets\"],\"verbs\":[\"get\"]},{\"apiGroups\":[\"\"],\"resourceNames\":[\"pms-config\",\"app-config\"],\"resources\":[\"configmaps\"],\"verbs\":[\"get\"]},{\"apiGroups\":[\"\"],\"resourceNames\":[],\"resources\":[\"pods\"],\"verbs\":[\"get\"]},{\"apiGroups\":[\"\"],\"resources\":[\"events\"],\"verbs\":[\"create\"]}]}\n",
+          "last-reviewed": "2025-01-01"
+        },
+        "creationTimestamp": "2025-08-09T06:48:44Z",
+        "labels": {
+          "app": "pms-backend",
+          "rbac-version": "v2.0"
+        },
+        "name": "pms-backend-role",
+        "namespace": "pms",
+        "resourceVersion": "368411",
+        "uid": "cf2896e1-913b-465b-8a48-0128c85ce262"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resourceNames": [
+            "pms-secrets",
+            "database-credentials"
+          ],
+          "resources": [
+            "secrets"
+          ],
+          "verbs": [
+            "get"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resourceNames": [
+            "pms-config",
+            "app-config"
+          ],
+          "resources": [
+            "configmaps"
+          ],
+          "verbs": [
+            "get"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "pods"
+          ],
+          "verbs": [
+            "get"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "events"
+          ],
+          "verbs": [
+            "create"
+          ]
+        }
+      ],
+      "permissions": [
+        "get:secrets:pms-secrets,database-credentials",
+        "get:configmaps:pms-config,app-config",
+        "get:pods",
+        "create:events"
+      ]
+    },
+    {
+      "name": "pms-backup-role",
+      "metadata": {
+        "annotations": {
+          "description": "Read-only role for backup operations",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"rbac.authorization.k8s.io/v1\",\"kind\":\"Role\",\"metadata\":{\"annotations\":{\"description\":\"Read-only role for backup operations\",\"last-reviewed\":\"2025-01-01\"},\"labels\":{\"app\":\"pms-backup\",\"rbac-version\":\"v2.0\"},\"name\":\"pms-backup-role\",\"namespace\":\"pms\"},\"rules\":[{\"apiGroups\":[\"\"],\"resources\":[\"pods\",\"pods/log\"],\"verbs\":[\"get\",\"list\"]},{\"apiGroups\":[\"\"],\"resourceNames\":[\"backup-config\",\"pms-config\"],\"resources\":[\"configmaps\"],\"verbs\":[\"get\"]},{\"apiGroups\":[\"\"],\"resourceNames\":[\"backup-credentials\",\"s3-backup-credentials\"],\"resources\":[\"secrets\"],\"verbs\":[\"get\"]},{\"apiGroups\":[\"batch\"],\"resources\":[\"jobs\",\"cronjobs\"],\"verbs\":[\"get\",\"list\",\"create\",\"update\"]},{\"apiGroups\":[\"\"],\"resources\":[\"events\"],\"verbs\":[\"create\"]}]}\n",
+          "last-reviewed": "2025-01-01"
+        },
+        "creationTimestamp": "2025-08-09T06:48:44Z",
+        "labels": {
+          "app": "pms-backup",
+          "rbac-version": "v2.0"
+        },
+        "name": "pms-backup-role",
+        "namespace": "pms",
+        "resourceVersion": "368413",
+        "uid": "87d76bc9-5a00-44d1-8466-e19469402023"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "pods",
+            "pods/log"
+          ],
+          "verbs": [
+            "get",
+            "list"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resourceNames": [
+            "backup-config",
+            "pms-config"
+          ],
+          "resources": [
+            "configmaps"
+          ],
+          "verbs": [
+            "get"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resourceNames": [
+            "backup-credentials",
+            "s3-backup-credentials"
+          ],
+          "resources": [
+            "secrets"
+          ],
+          "verbs": [
+            "get"
+          ]
+        },
+        {
+          "apiGroups": [
+            "batch"
+          ],
+          "resources": [
+            "jobs",
+            "cronjobs"
+          ],
+          "verbs": [
+            "get",
+            "list",
+            "create",
+            "update"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "events"
+          ],
+          "verbs": [
+            "create"
+          ]
+        }
+      ],
+      "permissions": [
+        "get:pods",
+        "list:pods",
+        "get:pods/log",
+        "list:pods/log",
+        "get:configmaps:backup-config,pms-config",
+        "get:secrets:backup-credentials,s3-backup-credentials",
+        "get:jobs",
+        "list:jobs",
+        "create:jobs",
+        "update:jobs",
+        "get:cronjobs",
+        "list:cronjobs",
+        "create:cronjobs",
+        "update:cronjobs",
+        "create:events"
+      ]
+    },
+    {
+      "name": "pms-dev-debug-role",
+      "metadata": {
+        "annotations": {
+          "description": "Additional debugging permissions for development environment",
+          "environment-only": "development",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"rbac.authorization.k8s.io/v1\",\"kind\":\"Role\",\"metadata\":{\"annotations\":{\"description\":\"Additional debugging permissions for development environment\",\"environment-only\":\"development\",\"last-reviewed\":\"2025-01-01\"},\"labels\":{\"environment\":\"development\",\"rbac-version\":\"v2.0\"},\"name\":\"pms-dev-debug-role\",\"namespace\":\"pms\"},\"rules\":[{\"apiGroups\":[\"\"],\"resources\":[\"pods/exec\"],\"verbs\":[\"create\"]},{\"apiGroups\":[\"\"],\"resources\":[\"pods/log\"],\"verbs\":[\"get\",\"list\"]},{\"apiGroups\":[\"\"],\"resourceNames\":[\"dev-config\",\"test-config\"],\"resources\":[\"configmaps\"],\"verbs\":[\"get\",\"update\",\"patch\"]}]}\n",
+          "last-reviewed": "2025-01-01"
+        },
+        "creationTimestamp": "2025-08-09T06:48:44Z",
+        "labels": {
+          "environment": "development",
+          "rbac-version": "v2.0"
+        },
+        "name": "pms-dev-debug-role",
+        "namespace": "pms",
+        "resourceVersion": "368415",
+        "uid": "202427e7-aa6c-4aa9-a0c4-77fb91acb79a"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "pods/exec"
+          ],
+          "verbs": [
+            "create"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "pods/log"
+          ],
+          "verbs": [
+            "get",
+            "list"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resourceNames": [
+            "dev-config",
+            "test-config"
+          ],
+          "resources": [
+            "configmaps"
+          ],
+          "verbs": [
+            "get",
+            "update",
+            "patch"
+          ]
+        }
+      ],
+      "permissions": [
+        "create:pods/exec",
+        "get:pods/log",
+        "list:pods/log",
+        "get:configmaps:dev-config,test-config",
+        "update:configmaps:dev-config,test-config",
+        "patch:configmaps:dev-config,test-config"
+      ]
+    },
+    {
+      "name": "pms-frontend-role",
+      "metadata": {
+        "annotations": {
+          "description": "Minimal role for frontend web service",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"rbac.authorization.k8s.io/v1\",\"kind\":\"Role\",\"metadata\":{\"annotations\":{\"description\":\"Minimal role for frontend web service\",\"last-reviewed\":\"2025-01-01\"},\"labels\":{\"app\":\"pms-frontend\",\"rbac-version\":\"v2.0\"},\"name\":\"pms-frontend-role\",\"namespace\":\"pms\"},\"rules\":[{\"apiGroups\":[\"\"],\"resourceNames\":[\"pms-public-config\",\"frontend-config\"],\"resources\":[\"configmaps\"],\"verbs\":[\"get\"]},{\"apiGroups\":[\"\"],\"resources\":[\"events\"],\"verbs\":[\"create\"]}]}\n",
+          "last-reviewed": "2025-01-01"
+        },
+        "creationTimestamp": "2025-08-09T06:48:44Z",
+        "labels": {
+          "app": "pms-frontend",
+          "rbac-version": "v2.0"
+        },
+        "name": "pms-frontend-role",
+        "namespace": "pms",
+        "resourceVersion": "368412",
+        "uid": "113b8df6-199e-46ed-8b30-f8b4d7bc0526"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resourceNames": [
+            "pms-public-config",
+            "frontend-config"
+          ],
+          "resources": [
+            "configmaps"
+          ],
+          "verbs": [
+            "get"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "events"
+          ],
+          "verbs": [
+            "create"
+          ]
+        }
+      ],
+      "permissions": [
+        "get:configmaps:pms-public-config,frontend-config",
+        "create:events"
+      ]
+    },
+    {
+      "name": "pms-monitoring-role",
+      "metadata": {
+        "annotations": {
+          "description": "Metrics collection role for monitoring",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"rbac.authorization.k8s.io/v1\",\"kind\":\"Role\",\"metadata\":{\"annotations\":{\"description\":\"Metrics collection role for monitoring\",\"last-reviewed\":\"2025-01-01\"},\"labels\":{\"app\":\"pms-monitoring\",\"rbac-version\":\"v2.0\"},\"name\":\"pms-monitoring-role\",\"namespace\":\"pms\"},\"rules\":[{\"apiGroups\":[\"\"],\"resources\":[\"pods\",\"pods/metrics\"],\"verbs\":[\"get\",\"list\"]},{\"apiGroups\":[\"\"],\"resources\":[\"services\",\"endpoints\"],\"verbs\":[\"get\",\"list\"]},{\"apiGroups\":[\"\"],\"resources\":[\"nodes/metrics\",\"nodes/stats\"],\"verbs\":[\"get\"]},{\"apiGroups\":[\"\"],\"resources\":[\"events\"],\"verbs\":[\"create\"]}]}\n",
+          "last-reviewed": "2025-01-01"
+        },
+        "creationTimestamp": "2025-08-09T06:48:44Z",
+        "labels": {
+          "app": "pms-monitoring",
+          "rbac-version": "v2.0"
+        },
+        "name": "pms-monitoring-role",
+        "namespace": "pms",
+        "resourceVersion": "368414",
+        "uid": "171f3db0-8ead-4704-9509-bd086ad1e4da"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "pods",
+            "pods/metrics"
+          ],
+          "verbs": [
+            "get",
+            "list"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "services",
+            "endpoints"
+          ],
+          "verbs": [
+            "get",
+            "list"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "nodes/metrics",
+            "nodes/stats"
+          ],
+          "verbs": [
+            "get"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "events"
+          ],
+          "verbs": [
+            "create"
+          ]
+        }
+      ],
+      "permissions": [
+        "get:pods",
+        "list:pods",
+        "get:pods/metrics",
+        "list:pods/metrics",
+        "get:services",
+        "list:services",
+        "get:endpoints",
+        "list:endpoints",
+        "get:nodes/metrics",
+        "get:nodes/stats",
+        "create:events"
+      ]
+    },
+    {
+      "name": "rbac-manager-role",
+      "metadata": {
+        "annotations": {
+          "description": "Role for RBAC management operations and auditing",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"rbac.authorization.k8s.io/v1\",\"kind\":\"Role\",\"metadata\":{\"annotations\":{\"description\":\"Role for RBAC management operations and auditing\",\"last-reviewed\":\"2025-01-01\"},\"labels\":{\"app\":\"rbac-manager\",\"rbac-version\":\"v2.0\"},\"name\":\"rbac-manager-role\",\"namespace\":\"pms\"},\"rules\":[{\"apiGroups\":[\"rbac.authorization.k8s.io\"],\"resources\":[\"roles\",\"rolebindings\"],\"verbs\":[\"get\",\"list\"]},{\"apiGroups\":[\"\"],\"resources\":[\"serviceaccounts\"],\"verbs\":[\"get\",\"list\"]},{\"apiGroups\":[\"\"],\"resourceNames\":[\"rbac-policy-config\"],\"resources\":[\"configmaps\"],\"verbs\":[\"get\",\"list\"]},{\"apiGroups\":[\"\"],\"resources\":[\"events\"],\"verbs\":[\"create\"]},{\"apiGroups\":[\"\"],\"resources\":[\"pods\"],\"verbs\":[\"get\",\"list\"]}]}\n",
+          "last-reviewed": "2025-01-01"
+        },
+        "creationTimestamp": "2025-08-09T06:48:50Z",
+        "labels": {
+          "app": "rbac-manager",
+          "rbac-version": "v2.0"
+        },
+        "name": "rbac-manager-role",
+        "namespace": "pms",
+        "resourceVersion": "368432",
+        "uid": "16747b55-3183-47d2-af52-a6e18be0b54e"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            "rbac.authorization.k8s.io"
+          ],
+          "resources": [
+            "roles",
+            "rolebindings"
+          ],
+          "verbs": [
+            "get",
+            "list"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "serviceaccounts"
+          ],
+          "verbs": [
+            "get",
+            "list"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resourceNames": [
+            "rbac-policy-config"
+          ],
+          "resources": [
+            "configmaps"
+          ],
+          "verbs": [
+            "get",
+            "list"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "events"
+          ],
+          "verbs": [
+            "create"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "pods"
+          ],
+          "verbs": [
+            "get",
+            "list"
+          ]
+        }
+      ],
+      "permissions": [
+        "get:roles",
+        "list:roles",
+        "get:rolebindings",
+        "list:rolebindings",
+        "get:serviceaccounts",
+        "list:serviceaccounts",
+        "get:configmaps:rbac-policy-config",
+        "list:configmaps:rbac-policy-config",
+        "create:events",
+        "get:pods",
+        "list:pods"
+      ]
+    }
+  ],
+  "violations": [
+    {
+      "service_account": "N/A",
+      "role": "pms-backend-role",
+      "resource": "events",
+      "verb": "create",
+      "severity": "medium",
+      "description": "Unrestricted write: create:events",
+      "recommendation": "Restrict to specific resource names"
+    },
+    {
+      "service_account": "N/A",
+      "role": "pms-backup-role",
+      "resource": "jobs",
+      "verb": "create",
+      "severity": "medium",
+      "description": "Unrestricted write: create:jobs",
+      "recommendation": "Restrict to specific resource names"
+    },
+    {
+      "service_account": "N/A",
+      "role": "pms-backup-role",
+      "resource": "jobs",
+      "verb": "update",
+      "severity": "medium",
+      "description": "Unrestricted write: update:jobs",
+      "recommendation": "Restrict to specific resource names"
+    },
+    {
+      "service_account": "N/A",
+      "role": "pms-backup-role",
+      "resource": "cronjobs",
+      "verb": "create",
+      "severity": "medium",
+      "description": "Unrestricted write: create:cronjobs",
+      "recommendation": "Restrict to specific resource names"
+    },
+    {
+      "service_account": "N/A",
+      "role": "pms-backup-role",
+      "resource": "cronjobs",
+      "verb": "update",
+      "severity": "medium",
+      "description": "Unrestricted write: update:cronjobs",
+      "recommendation": "Restrict to specific resource names"
+    },
+    {
+      "service_account": "N/A",
+      "role": "pms-backup-role",
+      "resource": "events",
+      "verb": "create",
+      "severity": "medium",
+      "description": "Unrestricted write: create:events",
+      "recommendation": "Restrict to specific resource names"
+    },
+    {
+      "service_account": "N/A",
+      "role": "pms-dev-debug-role",
+      "resource": "pods/exec",
+      "verb": "create",
+      "severity": "medium",
+      "description": "Unrestricted write: create:pods/exec",
+      "recommendation": "Restrict to specific resource names"
+    },
+    {
+      "service_account": "N/A",
+      "role": "pms-frontend-role",
+      "resource": "events",
+      "verb": "create",
+      "severity": "medium",
+      "description": "Unrestricted write: create:events",
+      "recommendation": "Restrict to specific resource names"
+    },
+    {
+      "service_account": "N/A",
+      "role": "pms-monitoring-role",
+      "resource": "events",
+      "verb": "create",
+      "severity": "medium",
+      "description": "Unrestricted write: create:events",
+      "recommendation": "Restrict to specific resource names"
+    },
+    {
+      "service_account": "N/A",
+      "role": "rbac-manager-role",
+      "resource": "events",
+      "verb": "create",
+      "severity": "medium",
+      "description": "Unrestricted write: create:events",
+      "recommendation": "Restrict to specific resource names"
+    }
+  ],
+  "access_review_items": [
+    {
+      "service_account": "default",
+      "role": "",
+      "permissions": [],
+      "last_reviewed": "never",
+      "next_review": "2025-08-09",
+      "status": "overdue",
+      "justification": "No justification provided"
+    },
+    {
+      "service_account": "pms-backend",
+      "role": "",
+      "permissions": [],
+      "last_reviewed": "2025-01-01",
+      "next_review": "2025-04-01",
+      "status": "overdue",
+      "justification": "Backend API service account with database and configuration access"
+    },
+    {
+      "service_account": "pms-backup",
+      "role": "",
+      "permissions": [],
+      "last_reviewed": "2025-01-01",
+      "next_review": "2025-04-01",
+      "status": "overdue",
+      "justification": "Backup service account with read-only access to resources"
+    },
+    {
+      "service_account": "pms-frontend",
+      "role": "",
+      "permissions": [],
+      "last_reviewed": "2025-01-01",
+      "next_review": "2025-04-01",
+      "status": "overdue",
+      "justification": "Frontend web service account with configuration access only"
+    },
+    {
+      "service_account": "pms-monitoring",
+      "role": "",
+      "permissions": [],
+      "last_reviewed": "2025-01-01",
+      "next_review": "2025-04-01",
+      "status": "overdue",
+      "justification": "Monitoring service account with metrics collection access"
+    },
+    {
+      "service_account": "rbac-manager",
+      "role": "",
+      "permissions": [],
+      "last_reviewed": "2025-01-01",
+      "next_review": "2025-04-01",
+      "status": "overdue",
+      "justification": "Service account for RBAC management and auditing operations"
+    }
+  ],
+  "recommendations": [
+    "Complete 6 overdue access reviews",
+    "Implement automated RBAC monitoring",
+    "Schedule quarterly access reviews",
+    "Document all service account justifications"
+  ]
+}

@@ -1,0 +1,392 @@
+# Enhanced RBAC Configuration for PMS
+# Implements least-privilege access control with environment-specific roles
+# Removes wildcard permissions and implements resource-specific access
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pms
+  labels:
+    name: pms
+    project: mental-health-pms
+    compliance: hipaa
+    rbac-version: "v2.0"
+
+---
+# Service Accounts with enhanced metadata
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pms-backend
+  namespace: pms
+  labels:
+    app: pms-backend
+    component: api
+    rbac-version: "v2.0"
+  annotations:
+    description: "Backend API service account with database and configuration access"
+    last-reviewed: "2025-01-01"
+    review-frequency: "quarterly"
+    compliance: "hipaa-compliant"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pms-frontend
+  namespace: pms
+  labels:
+    app: pms-frontend
+    component: web
+    rbac-version: "v2.0"
+  annotations:
+    description: "Frontend web service account with configuration access only"
+    last-reviewed: "2025-01-01"
+    review-frequency: "quarterly"
+    compliance: "hipaa-compliant"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pms-backup
+  namespace: pms
+  labels:
+    app: pms-backup
+    component: backup
+    rbac-version: "v2.0"
+  annotations:
+    description: "Backup service account with read-only access to resources"
+    last-reviewed: "2025-01-01"
+    review-frequency: "quarterly"
+    compliance: "hipaa-compliant"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pms-monitoring
+  namespace: pms
+  labels:
+    app: pms-monitoring
+    component: observability
+    rbac-version: "v2.0"
+  annotations:
+    description: "Monitoring service account with metrics collection access"
+    last-reviewed: "2025-01-01"
+    review-frequency: "quarterly"
+    compliance: "hipaa-compliant"
+
+---
+# Enhanced Backend Role - Least Privilege
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: pms
+  name: pms-backend-role
+  labels:
+    app: pms-backend
+    rbac-version: "v2.0"
+  annotations:
+    description: "Least-privilege role for backend API service"
+    last-reviewed: "2025-01-01"
+rules:
+# Database connection secrets - specific secret names only
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["pms-secrets", "database-credentials"]
+  verbs: ["get"]
+# Application configuration - specific configmap names only
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["pms-config", "app-config"]
+  verbs: ["get"]
+# Pod information for health checks and service discovery
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get"]
+  resourceNames: [] # Will be restricted to own pod via admission controller
+# Events for application logging (create only)
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+
+---
+# Frontend Role - Minimal Configuration Access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: pms
+  name: pms-frontend-role
+  labels:
+    app: pms-frontend
+    rbac-version: "v2.0"
+  annotations:
+    description: "Minimal role for frontend web service"
+    last-reviewed: "2025-01-01"
+rules:
+# Only public configuration - no secrets
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["pms-public-config", "frontend-config"]
+  verbs: ["get"]
+# Events for application logging (create only)
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+
+---
+# Backup Role - Read-only Resource Access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: pms
+  name: pms-backup-role
+  labels:
+    app: pms-backup
+    rbac-version: "v2.0"
+  annotations:
+    description: "Read-only role for backup operations"
+    last-reviewed: "2025-01-01"
+rules:
+# Pod information for backup coordination
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list"]
+# Configuration for backup settings
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["backup-config", "pms-config"]
+  verbs: ["get"]
+# Secrets for backup credentials only
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["backup-credentials", "s3-backup-credentials"]
+  verbs: ["get"]
+# Job management for backup operations
+- apiGroups: ["batch"]
+  resources: ["jobs", "cronjobs"]
+  verbs: ["get", "list", "create", "update"]
+# Events for backup logging
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+
+---
+# Monitoring Role - Metrics Collection
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: pms
+  name: pms-monitoring-role
+  labels:
+    app: pms-monitoring
+    rbac-version: "v2.0"
+  annotations:
+    description: "Metrics collection role for monitoring"
+    last-reviewed: "2025-01-01"
+rules:
+# Pod metrics collection
+- apiGroups: [""]
+  resources: ["pods", "pods/metrics"]
+  verbs: ["get", "list"]
+# Service metrics
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list"]
+# Node metrics (limited to namespace resources)
+- apiGroups: [""]
+  resources: ["nodes/metrics", "nodes/stats"]
+  verbs: ["get"]
+# Events for monitoring alerts
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+
+---
+# Environment-Specific Role for Development
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: pms
+  name: pms-dev-debug-role
+  labels:
+    environment: development
+    rbac-version: "v2.0"
+  annotations:
+    description: "Additional debugging permissions for development environment"
+    last-reviewed: "2025-01-01"
+    environment-only: "development"
+rules:
+# Pod exec for debugging (development only)
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+# Pod logs for debugging
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+# ConfigMap updates for testing
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["dev-config", "test-config"]
+  verbs: ["get", "update", "patch"]
+
+---
+# Role Bindings with Enhanced Metadata
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pms-backend-rolebinding
+  namespace: pms
+  labels:
+    app: pms-backend
+    rbac-version: "v2.0"
+  annotations:
+    description: "Binding backend service account to least-privilege role"
+    last-reviewed: "2025-01-01"
+subjects:
+- kind: ServiceAccount
+  name: pms-backend
+  namespace: pms
+roleRef:
+  kind: Role
+  name: pms-backend-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pms-frontend-rolebinding
+  namespace: pms
+  labels:
+    app: pms-frontend
+    rbac-version: "v2.0"
+  annotations:
+    description: "Binding frontend service account to minimal role"
+    last-reviewed: "2025-01-01"
+subjects:
+- kind: ServiceAccount
+  name: pms-frontend
+  namespace: pms
+roleRef:
+  kind: Role
+  name: pms-frontend-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pms-backup-rolebinding
+  namespace: pms
+  labels:
+    app: pms-backup
+    rbac-version: "v2.0"
+  annotations:
+    description: "Binding backup service account to read-only role"
+    last-reviewed: "2025-01-01"
+subjects:
+- kind: ServiceAccount
+  name: pms-backup
+  namespace: pms
+roleRef:
+  kind: Role
+  name: pms-backup-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pms-monitoring-rolebinding
+  namespace: pms
+  labels:
+    app: pms-monitoring
+    rbac-version: "v2.0"
+  annotations:
+    description: "Binding monitoring service account to metrics collection role"
+    last-reviewed: "2025-01-01"
+subjects:
+- kind: ServiceAccount
+  name: pms-monitoring
+  namespace: pms
+roleRef:
+  kind: Role
+  name: pms-monitoring-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Development Environment Debug Binding (conditional)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pms-dev-debug-rolebinding
+  namespace: pms
+  labels:
+    environment: development
+    rbac-version: "v2.0"
+  annotations:
+    description: "Additional debugging permissions for development environment only"
+    last-reviewed: "2025-01-01"
+    environment-only: "development"
+    conditional: "true"
+subjects:
+- kind: ServiceAccount
+  name: pms-backend
+  namespace: pms
+roleRef:
+  kind: Role
+  name: pms-dev-debug-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Network Policy for Additional Security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pms-rbac-network-policy
+  namespace: pms
+  labels:
+    rbac-version: "v2.0"
+  annotations:
+    description: "Network isolation to complement RBAC policies"
+spec:
+  podSelector:
+    matchLabels:
+      rbac-version: "v2.0"
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 80
+  egress:
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53  # DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 443  # Kubernetes API
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis

@@ -222,17 +222,21 @@ jobs:
 
           # Add environment info
           echo "### 🔧 Test Environment" >> performance-summary.md
-          echo "- **Environment:** ${{ github.event.inputs.environment || 'staging' }}" >> performance-summary.md
-          echo "- **Scenario:** ${{ matrix.test-scenario }}" >> performance-summary.md
-          echo "- **Commit:** ${{ github.sha }}" >> performance-summary.md
-          echo "- **Baseline Date:** ${{ steps.load-baseline.outputs.baseline_date || 'N/A' }}" >> performance-summary.md
+          ENVIRONMENT="${{ github.event.inputs.environment || 'staging' }}"
+          SCENARIO="${{ matrix.test-scenario }}"
+          GIT_SHA="${{ github.sha }}"
+          BASELINE_DATE="${{ steps.load-baseline.outputs.baseline_date || 'N/A' }}"
+          echo "- **Environment:** "$ENVIRONMENT >> performance-summary.md
+          echo "- **Scenario:** "$SCENARIO >> performance-summary.md
+          echo "- **Commit:** "$GIT_SHA >> performance-summary.md
+          echo "- **Baseline Date:** "$BASELINE_DATE >> performance-summary.md
 
           echo "summary_file=performance-summary.md" >> $GITHUB_OUTPUT
 
       - name: Upload performance results
         uses: actions/upload-artifact@v4
         with:
-          name: performance-results-${{ matrix.test-scenario }}-${{ github.sha }}
+          name: performance-results-${{ matrix.test-scenario }}-${{ github.sha }} # safe in with: context
           path: |
             tests/performance/reports/
             tests/performance/results/
@@ -321,11 +325,14 @@ jobs:
             git config --local user.name "GitHub Action"
 
             git add baseline-results.json
+            GIT_SHA="${{ github.sha }}"
+            ENVIRONMENT="${{ github.event.inputs.environment || 'staging' }}"
+            EVENT_NAME="${{ github.event_name }}"
             git commit -m "chore: update performance baseline [skip ci]
 
-            - Updated from commit: ${{ github.sha }}
-            - Environment: ${{ github.event.inputs.environment || 'staging' }}
-            - Triggered by: ${{ github.event_name }}
+            - Updated from commit: $GIT_SHA
+            - Environment: $ENVIRONMENT
+            - Triggered by: $EVENT_NAME
             " || echo "No changes to commit"
 
             git push
@@ -384,9 +391,12 @@ jobs:
         run: |
           echo "## 📊 Performance Test Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Environment:** ${{ github.event.inputs.environment || 'staging' }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          GIT_SHA="${{ github.sha }}"
+          ENVIRONMENT="${{ github.event.inputs.environment || 'staging' }}"
+          EVENT_NAME="${{ github.event_name }}"
+          echo "**Commit:** "$GIT_SHA >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** "$ENVIRONMENT >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** "$EVENT_NAME >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Add links to artifacts

@@ -343,7 +343,11 @@ jobs:
           aws ssm put-parameter --name "/pms/production/current-version" --value "${{ steps.deploy-version.outputs.version }}" --overwrite
 
           # Store deployment metadata
-          aws ssm put-parameter --name "/pms/production/last-deployment" --value '{"version":"${{ steps.deploy-version.outputs.version }}","gitSha":"${{ needs.build.outputs.git-sha }}","deployedAt":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","deployedBy":"${{ github.actor }}"}' --overwrite
+          VERSION_OUTPUT="${{ steps.deploy-version.outputs.version }}"
+          BUILD_GIT_SHA="${{ needs.build.outputs.git-sha }}"
+          DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          GITHUB_ACTOR_NAME="${{ github.actor }}"
+          aws ssm put-parameter --name "/pms/production/last-deployment" --value '{"version":"'"$VERSION_OUTPUT"'","gitSha":"'"$BUILD_GIT_SHA"'","deployedAt":"'"$DEPLOYED_AT"'","deployedBy":"'"$GITHUB_ACTOR_NAME"'"}' --overwrite
 
       - name: Update deployment status
         run: |

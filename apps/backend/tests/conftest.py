@@ -228,8 +228,12 @@ def mock_db():
 
 @pytest.fixture
 def client():
-    """Create test client."""
-    return TestClient(app)
+    """Create test client with clean dependency overrides."""
+    # Clear any existing dependency overrides before each test
+    app.dependency_overrides.clear()
+    yield TestClient(app)
+    # Clean up after each test
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture

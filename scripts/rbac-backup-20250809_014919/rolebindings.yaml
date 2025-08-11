@@ -1,0 +1,151 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      description: Binding backend service account to least-privilege role
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{"description":"Binding backend service account to least-privilege role","last-reviewed":"2025-01-01"},"labels":{"app":"pms-backend","rbac-version":"v2.0"},"name":"pms-backend-rolebinding","namespace":"pms"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"pms-backend-role"},"subjects":[{"kind":"ServiceAccount","name":"pms-backend","namespace":"pms"}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      app: pms-backend
+      rbac-version: v2.0
+    name: pms-backend-rolebinding
+    namespace: pms
+    resourceVersion: "368416"
+    uid: 254247c3-2a6a-48ee-9d97-af6e1cee3002
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: pms-backend-role
+  subjects:
+  - kind: ServiceAccount
+    name: pms-backend
+    namespace: pms
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      description: Binding backup service account to read-only role
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{"description":"Binding backup service account to read-only role","last-reviewed":"2025-01-01"},"labels":{"app":"pms-backup","rbac-version":"v2.0"},"name":"pms-backup-rolebinding","namespace":"pms"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"pms-backup-role"},"subjects":[{"kind":"ServiceAccount","name":"pms-backup","namespace":"pms"}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      app: pms-backup
+      rbac-version: v2.0
+    name: pms-backup-rolebinding
+    namespace: pms
+    resourceVersion: "368418"
+    uid: 95f39944-522a-4435-a361-e22d35e119b9
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: pms-backup-role
+  subjects:
+  - kind: ServiceAccount
+    name: pms-backup
+    namespace: pms
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      conditional: "true"
+      description: Additional debugging permissions for development environment only
+      environment-only: development
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{"conditional":"true","description":"Additional debugging permissions for development environment only","environment-only":"development","last-reviewed":"2025-01-01"},"labels":{"environment":"development","rbac-version":"v2.0"},"name":"pms-dev-debug-rolebinding","namespace":"pms"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"pms-dev-debug-role"},"subjects":[{"kind":"ServiceAccount","name":"pms-backend","namespace":"pms"}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      environment: development
+      rbac-version: v2.0
+    name: pms-dev-debug-rolebinding
+    namespace: pms
+    resourceVersion: "368420"
+    uid: 83630f7e-4299-4ec9-aef4-4817dcc27d23
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: pms-dev-debug-role
+  subjects:
+  - kind: ServiceAccount
+    name: pms-backend
+    namespace: pms
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      description: Binding frontend service account to minimal role
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{"description":"Binding frontend service account to minimal role","last-reviewed":"2025-01-01"},"labels":{"app":"pms-frontend","rbac-version":"v2.0"},"name":"pms-frontend-rolebinding","namespace":"pms"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"pms-frontend-role"},"subjects":[{"kind":"ServiceAccount","name":"pms-frontend","namespace":"pms"}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      app: pms-frontend
+      rbac-version: v2.0
+    name: pms-frontend-rolebinding
+    namespace: pms
+    resourceVersion: "368417"
+    uid: 82fcc80c-5c16-4d9c-9c49-a49e12ca40c4
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: pms-frontend-role
+  subjects:
+  - kind: ServiceAccount
+    name: pms-frontend
+    namespace: pms
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      description: Binding monitoring service account to metrics collection role
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{"description":"Binding monitoring service account to metrics collection role","last-reviewed":"2025-01-01"},"labels":{"app":"pms-monitoring","rbac-version":"v2.0"},"name":"pms-monitoring-rolebinding","namespace":"pms"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"pms-monitoring-role"},"subjects":[{"kind":"ServiceAccount","name":"pms-monitoring","namespace":"pms"}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      app: pms-monitoring
+      rbac-version: v2.0
+    name: pms-monitoring-rolebinding
+    namespace: pms
+    resourceVersion: "368419"
+    uid: 9b99d315-4ccc-4e3a-9a44-7dfb78981564
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: pms-monitoring-role
+  subjects:
+  - kind: ServiceAccount
+    name: pms-monitoring
+    namespace: pms
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      description: Binding for RBAC management service account
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{"description":"Binding for RBAC management service account","last-reviewed":"2025-01-01"},"labels":{"app":"rbac-manager","rbac-version":"v2.0"},"name":"rbac-manager-rolebinding","namespace":"pms"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"rbac-manager-role"},"subjects":[{"kind":"ServiceAccount","name":"rbac-manager","namespace":"pms"}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:50Z"
+    labels:
+      app: rbac-manager
+      rbac-version: v2.0
+    name: rbac-manager-rolebinding
+    namespace: pms
+    resourceVersion: "368433"
+    uid: cd266bec-d1f4-48c1-ad03-680e8225e148
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: rbac-manager-role
+  subjects:
+  - kind: ServiceAccount
+    name: rbac-manager
+    namespace: pms
+kind: List
+metadata:
+  resourceVersion: ""

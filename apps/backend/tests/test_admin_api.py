@@ -1,6 +1,6 @@
 """Tests for admin API endpoints."""
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
@@ -184,12 +184,23 @@ class TestAdminAPI:
         assert "Failed to retrieve user" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
+    @patch("api.admin.create_rbac_audit_record")
+    @patch("api.admin.log_rbac_role_assignment")
     async def test_update_user_roles_success(
-        self, mock_admin_user, mock_db, sample_user
+        self, mock_log_rbac, mock_create_audit, mock_admin_user, mock_db, sample_user
     ):
         """Test successful user role update."""
         user_id = sample_user.id
         role_update = UserRoleUpdate(user_id=user_id, roles=["biller"])
+
+        # Mock request object
+        mock_request = MagicMock()
+        mock_request.client.host = "127.0.0.1"
+        mock_request.headers.get.return_value = "test-user-agent"
+
+        # Mock audit functions
+        mock_create_audit.return_value = AsyncMock()
+        mock_log_rbac.return_value = None
 
         # Mock database query results
         mock_user_result = MagicMock()
@@ -200,6 +211,7 @@ class TestAdminAPI:
         response = await update_user_roles(
             user_id=user_id,
             role_update=role_update,
+            request=mock_request,
             current_user=mock_admin_user,
             db=mock_db,
         )
@@ -218,11 +230,17 @@ class TestAdminAPI:
         user_id = uuid4()
         role_update = UserRoleUpdate(user_id=user_id, roles=["invalid_role"])
 
+        # Mock request object
+        mock_request = MagicMock()
+        mock_request.client.host = "127.0.0.1"
+        mock_request.headers.get.return_value = "test-user-agent"
+
         # Test that HTTPException is raised for invalid role
         with pytest.raises(HTTPException) as exc_info:
             await update_user_roles(
                 user_id=user_id,
                 role_update=role_update,
+                request=mock_request,
                 current_user=mock_admin_user,
                 db=mock_db,
             )
@@ -236,6 +254,11 @@ class TestAdminAPI:
         user_id = uuid4()
         role_update = UserRoleUpdate(user_id=user_id, roles=["clinician"])
 
+        # Mock request object
+        mock_request = MagicMock()
+        mock_request.client.host = "127.0.0.1"
+        mock_request.headers.get.return_value = "test-user-agent"
+
         # Mock database query result - user not found
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = None
@@ -246,6 +269,7 @@ class TestAdminAPI:
             await update_user_roles(
                 user_id=user_id,
                 role_update=role_update,
+                request=mock_request,
                 current_user=mock_admin_user,
                 db=mock_db,
             )

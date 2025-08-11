@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
+from api.access_review import router as access_review_router
 from api.admin import router as admin_router
 from api.appointments import router as appointments_router
 from api.auth import router as auth_api_router
@@ -372,6 +373,7 @@ app.include_router(providers_router, prefix="/api")
 app.include_router(notes_router, prefix="/api")
 app.include_router(ledger_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
+app.include_router(access_review_router, prefix="/api")
 app.include_router(auth_api_router, prefix="/api")
 app.include_router(feature_flags_router, prefix="/api")
 app.include_router(mock_services_router, prefix="/api")

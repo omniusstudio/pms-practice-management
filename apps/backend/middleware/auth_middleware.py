@@ -17,6 +17,7 @@ from database import get_db
 # from models.auth_token import AuthToken  # Disabled
 from models.user import User
 from utils.error_handlers import AuthenticationError
+from utils.rbac_audit_logger import log_rbac_permission_check
 
 # SQLAlchemy imports removed - not currently used
 
@@ -126,7 +127,8 @@ async def get_current_user(
         # token = await auth_svc.validate_token(credentials.credentials)
         # Authentication is disabled - return None
         logger.debug(
-            "Authentication disabled", extra={"correlation_id": correlation_id}
+            "Authentication disabled",
+            extra={"correlation_id": correlation_id},
         )
         return None
 
@@ -260,7 +262,8 @@ async def require_auth(
 
     if not user:
         logger.warning(
-            "Authentication required but not provided", extra={"path": request.url.path}
+            "Authentication required but not provided",
+            extra={"path": request.url.path},
         )
         correlation_id = getattr(request.state, "correlation_id", "unknown")
         raise AuthenticationError(
@@ -279,7 +282,21 @@ def require_roles(required_roles: List[str]):
         if not user:
             user = await require_auth(request)
 
-        if not user.has_any_role(required_roles):
+        has_access = user.has_any_role(required_roles)
+
+        # Log RBAC permission check
+        log_rbac_permission_check(
+            user_id=user.user_id,
+            resource=request.url.path,
+            permission_type="role_check",
+            required_permissions=required_roles,
+            user_permissions=user.roles,
+            access_granted=has_access,
+            ip_address=(request.client.host if request.client else None),
+            user_agent=request.headers.get("user-agent"),
+        )
+
+        if not has_access:
             logger.warning(
                 "Insufficient roles for access",
                 extra={
@@ -290,7 +307,8 @@ def require_roles(required_roles: List[str]):
                 },
             )
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions",
             )
 
         return user
@@ -307,7 +325,21 @@ def require_permissions(required_permissions: List[str]):
         if not user:
             user = await require_auth(request)
 
-        if not user.has_all_permissions(required_permissions):
+        has_access = user.has_all_permissions(required_permissions)
+
+        # Log RBAC permission check
+        log_rbac_permission_check(
+            user_id=user.user_id,
+            resource=request.url.path,
+            permission_type="permission_check",
+            required_permissions=required_permissions,
+            user_permissions=user.permissions,
+            access_granted=has_access,
+            ip_address=(request.client.host if request.client else None),
+            user_agent=request.headers.get("user-agent"),
+        )
+
+        if not has_access:
             logger.warning(
                 "Insufficient permissions for access",
                 extra={
@@ -318,7 +350,8 @@ def require_permissions(required_permissions: List[str]):
                 },
             )
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions",
             )
 
         return user
@@ -380,7 +413,10 @@ class AuthMiddleware:
             except Exception as e:
                 logger.error(
                     "Authentication middleware error",
-                    extra={"error": str(e), "path": request.url.path},
+                    extra={
+                        "error": str(e),
+                        "path": request.url.path,
+                    },
                 )
                 request.state.user = None
 

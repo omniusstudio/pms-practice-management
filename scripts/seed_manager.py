@@ -33,7 +33,7 @@ from models import (
 from factories import (
     PracticeProfileFactory, LocationFactory, ClientFactory,
     ProviderFactory, AppointmentFactory, NoteFactory,
-    LedgerEntryFactory, AuthTokenFactory,
+    LedgerEntryFactory,
     EncryptionKeyFactory, FHIRMappingFactory,
     PatientMappingFactory, PractitionerMappingFactory,
     AppointmentMappingFactory
@@ -61,7 +61,7 @@ class SeedManager:
             'appointments': AppointmentFactory,
             'notes': NoteFactory,
             'ledger_entries': LedgerEntryFactory,
-            'auth_tokens': AuthTokenFactory,
+            # 'auth_tokens': AuthTokenFactory,  # Disabled
             'encryption_keys': EncryptionKeyFactory,
             'fhir_mappings': FHIRMappingFactory
         }
@@ -224,15 +224,10 @@ class SeedManager:
 
             generated_data['ledger_entries'] = ledger_entries
 
-            # Generate auth tokens
-            logger.info("Generating auth tokens...")
+            # Generate auth tokens - DISABLED
+            logger.info("Skipping auth tokens generation...")
             auth_tokens = []
-            for i in range(counts['auth_tokens']):
-                tenant_id = tenant_ids[i % len(tenant_ids)]
-                auth_token = AuthTokenFactory.create(
-                    tenant_id=tenant_id
-                )
-                auth_tokens.append(auth_token)
+            # AuthTokenFactory disabled - skipping auth token creation
 
             generated_data['auth_tokens'] = auth_tokens
 

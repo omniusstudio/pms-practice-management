@@ -48,10 +48,10 @@ httpx==0.25.2
 sentry-sdk[fastapi]==1.38.0
 
 # Code Quality
-black==23.11.0
-flake8==6.1.0
-isort==5.12.0
-mypy==1.7.1
+black==25.1.0
+flake8==7.3.0
+isort==6.0.1
+mypy==1.17.1
 
 # Development
 watchdog==3.0.0

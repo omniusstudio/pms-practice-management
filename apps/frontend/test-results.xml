@@ -19,7 +19,7 @@ Sentry DSN not configured, error tracking disabled
 
             </system-err>
         </testcase>
-        <testcase classname="tests/App.test.tsx" name="App Component &gt; shows dashboard welcome message" time="0.007">
+        <testcase classname="tests/App.test.tsx" name="App Component &gt; shows dashboard welcome message" time="0.006">
             <system-err>
 Sentry DSN not configured, error tracking disabled
 
@@ -69,9 +69,9 @@ Sentry DSN not configured, error tracking disabled
         </testcase>
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track successful form submission" time="0.005">
         </testcase>
-        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track form submission with validation errors" time="0.001">
+        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track form submission with validation errors" time="0">
         </testcase>
-        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track form reset" time="0.001">
+        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track form reset" time="0.002">
         </testcase>
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useApiMetrics Hook &gt; should track successful API calls" time="0.003">
         </testcase>
@@ -97,7 +97,7 @@ Sentry DSN not configured, error tracking disabled
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Metrics Control &gt; should disable metrics collection" time="0.003">
         </testcase>
-        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Metrics Control &gt; should enable metrics collection" time="0.001">
+        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Metrics Control &gt; should enable metrics collection" time="0">
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Buffer Management &gt; should add metrics to buffer" time="0.003">
         </testcase>

@@ -69,7 +69,7 @@ Sentry DSN not configured, error tracking disabled
         </testcase>
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track successful form submission" time="0.016">
         </testcase>
-        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track form submission with validation errors" time="0.001">
+        <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track form submission with validation errors" time="0.002">
         </testcase>
         <testcase classname="src/hooks/__tests__/useMetrics.test.ts" name="useFormMetrics Hook &gt; should track form reset" time="0">
         </testcase>
@@ -105,11 +105,11 @@ Sentry DSN not configured, error tracking disabled
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; HIPAA Compliance &gt; should not expose PHI in metrics" time="0.003">
         </testcase>
-        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; HIPAA Compliance &gt; should scrub sensitive data from tags" time="0">
+        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; HIPAA Compliance &gt; should scrub sensitive data from tags" time="0.001">
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Error Handling &gt; should handle flush errors gracefully" time="0.003">
         </testcase>
-        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Error Handling &gt; should continue collecting metrics after flush error" time="0">
+        <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Error Handling &gt; should continue collecting metrics after flush error" time="0.001">
         </testcase>
         <testcase classname="src/utils/__tests__/metrics.test.ts" name="Frontend Metrics &gt; Timestamp and Correlation &gt; should add timestamps to metrics" time="0.001">
         </testcase>

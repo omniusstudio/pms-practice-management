@@ -64,7 +64,7 @@ jobs:
           cache-dependency-path: 'tests/performance/package-lock.json'
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -311,7 +311,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download performance results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: performance-results-baseline-${{ github.sha }}
           path: tests/performance/
@@ -352,7 +352,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download all performance results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: performance-results-*-${{ github.sha }}
           path: performance-artifacts/

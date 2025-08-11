@@ -1,0 +1,285 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    annotations:
+      description: Least-privilege role for backend API service
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{"description":"Least-privilege role for backend API service","last-reviewed":"2025-01-01"},"labels":{"app":"pms-backend","rbac-version":"v2.0"},"name":"pms-backend-role","namespace":"pms"},"rules":[{"apiGroups":[""],"resourceNames":["pms-secrets","database-credentials"],"resources":["secrets"],"verbs":["get"]},{"apiGroups":[""],"resourceNames":["pms-config","app-config"],"resources":["configmaps"],"verbs":["get"]},{"apiGroups":[""],"resourceNames":[],"resources":["pods"],"verbs":["get"]},{"apiGroups":[""],"resources":["events"],"verbs":["create"]}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      app: pms-backend
+      rbac-version: v2.0
+    name: pms-backend-role
+    namespace: pms
+    resourceVersion: "368411"
+    uid: cf2896e1-913b-465b-8a48-0128c85ce262
+  rules:
+  - apiGroups:
+    - ""
+    resourceNames:
+    - pms-secrets
+    - database-credentials
+    resources:
+    - secrets
+    verbs:
+    - get
+  - apiGroups:
+    - ""
+    resourceNames:
+    - pms-config
+    - app-config
+    resources:
+    - configmaps
+    verbs:
+    - get
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - get
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    annotations:
+      description: Read-only role for backup operations
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{"description":"Read-only role for backup operations","last-reviewed":"2025-01-01"},"labels":{"app":"pms-backup","rbac-version":"v2.0"},"name":"pms-backup-role","namespace":"pms"},"rules":[{"apiGroups":[""],"resources":["pods","pods/log"],"verbs":["get","list"]},{"apiGroups":[""],"resourceNames":["backup-config","pms-config"],"resources":["configmaps"],"verbs":["get"]},{"apiGroups":[""],"resourceNames":["backup-credentials","s3-backup-credentials"],"resources":["secrets"],"verbs":["get"]},{"apiGroups":["batch"],"resources":["jobs","cronjobs"],"verbs":["get","list","create","update"]},{"apiGroups":[""],"resources":["events"],"verbs":["create"]}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      app: pms-backup
+      rbac-version: v2.0
+    name: pms-backup-role
+    namespace: pms
+    resourceVersion: "368413"
+    uid: 87d76bc9-5a00-44d1-8466-e19469402023
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    - pods/log
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - ""
+    resourceNames:
+    - backup-config
+    - pms-config
+    resources:
+    - configmaps
+    verbs:
+    - get
+  - apiGroups:
+    - ""
+    resourceNames:
+    - backup-credentials
+    - s3-backup-credentials
+    resources:
+    - secrets
+    verbs:
+    - get
+  - apiGroups:
+    - batch
+    resources:
+    - jobs
+    - cronjobs
+    verbs:
+    - get
+    - list
+    - create
+    - update
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    annotations:
+      description: Additional debugging permissions for development environment
+      environment-only: development
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{"description":"Additional debugging permissions for development environment","environment-only":"development","last-reviewed":"2025-01-01"},"labels":{"environment":"development","rbac-version":"v2.0"},"name":"pms-dev-debug-role","namespace":"pms"},"rules":[{"apiGroups":[""],"resources":["pods/exec"],"verbs":["create"]},{"apiGroups":[""],"resources":["pods/log"],"verbs":["get","list"]},{"apiGroups":[""],"resourceNames":["dev-config","test-config"],"resources":["configmaps"],"verbs":["get","update","patch"]}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      environment: development
+      rbac-version: v2.0
+    name: pms-dev-debug-role
+    namespace: pms
+    resourceVersion: "368415"
+    uid: 202427e7-aa6c-4aa9-a0c4-77fb91acb79a
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - pods/exec
+    verbs:
+    - create
+  - apiGroups:
+    - ""
+    resources:
+    - pods/log
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - ""
+    resourceNames:
+    - dev-config
+    - test-config
+    resources:
+    - configmaps
+    verbs:
+    - get
+    - update
+    - patch
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    annotations:
+      description: Minimal role for frontend web service
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{"description":"Minimal role for frontend web service","last-reviewed":"2025-01-01"},"labels":{"app":"pms-frontend","rbac-version":"v2.0"},"name":"pms-frontend-role","namespace":"pms"},"rules":[{"apiGroups":[""],"resourceNames":["pms-public-config","frontend-config"],"resources":["configmaps"],"verbs":["get"]},{"apiGroups":[""],"resources":["events"],"verbs":["create"]}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      app: pms-frontend
+      rbac-version: v2.0
+    name: pms-frontend-role
+    namespace: pms
+    resourceVersion: "368412"
+    uid: 113b8df6-199e-46ed-8b30-f8b4d7bc0526
+  rules:
+  - apiGroups:
+    - ""
+    resourceNames:
+    - pms-public-config
+    - frontend-config
+    resources:
+    - configmaps
+    verbs:
+    - get
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    annotations:
+      description: Metrics collection role for monitoring
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{"description":"Metrics collection role for monitoring","last-reviewed":"2025-01-01"},"labels":{"app":"pms-monitoring","rbac-version":"v2.0"},"name":"pms-monitoring-role","namespace":"pms"},"rules":[{"apiGroups":[""],"resources":["pods","pods/metrics"],"verbs":["get","list"]},{"apiGroups":[""],"resources":["services","endpoints"],"verbs":["get","list"]},{"apiGroups":[""],"resources":["nodes/metrics","nodes/stats"],"verbs":["get"]},{"apiGroups":[""],"resources":["events"],"verbs":["create"]}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:44Z"
+    labels:
+      app: pms-monitoring
+      rbac-version: v2.0
+    name: pms-monitoring-role
+    namespace: pms
+    resourceVersion: "368414"
+    uid: 171f3db0-8ead-4704-9509-bd086ad1e4da
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    - pods/metrics
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - ""
+    resources:
+    - services
+    - endpoints
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - ""
+    resources:
+    - nodes/metrics
+    - nodes/stats
+    verbs:
+    - get
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    annotations:
+      description: Role for RBAC management operations and auditing
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{"description":"Role for RBAC management operations and auditing","last-reviewed":"2025-01-01"},"labels":{"app":"rbac-manager","rbac-version":"v2.0"},"name":"rbac-manager-role","namespace":"pms"},"rules":[{"apiGroups":["rbac.authorization.k8s.io"],"resources":["roles","rolebindings"],"verbs":["get","list"]},{"apiGroups":[""],"resources":["serviceaccounts"],"verbs":["get","list"]},{"apiGroups":[""],"resourceNames":["rbac-policy-config"],"resources":["configmaps"],"verbs":["get","list"]},{"apiGroups":[""],"resources":["events"],"verbs":["create"]},{"apiGroups":[""],"resources":["pods"],"verbs":["get","list"]}]}
+      last-reviewed: "2025-01-01"
+    creationTimestamp: "2025-08-09T06:48:50Z"
+    labels:
+      app: rbac-manager
+      rbac-version: v2.0
+    name: rbac-manager-role
+    namespace: pms
+    resourceVersion: "368432"
+    uid: 16747b55-3183-47d2-af52-a6e18be0b54e
+  rules:
+  - apiGroups:
+    - rbac.authorization.k8s.io
+    resources:
+    - roles
+    - rolebindings
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - ""
+    resources:
+    - serviceaccounts
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - ""
+    resourceNames:
+    - rbac-policy-config
+    resources:
+    - configmaps
+    verbs:
+    - get
+    - list
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - get
+    - list
+kind: List
+metadata:
+  resourceVersion: ""

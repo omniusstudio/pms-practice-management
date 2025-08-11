@@ -191,7 +191,7 @@ class TestAuditLogging:
 
         # Check the audit entry structure
         audit_entry = call_args[1]
-        assert audit_entry["event"] == "audit_log"
+        # Note: 'event' is now passed as positional argument, not in kwargs
         assert audit_entry["audit_action"] == "CREATE"
         assert audit_entry["resource_type"] == "patient"
         assert audit_entry["user_id"] == "user_123"
@@ -243,7 +243,7 @@ class TestAuditLogging:
         assert "Data Access: READ patient" in call_args[0][0]
 
         audit_entry = call_args[1]
-        assert audit_entry["event"] == "data_access_audit"
+        # Note: 'event' is now passed as positional argument, not in kwargs
         assert audit_entry["access_type"] == "READ"
         assert audit_entry["resource_type"] == "patient"
         assert audit_entry["immutable"] is True

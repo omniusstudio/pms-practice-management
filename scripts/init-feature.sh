@@ -1,159 +1,191 @@
 #!/bin/bash
 
-# init-feature.sh - Initialize a new feature branch with proper workflow
-# Usage: ./scripts/init-feature.sh
+# Feature Branch Initialization Script for HIPAA-compliant Mental Health PMS
+# Creates a feature branch, ensures proper naming conventions, and sets up tracking
 
-set -e  # Exit on any error
+set -euo pipefail
 
 # Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
 
-# Function to print colored output
-print_info() {
-    echo -e "${BLUE}ℹ️  $1${NC}"
-}
+# Logging functions
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
+log_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-print_success() {
-    echo -e "${GREEN}✅ $1${NC}"
-}
-
-print_warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}"
-}
-
-print_error() {
-    echo -e "${RED}❌ $1${NC}"
-}
-
-print_header() {
-    echo -e "${BLUE}"
-    echo "═══════════════════════════════════════════════════════════════"
-    echo "🚀 Feature Branch Initialization Script"
-    echo "═══════════════════════════════════════════════════════════════"
-    echo -e "${NC}"
-}
+# Configuration
+readonly REQUIRED_PREFIX="feature/"
+readonly PROTECTED_BRANCHES=("main" "master" "develop" "staging" "production" "release")
+readonly MAX_BRANCH_NAME_LENGTH=80
 
 # Function to validate branch name
 validate_branch_name() {
     local branch_name="$1"
 
-    # Check if branch name is empty
-    if [[ -z "$branch_name" ]]; then
-        print_error "Branch name cannot be empty"
+    # Check if branch name starts with required prefix
+    if [[ ! "$branch_name" =~ ^${REQUIRED_PREFIX} ]]; then
+        log_error "Branch name must start with '${REQUIRED_PREFIX}'"
         return 1
     fi
 
-    # Check for valid characters (alphanumeric, hyphens, underscores, forward slashes)
+    # Check length
+    if (( ${#branch_name} > MAX_BRANCH_NAME_LENGTH )); then
+        log_error "Branch name too long (${#branch_name} chars). Maximum: ${MAX_BRANCH_NAME_LENGTH}"
+        return 1
+    fi
+
+    # Check for invalid characters (only allow alphanumeric, hyphens, underscores, slashes)
     if [[ ! "$branch_name" =~ ^[a-zA-Z0-9/_-]+$ ]]; then
-        print_error "Branch name contains invalid characters. Use only letters, numbers, hyphens, underscores, and forward slashes."
+        log_error "Branch name contains invalid characters. Only alphanumeric, hyphens, underscores, and slashes allowed."
         return 1
     fi
 
-    # Check if branch name starts with a letter
-    if [[ ! "$branch_name" =~ ^[a-zA-Z] ]]; then
-        print_error "Branch name must start with a letter"
+    # Check for consecutive special characters
+    if [[ "$branch_name" =~ [-_/]{2,} ]]; then
+        log_error "Branch name cannot contain consecutive special characters"
         return 1
     fi
 
-    # Check length (reasonable limit)
-    if [[ ${#branch_name} -gt 50 ]]; then
-        print_error "Branch name is too long (max 50 characters)"
+    # Check it doesn't end with special characters
+    if [[ "$branch_name" =~ [-_/]$ ]]; then
+        log_error "Branch name cannot end with special characters"
         return 1
     fi
 
     return 0
 }
 
-# Function to check if we're in a git repository
-check_git_repo() {
-    if ! git rev-parse --git-dir > /dev/null 2>&1; then
-        print_error "Not in a git repository. Please run this script from the project root."
-        exit 1
-    fi
+# Function to check if branch is protected
+is_protected_branch() {
+    local branch_name="$1"
+    for protected in "${PROTECTED_BRANCHES[@]}"; do
+        if [[ "$branch_name" == "$protected" ]]; then
+            return 0
+        fi
+    done
+    return 1
 }
 
-# Function to check if main branch exists
-check_main_branch() {
-    if ! git show-ref --verify --quiet refs/heads/main; then
-        if git show-ref --verify --quiet refs/heads/master; then
-            print_warning "Using 'master' branch instead of 'main'"
-            MAIN_BRANCH="master"
+# Function to ensure we're on main branch
+ensure_on_main() {
+    local current_branch
+    current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+    if [[ "$current_branch" != "main" ]]; then
+        log_warning "Not on main branch (currently on: $current_branch)"
+        read -p "Switch to main branch? (y/N): " -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Switching to main branch..."
+            git checkout main
         else
-            print_error "Neither 'main' nor 'master' branch found"
+            log_error "Aborting. Please switch to main branch manually."
             exit 1
         fi
-    else
-        MAIN_BRANCH="main"
-    fi
-}
-
-# Function to check for uncommitted changes
-check_working_directory() {
-    if ! git diff-index --quiet HEAD --; then
-        print_error "You have uncommitted changes. Please commit or stash them before creating a new feature branch."
-        echo
-        print_info "Uncommitted changes:"
-        git status --porcelain
-        exit 1
     fi
 }
 
 # Function to update main branch
-update_main_branch() {
-    print_info "Updating $MAIN_BRANCH branch..."
-
-    # Fetch latest changes
-    if ! git fetch origin; then
-        print_error "Failed to fetch from origin"
+update_main() {
+    log_info "Updating main branch..."
+    if ! git fetch origin main; then
+        log_error "Failed to fetch main branch"
         exit 1
     fi
 
-    # Switch to main branch
-    if ! git checkout "$MAIN_BRANCH"; then
-        print_error "Failed to checkout $MAIN_BRANCH branch"
+    if ! git rebase origin/main; then
+        log_error "Failed to rebase main branch"
         exit 1
     fi
 
-    # Pull latest changes
-    if ! git pull origin "$MAIN_BRANCH"; then
-        print_error "Failed to pull latest changes from $MAIN_BRANCH"
-        exit 1
-    fi
-
-    print_success "$MAIN_BRANCH branch updated successfully"
+    log_success "Main branch updated successfully"
 }
 
 # Function to create feature branch
 create_feature_branch() {
     local branch_name="$1"
 
-    print_info "Creating feature branch: $branch_name"
-
-    # Check if branch already exists
+    # Check if branch already exists locally
     if git show-ref --verify --quiet "refs/heads/$branch_name"; then
-        print_error "Branch '$branch_name' already exists locally"
+        log_error "Branch '$branch_name' already exists locally"
         exit 1
     fi
 
     # Check if branch exists on remote
-    if git show-ref --verify --quiet "refs/remotes/origin/$branch_name"; then
-        print_error "Branch '$branch_name' already exists on remote"
-        exit 1
+    if git ls-remote --exit-code origin "$branch_name" >/dev/null 2>&1; then
+        log_warning "Branch '$branch_name' exists on remote"
+        read -p "Check out existing remote branch? (y/N): " -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            git checkout -b "$branch_name" "origin/$branch_name"
+            log_success "Checked out existing remote branch: $branch_name"
+            return
+        else
+            log_error "Aborting to avoid conflicts"
+            exit 1
+        fi
     fi
 
-    # Create and checkout the new branch
+    # Create new branch
     if ! git checkout -b "$branch_name"; then
-        print_error "Failed to create branch '$branch_name'"
+        log_error "Failed to create branch: $branch_name"
         exit 1
     fi
 
-    print_success "Feature branch '$branch_name' created and checked out"
+    log_success "Created and switched to branch: $branch_name"
 }
 
+# Function to set up branch tracking
+setup_tracking() {
+    local branch_name="$1"
+
+    log_info "Setting up remote tracking..."
+    if ! git push -u origin "$branch_name"; then
+        log_error "Failed to set up remote tracking"
+        exit 1
+    fi
+
+    log_success "Remote tracking set up successfully"
+}
+
+# Function to display next steps
+display_next_steps() {
+    local branch_name="$1"
+
+    cat << EOF
+
+${GREEN}✅ Branch Setup Complete!${NC}
+
+${BLUE}Branch:${NC} $branch_name
+${BLUE}Remote:${NC} origin/$branch_name
+
+${YELLOW}Next Steps:${NC}
+1. Make your changes
+2. Commit frequently with descriptive messages
+3. Push changes: ${BLUE}git push${NC}
+4. Create a Pull Request targeting ${BLUE}main${NC}
+
+${YELLOW}Important Reminders:${NC}
+• Follow HIPAA compliance guidelines
+• Write comprehensive tests
+• Update documentation as needed
+• Run pre-commit hooks before pushing
+• Ensure CI/CD passes before requesting review
+
+${BLUE}Pull Request Process:${NC}
+• Create PR with descriptive title and body
+• Link to relevant issues/tickets
+• Request review from team members
+• Address feedback promptly
+• Ensure all checks pass before merge
+
+EOF
+}
+
+<<<<<<< HEAD
 # Function to create draft PR
 create_draft_pr() {
     local branch_name="$1"
@@ -259,6 +291,9 @@ show_draft_pr_reminder() {
 }
 
 # Function to display PR process reminder (for manual PR creation)
+=======
+# Function to display PR process reminder
+>>>>>>> feat: implement comprehensive DevOps infrastructure and workflow automation
 show_pr_process_reminder() {
     local branch_name="$1"
 
@@ -296,10 +331,16 @@ show_pr_process_reminder() {
     echo "   • Reference the related issue number in your PR"
     echo "   • Use format: 'Fixes #123' or 'Closes #123'"
     echo
+<<<<<<< HEAD
     echo "6. 📤 Push and create draft PR"
     echo "   • git push -u origin $branch_name"
     echo "   • Create draft PR through GitHub UI or CLI"
     echo "   • Convert to ready when development is complete"
+=======
+    echo "6. 📤 Push and create PR"
+    echo "   • git push -u origin $branch_name"
+    echo "   • Create PR through GitHub UI or CLI"
+>>>>>>> feat: implement comprehensive DevOps infrastructure and workflow automation
     echo
     echo "7. 👥 Request reviews"
     echo "   • At least 1 reviewer required (as per branch protection)"
@@ -348,6 +389,7 @@ main() {
         echo
     done
 
+<<<<<<< HEAD
     # Optional: Get ticket number
     echo
     read -p "Enter ticket/issue number (optional): " ticket_number
@@ -357,6 +399,10 @@ main() {
     if [[ -n "$ticket_number" ]]; then
         print_info "Ticket number: #$ticket_number"
     fi
+=======
+    echo
+    print_info "Branch name: $branch_name"
+>>>>>>> feat: implement comprehensive DevOps infrastructure and workflow automation
 
     # Confirm with user
     read -p "Proceed with creating this branch? (y/N): " confirm
@@ -370,6 +416,7 @@ main() {
     # Execute the workflow
     update_main_branch
     create_feature_branch "$branch_name"
+<<<<<<< HEAD
 
     # Ask if user wants to create a draft PR
     echo
@@ -381,6 +428,9 @@ main() {
         create_draft_pr "$branch_name" "$ticket_number"
         show_draft_pr_reminder "$branch_name"
     fi
+=======
+    show_pr_process_reminder "$branch_name"
+>>>>>>> feat: implement comprehensive DevOps infrastructure and workflow automation
 }
 
 # Run main function

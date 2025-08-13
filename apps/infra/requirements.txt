@@ -2,8 +2,8 @@
 terraform-compliance==1.3.40
 
 # AWS SDK
-boto3==1.34.0
-botocore==1.34.0
+boto3==1.40.8
+botocore==1.40.8
 
 # Kubernetes
 kubernetes==28.1.0

@@ -39,7 +39,7 @@ jobs:
       git-sha: ${{ steps.version.outputs.git-sha }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -158,7 +158,7 @@ jobs:
       url: https://staging.pms.example.com
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download deployment artifacts
         uses: actions/download-artifact@v5
@@ -240,7 +240,7 @@ jobs:
     environment: production
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Get deployment version
         id: deploy-version

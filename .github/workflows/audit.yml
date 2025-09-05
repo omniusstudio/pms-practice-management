@@ -16,12 +16,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Fetch full history for audit
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '18'
 
@@ -110,7 +110,7 @@ jobs:
 
       - name: Create audit report issue
         if: steps.direct-commits.outputs.direct_commits_found == 'true' || steps.staging-branches.outputs.staging_branches_found == 'true' || steps.skipped-tests.outputs.skipped_tests_found == 'true' || steps.ci-skips.outputs.ci_skips_found == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const date = new Date().toISOString().split('T')[0];

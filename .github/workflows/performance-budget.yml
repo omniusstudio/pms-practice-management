@@ -52,19 +52,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Need full history for baseline comparison
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: 'tests/performance/package-lock.json'
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -234,7 +234,7 @@ jobs:
           echo "summary_file=performance-summary.md" >> $GITHUB_OUTPUT
 
       - name: Upload performance results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: performance-results-${{ matrix.test-scenario }}-${{ github.sha }} # safe in with: context
           path: |
@@ -246,7 +246,7 @@ jobs:
 
       - name: Comment on PR with results
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');
@@ -308,10 +308,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download performance results
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: performance-results-baseline-${{ github.sha }}
           path: tests/performance/
@@ -349,10 +349,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download all performance results
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: performance-results-*-${{ github.sha }}
           path: performance-artifacts/
@@ -381,7 +381,7 @@ jobs:
           echo "✅ Consolidated report generated"
 
       - name: Upload consolidated report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: performance-consolidated-report-${{ github.sha }}
           path: consolidated-report/

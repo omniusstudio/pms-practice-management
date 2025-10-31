@@ -39,7 +39,7 @@ jobs:
       git-sha: ${{ steps.version.outputs.git-sha }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -77,12 +77,12 @@ jobs:
           echo "git-sha=${GIT_SHA}" >> $GITHUB_OUTPUT
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -137,7 +137,7 @@ jobs:
           docker save pms-frontend:${{ steps.version.outputs.version }} | gzip > frontend-image.tar.gz
 
       - name: Upload deployment artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: deployment-artifacts-${{ steps.version.outputs.version }}
           path: |
@@ -158,10 +158,10 @@ jobs:
       url: https://staging.pms.example.com
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download deployment artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: deployment-artifacts-${{ needs.build.outputs.version }}
 
@@ -240,7 +240,7 @@ jobs:
     environment: production
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Get deployment version
         id: deploy-version
@@ -257,7 +257,7 @@ jobs:
 
       - name: Download deployment artifacts
         if: ${{ !inputs.rollback }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: deployment-artifacts-${{ needs.build.outputs.version }}
 
